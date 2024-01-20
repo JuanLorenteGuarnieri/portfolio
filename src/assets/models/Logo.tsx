@@ -39,4 +39,4 @@ export const Logo = forwardRef<Group, LogoProps>((props, ref) => {
   )
 });
 
-useGLTF.preload('./logo.glb')
+useGLTF.preload('src/assets/models/logo.glb')

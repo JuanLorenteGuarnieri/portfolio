@@ -56,4 +56,4 @@ export const LogoGema = forwardRef<Group, LogoProps>((props, ref) => {
   )
 });
 
-useGLTF.preload('./logoGema.glb')
+useGLTF.preload('src/assets/models/logoGema.glb')
