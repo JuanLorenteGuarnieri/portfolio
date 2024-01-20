@@ -29,7 +29,7 @@ type LogoProps = JSX.IntrinsicElements['group'] & {
 export const LogoGema = forwardRef<Group, LogoProps>((props, ref) => {
   const { nodes, materials } = useGLTF('src/assets/models/logoGema.glb') as GLTFResult
   const position: [number, number, number] = [2, 0.2, -1];
-  const rotation: [number, number, number] = [-Math.PI / 4, -Math.PI / 12, 0];
+  const rotation: [number, number, number] = [-Math.PI / 3, -Math.PI / 12, 0];
   const scale = 0.6;
 
   const loader = new THREE.CubeTextureLoader();

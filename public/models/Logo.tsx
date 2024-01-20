@@ -29,10 +29,10 @@ type LogoProps = JSX.IntrinsicElements['group'] & {
 export const Logo = forwardRef<Group, LogoProps>((props, ref) => {
   const { nodes, materials } = useGLTF('src/assets/models/logo.glb') as GLTFResult
   const position: [number, number, number] = [2, 0.2, -1];
-  const rotation: [number, number, number] = [-Math.PI / 4, -Math.PI / 12, 0];
+  const rotation: [number, number, number] = [-Math.PI / 3, -Math.PI / 12, 0];
   const scale = 0.6;
   return (
-    <group ref={ref} {...props} scale={scale} rotation={rotation} position={position} dispose={null}>
+    <group ref={ref} {...props} scale={[scale, scale, scale / 2]} rotation={rotation} position={position} dispose={null}>
       <mesh geometry={nodes.LogoDrch.geometry} material={materials.M_Logo} position={[-0.456, 2.864, -1.059]} rotation={[Math.PI / 2, 0, 0]} scale={[1.038, 0.6, 1.475]} />
       <mesh geometry={nodes.LogoIzq.geometry} material={materials.M_Logo} position={[0.49, 2.864, -1.059]} rotation={[-Math.PI / 2, 0, 0]} scale={[-1.038, -0.6, -1.475]} />
     </group>

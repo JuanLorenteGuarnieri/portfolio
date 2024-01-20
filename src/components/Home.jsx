@@ -6,8 +6,8 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Plane, Box, MeshReflectorMaterial, SoftShadows, ScrollControls, useScroll, Text3D, SpotLight, Float, } from '@react-three/drei';
 import CameraController from './CameraController';
 import SpotLightAberration from './SpotLightAberration';
-import { Logo } from '../assets/models/Logo';
-import { LogoGema } from '../assets/models/LogoGema';
+import { Logo } from '../../public/models/Logo';
+import { LogoGema } from '../../public/models/LogoGema';
 
 
 const Planee = () => {
@@ -99,7 +99,9 @@ const Home = () => {
         <CameraController scrollValue={scrollValue} cameraRef={cameraRef} />
         <pointLight ref={lightRef} intensity={1} position={[0, 2, 0]}
           color={[1, 1, 1]} />
-        <pointLight intensity={3} position={[2.2, 0.4, -2]}
+        <pointLight intensity={2} position={[2.2, 1, -2]}
+          color={[0.3, 0.3, 2]} />
+        <pointLight intensity={3} position={[1.7, 1.2, -1.2]}
           color={[0.3, 0.3, 2]} />
         <ScrollControls eps={0.00001} pages={3} distance={4} maxSpeed={3} >
           <ScrollContent setPercen={setScrollValue} />
