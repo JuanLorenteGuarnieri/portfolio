@@ -1,11 +1,13 @@
 import React, { useRef, useState, useEffect } from 'react';
+import font from '../assets/fonts/BungeeSpice.json';
 import * as THREE from 'three'
 import { Vector3 } from 'three';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Plane, Box, MeshReflectorMaterial, SoftShadows, ScrollControls, useScroll, Text3D, } from '@react-three/drei';
+import { Plane, Box, MeshReflectorMaterial, SoftShadows, ScrollControls, useScroll, Text3D, SpotLight, Float, } from '@react-three/drei';
 import CameraController from './CameraController';
 import SpotLightAberration from './SpotLightAberration';
-import SpotLightAberration2 from './SpotLightAberration2';
+import { Logo } from '../assets/models/Logo';
+import { LogoGema } from '../assets/models/LogoGema';
 
 
 const Planee = () => {
@@ -53,8 +55,10 @@ const Home = () => {
   const box1Ref = useRef();
   const box2Ref = useRef();
   const [targetPos, setTargetPos] = useState(0);
-
   const [scrollValue, setScrollValue] = useState(0);
+
+  const targetNameRef = useRef();
+  const spotNameRef = useRef();
 
 
   const onMouseMove = (event) => {
@@ -77,8 +81,10 @@ const Home = () => {
 
   useEffect(() => {
     // Agregar el evento listener
+    if (spotNameRef.current) {
+      spotNameRef.current.target = targetNameRef.current;
+    }
     window.addEventListener('mousemove', onMouseMove);
-
 
     // Limpiar el evento listener
     return () => {
@@ -93,30 +99,52 @@ const Home = () => {
         <CameraController scrollValue={scrollValue} cameraRef={cameraRef} />
         <pointLight ref={lightRef} intensity={1} position={[0, 2, 0]}
           color={[1, 1, 1]} />
-        <pointLight intensity={4} position={[0, 2, 0]}
+        <pointLight intensity={3} position={[2.2, 0.4, -2]}
           color={[0.3, 0.3, 2]} />
         <ScrollControls eps={0.00001} pages={3} distance={4} maxSpeed={3} >
           <ScrollContent setPercen={setScrollValue} />
         </ScrollControls>
+        <Logo />
+        <Float
+          speed={6} // Animation speed, defaults to 1
+          rotationIntensity={0.1} // XYZ rotation intensity, defaults to 1
+          floatIntensity={0.5} // Up/down float intensity, works like a multiplier with floatingRange,defaults to 1
+          floatingRange={[-0.1, 0.0]} // Range of y-axis values the object will float within, defaults to [-0.1,0.1]
+        >
+          <LogoGema />
+        </Float>
 
-        {/*
-        * Creates a new SpotLight.
-        * @param color Hexadecimal color of the light. Default `0xffffff` _(white)_.
-        * @param intensity Numeric value of the light's strength/intensity. Expects a `Float`. Default `1`.
-        * @param distance Maximum range of the light. Default is 0 (no limit). Expects a `Float`.
-        * @param angle Maximum angle of light dispersion from its direction whose upper bound is Math.PI/2.
-        * @param penumbra Percent of the {@link SpotLight} cone that is attenuated due to penumbra. Takes values between zero and 1. Expects a `Float`. Default `0`.
-        * @param decay The amount the light dims along the distance of the light. Expects a `Float`. Default `2`.
-        */}
-        {/* <SpotLightAberration position={[-15, 8, -10]} target={targetPos} intensity={88} maxDistance={30} scaleAberration={1} cameraRef={cameraRef} />
-        <SpotLightAberration position={[15, 8, 5]} target={targetPos} intensity={88} maxDistance={30} scaleAberration={1} cameraRef={cameraRef} />
-        <SpotLightAberration position={[-15, 8, 20]} target={targetPos} intensity={88} maxDistance={30} scaleAberration={1} cameraRef={cameraRef} />
-        <SpotLightAberration position={[15, 8, 35]} target={targetPos} intensity={88} maxDistance={30} scaleAberration={1} cameraRef={cameraRef} /> */}
+        <SpotLightAberration target={targetPos} intensity={55} scaleAngle={0.8} scaleAberration={0.5} cameraRef={cameraRef} />
 
-        <SpotLightAberration2 position={[0, 8, -10]} target={targetPos} intensity={55} maxDistance={30} scaleAngle={0.4} scaleAberration={2} cameraRef={cameraRef} />
+        <mesh ref={targetNameRef} position={[-6, 0, -2.6]} />
+        <SpotLight position={[-9, 2, -2.6]}
+          ref={spotNameRef}
+          target={targetNameRef.current}
+          distance={25}
+          angle={0.5}
+          intensity={9}
+          attenuation={2}
+          anglePower={5} // Diffuse-cone anglePower (default: 5)
+        />
 
-        {/* <OrbitControls /> */}
-        <SoftShadows samples={444} size={555} focus={3} />
+        <mesh rotation={[-Math.PI / 2, 0, 0]}>
+          <Text3D position={[-6, 3, 0]}
+            font={font}
+            height={0.1}
+            size={0.8}>
+            {"Juan\nLorente"}
+            <meshPhongMaterial emissive={[0, 0, 0.1]}
+              emissiveIntensity={0.01} color={[0.2, 0.2, 1]} />
+          </Text3D>
+        </mesh>
+
+        <Box ref={box1Ref} args={[1, 1, 1]} position={[0, 0.5, 5]}>
+          <meshStandardMaterial attach="material" color="red" />
+        </Box>
+        <Box ref={box2Ref} args={[1, 1, 1]} position={[1, 0.5, 6]}>
+          <meshStandardMaterial attach="material" color="red" />
+        </Box>
+
         <Plane args={[25, 100]} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 35]}>
           <meshPhongMaterial reflectivity={55}
             refractionRatio={2}
@@ -134,32 +162,10 @@ const Home = () => {
             depthToBlurRatioBias={0.5} // Adds a bias factor to the depthTexture before calculating the blur amount [blurFactor = blurTexture * (depthTexture + bias)]. It accepts values between 0 and 1, default is 0.25. An amount > 0 of bias makes sure that the blurTexture is not too sharp because of the multiplication with the depthTexture
             distortion={0} // Amount of distortion based on the distortionMap texture
             distortionMap={null} // The red channel of this texture is used as the distortion map. Default is null
-            debug={0} /* Depending on the assigned value, one of the following channels is shown:
-                      0 = no debug
-                      1 = depth channel
-                      2 = base channel
-                      3 = distortion channel
-                      4 = lod channel (based on the roughness)
-                    
+            debug={0} /* Depending on the assigned value, one of the following channels is shown: 0 = no debug 1 = depth channel 2 = base channel 3 = distortion channel 4 = lod channel (based on the roughness)
             reflectorOffset={0} // Offsets the virtual camera that projects the reflection. Useful when the reflective surface is some distance from the object's origin (default = 0)
           /> */}
         </Plane>
-        <mesh rotation={[-Math.PI / 2, 0, 0]}>
-          <Text3D position={[-5, 0, 0]}
-            font={"src/assets/fonts/BungeeSpice.json"}>
-            ???????????
-            <meshLambertMaterial />
-          </Text3D>
-        </mesh>
-
-        <Box ref={box1Ref} args={[1, 1, 1]} position={[0, 0.5, 0]}>
-          <meshStandardMaterial attach="material" color="red" />
-        </Box>
-        <Box ref={box2Ref} args={[1, 1, 1]} position={[1, 0.5, 1]}>
-          <meshStandardMaterial attach="material" color="red" />
-        </Box>
-
-
       </Canvas>
     </section >
   );
