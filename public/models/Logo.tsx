@@ -27,7 +27,7 @@ type LogoProps = JSX.IntrinsicElements['group'] & {
 };
 
 export const Logo = forwardRef<Group, LogoProps>((props, ref) => {
-  const { nodes, materials } = useGLTF('src/assets/models/logo.glb') as GLTFResult
+  const { nodes, materials } = useGLTF('public/models/logo.glb') as GLTFResult
   const position: [number, number, number] = [2, 0.2, -1];
   const rotation: [number, number, number] = [-Math.PI / 3, -Math.PI / 12, 0];
   const scale = 0.6;
@@ -39,4 +39,4 @@ export const Logo = forwardRef<Group, LogoProps>((props, ref) => {
   )
 });
 
-useGLTF.preload('src/assets/models/logo.glb')
+useGLTF.preload('public/models/logo.glb')
