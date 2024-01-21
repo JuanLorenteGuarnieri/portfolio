@@ -4,6 +4,7 @@ import font2 from '../assets/fonts/Audiowide.json';
 import fontUbuntuBold from '../assets/fonts/Ubuntu/Ubuntu_Bold.json';
 import fontUbuntuMedium from '../assets/fonts/Ubuntu/Ubuntu_Medium_Regular.json';
 import fontUbuntuMediumItalic from '../assets/fonts/Ubuntu/Ubuntu_Medium_Italic.json';
+import fontEmoji from '../assets/fonts/Noto_Color_Emoji/Noto_Color_Emoji.json';
 import * as THREE from 'three';
 import { Canvas, extend, useFrame, useThree } from '@react-three/fiber';
 import { Plane, Box, ScrollControls, useScroll, Text3D, SpotLight, Float, ContactShadows, Shadow, Svg, Gltf, } from '@react-three/drei';
@@ -15,6 +16,7 @@ import Raycaster from './Raycaster';
 import { Linkedin } from '../../public/models/Linkedin';
 import { Github } from '../../public/models/Github';
 import { CV } from '../../public/models/Cv';
+import TextAdvance from './TextAdvance';
 
 const Planee = () => {
   return (
@@ -59,14 +61,12 @@ function ScrollContent2({ setPercen }) {
 const Home = () => {
   const lightRef = useRef();
   const cameraRef = React.useRef();
-  const box1Ref = useRef();
-  const box2Ref = useRef();
-  const planoRef = useRef();
   const linkedinRef = useRef();
   const githubRef = useRef();
   const cvRef = useRef();
 
-  linkedinRef
+  const [dpr, setDpr] = useState([1, 2]); // Valores mínimos y máximos de dpr
+  const [resolution, setResolution] = useState(1.2); // Valores mínimos y máximos de dpr
 
   const [targetPos, setTargetPos] = useState(0);
   const [cameraPos, setCameraPos] = useState(0);
@@ -87,6 +87,7 @@ const Home = () => {
   const mouse = new THREE.Vector2();
 
   function onMouseClick(event) {
+    console.log(window.innerWidth);
     // Calcula la posición del mouse en coordenadas normalizadas (-1 a +1) para ambos ejes
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -113,11 +114,18 @@ const Home = () => {
 
     // Comprueba si hay intersecciones
     if (intersectsCV.length > 0) {
-      window.open('https://github.com/JuanLorenteGuarnieri/portfolio/CV.pdf', '_blank');
+      window.open('https://juanlorenteguarnieri.github.io/portfolio/CV.pdf', '_blank');
       return;
     }
 
   }
+
+  useEffect(() => {
+    // Ajusta el dpr basado en el ancho de la ventana, pero con límites
+    const width = window.innerWidth;
+    const newDpr = resolution * Math.min(Math.max(width / 1600, 0.5), 1); // Límites entre 1 y 2
+    setDpr([newDpr, newDpr]);
+  }, []);
 
 
   useEffect(() => {
@@ -140,7 +148,7 @@ const Home = () => {
   return (
 
     <section className="w-full h-screen">
-      <Canvas dpr={1} shadows={true} className="w-full h-screen bg-black" camera={({ far: 40, setFocalLength: 555, zoom: (window.innerWidth / window.innerHeight) / 1.6 })}>
+      <Canvas dpr={dpr} shadows={true} className="w-full h-screen bg-black" camera={({ far: 40, setFocalLength: 555, zoom: (window.innerWidth / window.innerHeight) / 1.6 })}>
         <SpotLightAberration position={scrollValue} target={targetPos} intensity={55} scaleAngle={0.6} scaleAberration={0.3} cameraRef={cameraRef} />
         <Raycaster externalCamera={cameraRef} onIntersect={handleIntersection} />
         <CameraController scrollValue={scrollValue} cameraRef={cameraRef} />
@@ -166,6 +174,7 @@ const Home = () => {
             </Float>
           </mesh>
         </mesh>
+        <ambientLight intensity={0.5} />
 
         <mesh ref={targetNameRef} position={[-5, 0, -2.8]} />
         <SpotLight position={[-9, 3, -2.8]}
@@ -178,44 +187,27 @@ const Home = () => {
           attenuation={2}
           anglePower={5} // Diffuse-cone anglePower (default: 5)
         />
-
-        <mesh receiveShadow={true} castShadow={true} rotation={[-Math.PI / 2, 0, 0]}>
-          <Text3D position={[-5, 3, 0]}
-            font={font2}
-            bevelEnabled={true}
-            bevelSize={0.05}
-            bevelSegments={1}
-            bevelThickness={0.025}
-            height={0.175}
-            size={0.8}>
-            {"Juan\nLorente"}
-            <meshStandardMaterial attach="material" color={[0.15, 0.15, 1]} />
-          </Text3D>
-          <Text3D position={[-5, 3, 0]}
-            font={font2}
-            height={0.2}
-            size={0.8}>
-            {"Juan\nLorente"}
-            <meshStandardMaterial attach="material" color={[1, 1, 1]} />
-          </Text3D>
-        </mesh>
-        <mesh position={[-2, 0.3, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <TextAdvance position={[-5, 0, -3]}
+          text={"Juan\nLorente"}
+          font={font2} size={0.8} height={0.2}
+          colorPri={"white"} colorSec={new THREE.Color(0x223060)}
+        />
+        <TextAdvance position={[-5, 0, 3]}
+          text={"I'm a 21-year-old programmer from Spain, passionate about \ncomputer graphics 🌐 and video game 👾 development. \n\nI'm in my final year of Computer Engineering 🎓 and always on \nthe lookout for projects that challenge my creativity and \ntechnical skills. I am fascinated by the idea of combining art 🎨 and \ntechnology 💻 to create immersive and exciting gaming experiences."}
+          font={fontUbuntuMedium} size={0.2} height={0.05}
+          colorPri={"white"} colorSec={new THREE.Color(0x223060)}
+        />
+        <mesh position={[-2, 0.1, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <Linkedin ref={linkedinRef} />
           <Github ref={githubRef} />
           <CV ref={cvRef} />
         </mesh>
 
-        <Box ref={box1Ref} args={[1, 1, 1]} position={[0, 0.5, 5]}>
-          <meshStandardMaterial attach="material" color="red" />
-        </Box>
-        <Box ref={box2Ref} args={[1, 1, 1]} position={[1, 0.5, 6]}>
-          <meshStandardMaterial attach="material" color="red" />
-        </Box>
         {/* <Planee ref={planoRef}></Planee> */}
 
         <mesh receiveShadow={true} castShadow={true}>
           <Plane args={[100, 200]} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 35]}>
-            <meshStandardMaterial attach="material"
+            <meshStandardMaterial attach="material" color={new THREE.Color(0x444444)}
             />
             {/* <MeshReflectorMaterial
               blur={[0, 0]} // Blur ground reflections (width, height), 0 skips blur
