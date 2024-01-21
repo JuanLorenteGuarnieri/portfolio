@@ -16,7 +16,9 @@ type GLTFResult = GLTF & {
   nodes: {
     LogoCentro: THREE.Mesh
   }
-  materials: {}
+  materials: {
+    M_Logo: THREE.MeshStandardMaterial
+  }
 }
 
 type ContextType = Record<string, React.ForwardRefExoticComponent<JSX.IntrinsicElements['mesh']>>
@@ -47,10 +49,7 @@ export const LogoGema = forwardRef<Group, LogoProps>((props, ref) => {
 
   return (
     <group ref={ref} {...props} rotation={rotation} scale={scale} position={position} dispose={null}>
-      <mesh geometry={nodes.LogoCentro.geometry} position={[0.49, 2.864, -1.438]} rotation={[-Math.PI / 2, 0, 0]} scale={[-1.038, -0.6, -1.475]} >
-        <meshPhongMaterial emissive={[0, 0, 0.1]}
-          emissiveIntensity={5} color={[0.5, 0.5, 1]} />
-
+      <mesh geometry={nodes.LogoCentro.geometry} material={materials.M_Logo} position={[0.49, 2.864, -1.438]} rotation={[-Math.PI / 2, 0, 0]} scale={[-1.038, -0.6, -1.475]} >
       </mesh>
     </group>
   )
