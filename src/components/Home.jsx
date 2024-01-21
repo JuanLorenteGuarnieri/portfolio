@@ -1,14 +1,20 @@
 import React, { useRef, useState, useEffect } from 'react';
 import font from '../assets/fonts/BungeeSpice.json';
-import * as THREE from 'three'
-import { Vector3 } from 'three';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Plane, Box, MeshReflectorMaterial, SoftShadows, ScrollControls, useScroll, Text3D, SpotLight, Float, } from '@react-three/drei';
+import font2 from '../assets/fonts/Audiowide.json';
+import fontUbuntuBold from '../assets/fonts/Ubuntu/Ubuntu_Bold.json';
+import fontUbuntuMedium from '../assets/fonts/Ubuntu/Ubuntu_Medium_Regular.json';
+import fontUbuntuMediumItalic from '../assets/fonts/Ubuntu/Ubuntu_Medium_Italic.json';
+import * as THREE from 'three';
+import { Canvas, extend, useFrame, useThree } from '@react-three/fiber';
+import { Plane, Box, ScrollControls, useScroll, Text3D, SpotLight, Float, ContactShadows, Shadow, Svg, Gltf, } from '@react-three/drei';
 import CameraController from './CameraController';
 import SpotLightAberration from './SpotLightAberration';
 import { Logo } from '../../public/models/Logo';
 import { LogoGema } from '../../public/models/LogoGema';
-
+import Raycaster from './Raycaster';
+import { Linkedin } from '../../public/models/Linkedin';
+import { Github } from '../../public/models/Github';
+import { CV } from '../../public/models/Cv';
 
 const Planee = () => {
   return (
@@ -48,45 +54,7 @@ function ScrollContent2({ setPercen }) {
 
 }
 
-const Raycaster = ({ externalCamera, onIntersect }) => {
-  const raycaster = new THREE.Raycaster();
-  const mouse = new THREE.Vector2();
 
-  const calculateIntersect = (x, y) => {
-    mouse.x = (x / window.innerWidth) * 2 - 1;
-    mouse.y = -(y / window.innerHeight) * 2 + 1;
-    raycaster.setFromCamera(mouse, externalCamera.current);
-
-    const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
-    const intersectPoint = new THREE.Vector3();
-
-    if (raycaster.ray.intersectPlane(plane, intersectPoint)) {
-      if (onIntersect) {
-        onIntersect(intersectPoint);
-      }
-    }
-  };
-
-  const onMouseMove = (event) => {
-    calculateIntersect(event.clientX, event.clientY);
-  };
-
-  const onTouchMove = (event) => {
-    event.preventDefault();
-    const touch = event.touches[0];
-    calculateIntersect(touch.clientX, touch.clientY);
-  };
-
-  useEffect(() => {
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('touchmove', onTouchMove);
-
-    return () => {
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('touchmove', onTouchMove);
-    };
-  }, []);
-};
 
 const Home = () => {
   const lightRef = useRef();
@@ -94,6 +62,11 @@ const Home = () => {
   const box1Ref = useRef();
   const box2Ref = useRef();
   const planoRef = useRef();
+  const linkedinRef = useRef();
+  const githubRef = useRef();
+  const cvRef = useRef();
+
+  linkedinRef
 
   const [targetPos, setTargetPos] = useState(0);
   const [cameraPos, setCameraPos] = useState(0);
@@ -109,72 +82,127 @@ const Home = () => {
   };
 
 
+  // Configura el raycaster
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+
+  function onMouseClick(event) {
+    // Calcula la posición del mouse en coordenadas normalizadas (-1 a +1) para ambos ejes
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    // Actualiza el rayo con la posición del mouse y la cámara
+    raycaster.setFromCamera(mouse, cameraRef.current);
+
+    // Realiza la intersección
+    const intersectsGithub = raycaster.intersectObject(githubRef.current);
+
+    // Comprueba si hay intersecciones
+    if (intersectsGithub.length > 0) {
+      window.open('https://github.com/JuanLorenteGuarnieri', '_blank');
+      return;
+    }
+
+    const intersectsLinkedin = raycaster.intersectObject(linkedinRef.current);
+    // Comprueba si hay intersecciones
+    if (intersectsLinkedin.length > 0) {
+      window.open('https://www.linkedin.com/in/juanlorenteguarnieri/', '_blank');
+      return;
+    }
+    const intersectsCV = raycaster.intersectObject(cvRef.current);
+
+    // Comprueba si hay intersecciones
+    if (intersectsCV.length > 0) {
+      window.open('https://github.com/JuanLorenteGuarnieri/portfolio/CV.pdf', '_blank');
+      return;
+    }
+
+  }
+
+
   useEffect(() => {
-    // Agregar el evento listener
     if (spotNameRef.current) {
       spotNameRef.current.target = targetNameRef.current;
     }
-  }, []);
-
-  useEffect(() => {
     if (targetNameRef.current) {
       // Establecer el target del SpotLight una vez que las referencias estén listas
       spotNameRef.current.target = targetNameRef.current;
       // Es necesario actualizar la matriz del target para aplicar el cambio
       targetNameRef.current.updateMatrixWorld();
     }
+    window.addEventListener('click', onMouseClick, false);
+
+    return () => {
+      window.removeEventListener('click', onMouseClick, false);
+    };
   }, []);
+
   return (
 
     <section className="w-full h-screen">
-      <Canvas shadows={true} className="w-full h-screen bg-black" camera={({ far: 40, zoom: (window.innerWidth / window.innerHeight) / 1.6 })}>
-
-        <SpotLightAberration position={scrollValue} target={targetPos} intensity={55} scaleAngle={0.8} scaleAberration={0.2} cameraRef={cameraRef} />
+      <Canvas dpr={1} shadows={true} className="w-full h-screen bg-black" camera={({ far: 40, setFocalLength: 555, zoom: (window.innerWidth / window.innerHeight) / 1.6 })}>
+        <SpotLightAberration position={scrollValue} target={targetPos} intensity={55} scaleAngle={0.6} scaleAberration={0.3} cameraRef={cameraRef} />
         <Raycaster externalCamera={cameraRef} onIntersect={handleIntersection} />
         <CameraController scrollValue={scrollValue} cameraRef={cameraRef} />
         <pointLight ref={lightRef} castShadow={true} intensity={5} position={[targetPos[0], 2, targetPos[2]]}
           color={[1, 1, 1]} />
-        <pointLight intensity={22} position={[2.2, 1, -2]}
-          color={new THREE.Color(0x223060)} />
-        <pointLight intensity={55} position={[1.8, 1.5, -1.2]}
-          color={new THREE.Color(0x223060)} />
         <ScrollControls eps={0.00001} pages={3} distance={4} maxSpeed={5} >
           <ScrollContent setPercen={setScrollValue} />
         </ScrollControls>
-        <Logo />
-        <Float
-          speed={6} // Animation speed, defaults to 1
-          rotationIntensity={0.1} // XYZ rotation intensity, defaults to 1
-          floatIntensity={0.5} // Up/down float intensity, works like a multiplier with floatingRange,defaults to 1
-          floatingRange={[-0.1, 0.0]} // Range of y-axis values the object will float within, defaults to [-0.1,0.1]
-        >
-          <LogoGema />
-        </Float>
+        <mesh className="LOGO" position={[1, 0, 0]}>
+          <pointLight intensity={22} position={[2.2, 1, -2]}
+            color={new THREE.Color(0x223060)} />
+          <pointLight intensity={55} position={[1.8, 1.5, -1.2]}
+            color={new THREE.Color(0x223060)} />
+          <mesh position={[2, 0.2, -1]} scale={0.6} rotation={[-Math.PI / 3, -Math.PI / 14, 0]}>
+            <Logo scale={[1, 1, 0.5]} />
+            <Float
+              speed={6} // Animation speed, defaults to 1
+              rotationIntensity={0.2} // XYZ rotation intensity, defaults to 1
+              floatIntensity={0.5} // Up/down float intensity, works like a multiplier with floatingRange,defaults to 1
+              floatingRange={[-0.1, 0.0]} // Range of y-axis values the object will float within, defaults to [-0.1,0.1]
+            >
+              <LogoGema />
+            </Float>
+          </mesh>
+        </mesh>
 
-
-        <mesh ref={targetNameRef} position={[-6, 0, -2.6]} />
-
-        <SpotLight position={[-9, 2, -2.6]}
+        <mesh ref={targetNameRef} position={[-5, 0, -2.8]} />
+        <SpotLight position={[-9, 3, -2.8]}
           castShadow={true}
           ref={spotNameRef}
           target={targetNameRef.current}
           distance={25}
           angle={0.5}
-          intensity={12}
+          intensity={25}
           attenuation={2}
           anglePower={5} // Diffuse-cone anglePower (default: 5)
         />
 
-
         <mesh receiveShadow={true} castShadow={true} rotation={[-Math.PI / 2, 0, 0]}>
-          <Text3D position={[-6, 3, 0]}
-            font={font}
-            height={0.1}
+          <Text3D position={[-5, 3, 0]}
+            font={font2}
+            bevelEnabled={true}
+            bevelSize={0.05}
+            bevelSegments={1}
+            bevelThickness={0.025}
+            height={0.175}
             size={0.8}>
             {"Juan\nLorente"}
-            <meshStandardMaterial attach="material" emissive={[0, 0, 0.1]}
-              emissiveIntensity={0.01} color={[0.2, 0.2, 1]} />
+            <meshStandardMaterial attach="material" color={[0.15, 0.15, 1]} />
           </Text3D>
+          <Text3D position={[-5, 3, 0]}
+            font={font2}
+            height={0.2}
+            size={0.8}>
+            {"Juan\nLorente"}
+            <meshStandardMaterial attach="material" color={[1, 1, 1]} />
+          </Text3D>
+        </mesh>
+        <mesh position={[-2, 0.3, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <Linkedin ref={linkedinRef} />
+          <Github ref={githubRef} />
+          <CV ref={cvRef} />
         </mesh>
 
         <Box ref={box1Ref} args={[1, 1, 1]} position={[0, 0.5, 5]}>
