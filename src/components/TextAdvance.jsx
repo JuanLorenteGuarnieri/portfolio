@@ -8,10 +8,10 @@ const TextAdvance = ({ text, position, font, size, height, colorPri, colorSec })
         <Text3D position={position} rotation={[-Math.PI / 2, 0, 0]}
           font={font}
           bevelEnabled={true}
-          bevelSize={size / 16}
+          bevelSize={0.0001}
           bevelSegments={1}
           bevelThickness={height * 0.25}
-          height={height * 0.75}
+          height={height * 0.7}
           size={size}>
           {text}
           <meshStandardMaterial attach="material" color={colorSec} />

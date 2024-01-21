@@ -2,12 +2,14 @@ import React, { useRef, useState, useEffect } from 'react';
 import font from '../assets/fonts/BungeeSpice.json';
 import font2 from '../assets/fonts/Audiowide.json';
 import fontUbuntuBold from '../assets/fonts/Ubuntu/Ubuntu_Bold.json';
+import fontTitle from '../assets/fonts/Encode_Sans_Semi_Expanded/Encode_Sans_Semi_Expanded_Bold.json';
+import fontText from '../assets/fonts/Source_Code_Pro/static/Source_Code_Pro_Regular.json';
 import fontUbuntuMedium from '../assets/fonts/Ubuntu/Ubuntu_Medium_Regular.json';
 import fontUbuntuMediumItalic from '../assets/fonts/Ubuntu/Ubuntu_Medium_Italic.json';
 import fontEmoji from '../assets/fonts/Noto_Color_Emoji/Noto_Color_Emoji.json';
 import * as THREE from 'three';
 import { Canvas, extend, useFrame, useThree } from '@react-three/fiber';
-import { Plane, Box, ScrollControls, useScroll, Text3D, SpotLight, Float, ContactShadows, Shadow, Svg, Gltf, } from '@react-three/drei';
+import { Plane, Box, ScrollControls, useScroll, Text3D, SpotLight, Float, ContactShadows, Shadow, Svg, Gltf, useTexture, } from '@react-three/drei';
 import CameraController from './CameraController';
 import SpotLightAberration from './SpotLightAberration';
 import { Logo } from '../../public/models/Logo';
@@ -17,6 +19,8 @@ import { Linkedin } from '../../public/models/Linkedin';
 import { Github } from '../../public/models/Github';
 import { CV } from '../../public/models/Cv';
 import TextAdvance from './TextAdvance';
+
+import perfil from '../../public/perfil.png'
 
 const Planee = () => {
   return (
@@ -56,7 +60,17 @@ function ScrollContent2({ setPercen }) {
 
 }
 
+const CircularImage = ({ imageSrc, position, scale }) => {
+  const texture = useTexture(imageSrc);
 
+  return (
+    <mesh rotation={[-Math.PI / 2, 0, 0]}
+      position={position} scale={scale}>
+      <circleGeometry args={[1, 32]} />
+      <meshBasicMaterial map={texture} />
+    </mesh>
+  );
+};
 
 const Home = () => {
   const lightRef = useRef();
@@ -71,13 +85,8 @@ const Home = () => {
   const [resolution, setResolution] = useState(1.2); // Valores mínimos y máximos de dpr
 
   const [targetPos, setTargetPos] = useState(0);
-  const [cameraPos, setCameraPos] = useState(0);
-
-
   const [scrollValue, setScrollValue] = useState(0);
 
-  const targetNameRef = useRef();
-  const spotNameRef = useRef();
 
   const handleIntersection = (point) => {
     setTargetPos([point.x, point.y, point.z]);
@@ -131,15 +140,6 @@ const Home = () => {
 
 
   useEffect(() => {
-    if (spotNameRef.current) {
-      spotNameRef.current.target = targetNameRef.current;
-    }
-    if (targetNameRef.current) {
-      // Establecer el target del SpotLight una vez que las referencias estén listas
-      spotNameRef.current.target = targetNameRef.current;
-      // Es necesario actualizar la matriz del target para aplicar el cambio
-      targetNameRef.current.updateMatrixWorld();
-    }
     window.addEventListener('click', onMouseClick, false);
 
     return () => {
@@ -151,56 +151,67 @@ const Home = () => {
 
     <section className="w-full h-screen">
       <Canvas dpr={dpr} shadows={true} className="w-full h-screen bg-black" camera={({ far: 40, setFocalLength: 555, zoom: (window.innerWidth / window.innerHeight) / 1.6 })}>
-        {/* <SpotLightAberration position={scrollValue} target={targetPos} intensity={55} scaleAngle={0.4} scaleAberration={0.4} cameraRef={cameraRef} /> */}
+
         <Raycaster externalCamera={cameraRef} onIntersect={handleIntersection} />
+
         <CameraController scrollValue={scrollValue} cameraRef={cameraRef} />
-        <pointLight ref={lightRef} castShadow={true} intensity={5} position={[targetPos[0], 0.05, targetPos[2]]}
-          color={new THREE.Color(0x223060)} />
-        <pointLight ref={lightRef2} castShadow={true} intensity={22} position={[targetPos[0], 0.6, targetPos[2]]}
-          color={new THREE.Color(0x223060)} />
-        <pointLight ref={lightRef3} castShadow={true} intensity={44} position={[targetPos[0], 2, targetPos[2]]}
-          color={new THREE.Color(0x223060)} />
-        <ScrollControls eps={0.00001} pages={3} distance={4} maxSpeed={5} >
+
+        <ScrollControls eps={0.00001} pages={3} distance={8} maxSpeed={15} >
           <ScrollContent setPercen={setScrollValue} />
         </ScrollControls>
+
+        <ambientLight intensity={0.5} />
+
+        <mesh className="PUNTERO">
+          <pointLight ref={lightRef} castShadow={true} intensity={5} position={[targetPos[0], 0.05, targetPos[2]]}
+            color={new THREE.Color(0x223060)} />
+          <pointLight ref={lightRef2} castShadow={true} intensity={22} position={[targetPos[0], 0.6, targetPos[2]]}
+            color={new THREE.Color(0x223060)} />
+          <pointLight ref={lightRef3} castShadow={true} intensity={44} position={[targetPos[0], 2, targetPos[2]]}
+            color={new THREE.Color(0x223060)} />
+        </mesh>
+
         <mesh className="LOGO" position={[0, 0, 0.5]}>
           <pointLight intensity={200} position={[0, 1, -2.5]}
             color={new THREE.Color(0x223060)} />
-
+          <pointLight intensity={200} position={[0, 1, -3]}
+            color={new THREE.Color(0x223060)} />
           <mesh position={[0, 0.2, -2]} scale={0.65} rotation={[-Math.PI / 3, 0, 0]}>
             <Logo scale={[1, 1., 0.5]} />
             <Float
               speed={6} // Animation speed, defaults to 1
               rotationIntensity={0.3} // XYZ rotation intensity, defaults to 1
-              floatIntensity={0.5} // Up/down float intensity, works like a multiplier with floatingRange,defaults to 1
+              floatIntensity={0.01} // Up/down float intensity, works like a multiplier with floatingRange,defaults to 1
               floatingRange={[-0.2, 0.1]} // Range of y-axis values the object will float within, defaults to [-0.1,0.1]
             >
               <LogoGema />
             </Float>
           </mesh>
         </mesh>
-        <ambientLight intensity={0.5} />
 
-        <mesh ref={targetNameRef} position={[-5, 0, -2.8]} />
-        <TextAdvance position={[-3.5, 0, -0.7]}
+        <TextAdvance position={[-3.05, 0, -0.7]}
           text={"Juan Lorente"}
-          font={font2} size={0.65} height={0.1}
-          colorPri={"white"} colorSec={new THREE.Color(0x223060)}
+          font={fontTitle} size={0.73} height={0.1}
+          colorPri={new THREE.Color(0xdddddd)} colorSec={new THREE.Color(0x333333)}
         />
         <TextAdvance position={[-2.7, 0, -0.2]}
           text={"Computer Ghraphics & Videogames developer"}
-          font={fontUbuntuMedium} size={0.18} height={0.05}
+          font={fontText} size={0.16} height={0.05}
           colorPri={"white"} colorSec={new THREE.Color(0x223060)}
         />
-        <TextAdvance position={[-4, 0, 3]}
-          text={"I'm a 21-year-old programmer from Spain, passionate about \ncomputer graphics 🌐 and video game 👾 development. \n\nI'm in my final year of Computer Engineering 🎓 and always on \nthe lookout for projects that challenge my creativity and \ntechnical skills. I am fascinated by the idea of combining art 🎨 and \ntechnology 💻 to create immersive and exciting gaming experiences."}
-          font={fontUbuntuMedium} size={0.18} height={0.05}
+        <CircularImage receiveShadow={true} castShadow={true}
+          imageSrc={perfil}
+          position={[-3.2, 0.001, 3]} scale={0.8} />
+
+        <TextAdvance position={[-2, 0, 2.8]}
+          text={"I'm a 21-year-old programmer from Spain, \npassionate about computer graphics and \nvideogame development. \n\nI'm in my final year of Computer \nEngineering and always on the lookout for \nprojects that challenge my creativity and \ntechnical skills."}
+          font={fontText} size={0.16} height={0.05}
           colorPri={"white"} colorSec={new THREE.Color(0x223060)}
         />
-        <mesh position={[-0.2, 0.02, 0.3]} scale={0.4} rotation={[-Math.PI / 2, 0, 0]}>
+        <mesh position={[0.37, -0.01, 0.3]} scale={[0.4, 0.4, 2]} rotation={[-Math.PI / 2, 0, 0]}>
           <Linkedin ref={linkedinRef} />
           <Github ref={githubRef} />
-          <CV ref={cvRef} />
+          <CV ref={cvRef} position={[-11.1, -0.85, 0]} scale={[5, 5, 1]} />
         </mesh>
 
         {/* <Planee ref={planoRef}></Planee> */}
