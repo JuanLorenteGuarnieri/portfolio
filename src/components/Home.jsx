@@ -163,12 +163,12 @@ const Home = () => {
         <ScrollControls eps={0.00001} pages={3} distance={4} maxSpeed={5} >
           <ScrollContent setPercen={setScrollValue} />
         </ScrollControls>
-        <mesh className="LOGO" position={[0, 0, 0]}>
-          <pointLight intensity={200} position={[0, 1, -2]}
+        <mesh className="LOGO" position={[0, 0, 0.5]}>
+          <pointLight intensity={200} position={[0, 1, -2.5]}
             color={new THREE.Color(0x223060)} />
 
-          <mesh position={[0, 0.2, -2]} scale={0.6} rotation={[-Math.PI / 3, 0, 0]}>
-            <Logo scale={[1, 1, 0.5]} />
+          <mesh position={[0, 0.2, -2]} scale={0.65} rotation={[-Math.PI / 3, 0, 0]}>
+            <Logo scale={[1, 1., 0.5]} />
             <Float
               speed={6} // Animation speed, defaults to 1
               rotationIntensity={0.3} // XYZ rotation intensity, defaults to 1
@@ -182,12 +182,12 @@ const Home = () => {
         <ambientLight intensity={0.5} />
 
         <mesh ref={targetNameRef} position={[-5, 0, -2.8]} />
-        <TextAdvance position={[-3.5, 0, -1]}
+        <TextAdvance position={[-3.5, 0, -0.7]}
           text={"Juan Lorente"}
           font={font2} size={0.65} height={0.1}
           colorPri={"white"} colorSec={new THREE.Color(0x223060)}
         />
-        <TextAdvance position={[-2.7, 0, -0.3]}
+        <TextAdvance position={[-2.7, 0, -0.2]}
           text={"Computer Ghraphics & Videogames developer"}
           font={fontUbuntuMedium} size={0.18} height={0.05}
           colorPri={"white"} colorSec={new THREE.Color(0x223060)}
@@ -197,7 +197,7 @@ const Home = () => {
           font={fontUbuntuMedium} size={0.18} height={0.05}
           colorPri={"white"} colorSec={new THREE.Color(0x223060)}
         />
-        <mesh position={[-0.2, 0.02, 0.5]} scale={0.4} rotation={[-Math.PI / 2, 0, 0]}>
+        <mesh position={[-0.2, 0.02, 0.3]} scale={0.4} rotation={[-Math.PI / 2, 0, 0]}>
           <Linkedin ref={linkedinRef} />
           <Github ref={githubRef} />
           <CV ref={cvRef} />
