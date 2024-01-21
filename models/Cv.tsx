@@ -34,10 +34,10 @@ export const CV = forwardRef<Group, LogoProps>((props, ref) => {
   const { nodes, materials } = useGLTF('models/cv.glb') as GLTFResult
   return (
     <group ref={ref} {...props} dispose={null}>
-      <mesh geometry={nodes.Curve.geometry} material={materials['Tinta (3)']} position={[1.479, 0.079, 0.021]} rotation={[Math.PI / 2, 0, 0]} scale={9.688} />
+      {/* <mesh geometry={nodes.Curve.geometry} material={materials['Tinta (3)']} position={[1.479, 0.079, 0.021]} rotation={[Math.PI / 2, 0, 0]} scale={9.688} /> */}
       <mesh geometry={nodes.Curve001.geometry} material={materials['Tinta (3)']} position={[1.479, 0.079, 0.021]} rotation={[Math.PI / 2, 0, 0]} scale={9.688} />
       <mesh geometry={nodes.Curve002.geometry} material={materials['Tinta (3)']} position={[1.479, 0.079, 0.021]} rotation={[Math.PI / 2, 0, 0]} scale={9.688} />
-      <mesh geometry={nodes.Objeto_1002.geometry} material={materials['Tinta (1).004']} position={[1.334, 0, 0.025]} rotation={[Math.PI / 2, 0, 0]} scale={[0.01, 0.219, 0.01]} />
+      {/* <mesh geometry={nodes.Objeto_1002.geometry} material={materials['Tinta (1).004']} position={[1.334, 0, 0.025]} rotation={[Math.PI / 2, 0, 0]} scale={[0.01, 0.219, 0.01]} /> */}
     </group>
   )
 });
