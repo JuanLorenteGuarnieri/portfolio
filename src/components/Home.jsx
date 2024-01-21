@@ -60,6 +60,8 @@ function ScrollContent2({ setPercen }) {
 
 const Home = () => {
   const lightRef = useRef();
+  const lightRef2 = useRef();
+  const lightRef3 = useRef();
   const cameraRef = React.useRef();
   const linkedinRef = useRef();
   const githubRef = useRef();
@@ -114,7 +116,7 @@ const Home = () => {
 
     // Comprueba si hay intersecciones
     if (intersectsCV.length > 0) {
-      window.open('https://juanlorenteguarnieri.github.io/portfolio/CV.pdf', '_blank');
+      //window.open('https://juanlorenteguarnieri.github.io/portfolio/CV.pdf', '_blank');
       return;
     }
 
@@ -149,26 +151,29 @@ const Home = () => {
 
     <section className="w-full h-screen">
       <Canvas dpr={dpr} shadows={true} className="w-full h-screen bg-black" camera={({ far: 40, setFocalLength: 555, zoom: (window.innerWidth / window.innerHeight) / 1.6 })}>
-        <SpotLightAberration position={scrollValue} target={targetPos} intensity={55} scaleAngle={0.6} scaleAberration={0.3} cameraRef={cameraRef} />
+        {/* <SpotLightAberration position={scrollValue} target={targetPos} intensity={55} scaleAngle={0.4} scaleAberration={0.4} cameraRef={cameraRef} /> */}
         <Raycaster externalCamera={cameraRef} onIntersect={handleIntersection} />
         <CameraController scrollValue={scrollValue} cameraRef={cameraRef} />
-        <pointLight ref={lightRef} castShadow={true} intensity={5} position={[targetPos[0], 2, targetPos[2]]}
-          color={[1, 1, 1]} />
+        <pointLight ref={lightRef} castShadow={true} intensity={5} position={[targetPos[0], 0.05, targetPos[2]]}
+          color={new THREE.Color(0x223060)} />
+        <pointLight ref={lightRef2} castShadow={true} intensity={22} position={[targetPos[0], 0.6, targetPos[2]]}
+          color={new THREE.Color(0x223060)} />
+        <pointLight ref={lightRef3} castShadow={true} intensity={44} position={[targetPos[0], 2, targetPos[2]]}
+          color={new THREE.Color(0x223060)} />
         <ScrollControls eps={0.00001} pages={3} distance={4} maxSpeed={5} >
           <ScrollContent setPercen={setScrollValue} />
         </ScrollControls>
-        <mesh className="LOGO" position={[1, 0, 0]}>
-          <pointLight intensity={22} position={[2.2, 1, -2]}
+        <mesh className="LOGO" position={[0, 0, 0]}>
+          <pointLight intensity={200} position={[0, 1, -2]}
             color={new THREE.Color(0x223060)} />
-          <pointLight intensity={55} position={[1.8, 1.5, -1.2]}
-            color={new THREE.Color(0x223060)} />
-          <mesh position={[2, 0.2, -1]} scale={0.6} rotation={[-Math.PI / 3, -Math.PI / 14, 0]}>
+
+          <mesh position={[0, 0.2, -2]} scale={0.6} rotation={[-Math.PI / 3, 0, 0]}>
             <Logo scale={[1, 1, 0.5]} />
             <Float
               speed={6} // Animation speed, defaults to 1
-              rotationIntensity={0.2} // XYZ rotation intensity, defaults to 1
+              rotationIntensity={0.3} // XYZ rotation intensity, defaults to 1
               floatIntensity={0.5} // Up/down float intensity, works like a multiplier with floatingRange,defaults to 1
-              floatingRange={[-0.1, 0.0]} // Range of y-axis values the object will float within, defaults to [-0.1,0.1]
+              floatingRange={[-0.2, 0.1]} // Range of y-axis values the object will float within, defaults to [-0.1,0.1]
             >
               <LogoGema />
             </Float>
@@ -177,27 +182,22 @@ const Home = () => {
         <ambientLight intensity={0.5} />
 
         <mesh ref={targetNameRef} position={[-5, 0, -2.8]} />
-        <SpotLight position={[-9, 3, -2.8]}
-          castShadow={true}
-          ref={spotNameRef}
-          target={targetNameRef.current}
-          distance={25}
-          angle={0.5}
-          intensity={25}
-          attenuation={2}
-          anglePower={5} // Diffuse-cone anglePower (default: 5)
-        />
-        <TextAdvance position={[-5, 0, -3]}
-          text={"Juan\nLorente"}
-          font={font2} size={0.8} height={0.2}
+        <TextAdvance position={[-3.5, 0, -1]}
+          text={"Juan Lorente"}
+          font={font2} size={0.65} height={0.1}
           colorPri={"white"} colorSec={new THREE.Color(0x223060)}
         />
-        <TextAdvance position={[-5, 0, 3]}
+        <TextAdvance position={[-2.7, 0, -0.3]}
+          text={"Computer Ghraphics & Videogames developer"}
+          font={fontUbuntuMedium} size={0.18} height={0.05}
+          colorPri={"white"} colorSec={new THREE.Color(0x223060)}
+        />
+        <TextAdvance position={[-4, 0, 3]}
           text={"I'm a 21-year-old programmer from Spain, passionate about \ncomputer graphics 🌐 and video game 👾 development. \n\nI'm in my final year of Computer Engineering 🎓 and always on \nthe lookout for projects that challenge my creativity and \ntechnical skills. I am fascinated by the idea of combining art 🎨 and \ntechnology 💻 to create immersive and exciting gaming experiences."}
-          font={fontUbuntuMedium} size={0.2} height={0.05}
+          font={fontUbuntuMedium} size={0.18} height={0.05}
           colorPri={"white"} colorSec={new THREE.Color(0x223060)}
         />
-        <mesh position={[-2, 0.1, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <mesh position={[-0.2, 0.02, 0.5]} scale={0.4} rotation={[-Math.PI / 2, 0, 0]}>
           <Linkedin ref={linkedinRef} />
           <Github ref={githubRef} />
           <CV ref={cvRef} />

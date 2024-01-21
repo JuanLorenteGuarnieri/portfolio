@@ -52,6 +52,7 @@ const SpotLightAberration = ({ position, target, intensity, scaleAngle, scaleAbe
         color={new THREE.Color(0x00ff00)}
         distance={25}
         angle={0.3 * scaleAngle}
+
         intensity={intensity}
         position={position2}
       />
