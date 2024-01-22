@@ -37,7 +37,7 @@ const CameraController = ({ scrollValue, cameraRef }) => {
     // Actualiza la posición en el eje X basándose en scrollValue
     if (cameraRef.current) {
 
-      cameraRef.current.position.z = scrollValue * 1.5;
+      cameraRef.current.position.z = scrollValue * 100 * 1.5;
     }
   }, [scrollValue]);
 

@@ -1,9 +1,11 @@
+import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect } from 'react';
 import * as THREE from 'three';
 
 const Raycaster = ({ externalCamera, onIntersect }) => {
   const raycaster = new THREE.Raycaster();
   const mouse = new THREE.Vector2();
+
 
   const calculateIntersect = (x, y) => {
     mouse.x = (x / window.innerWidth) * 2 - 1;
@@ -29,6 +31,7 @@ const Raycaster = ({ externalCamera, onIntersect }) => {
     const touch = event.touches[0];
     calculateIntersect(touch.clientX, touch.clientY);
   };
+
 
   useEffect(() => {
     window.addEventListener('mousemove', onMouseMove);

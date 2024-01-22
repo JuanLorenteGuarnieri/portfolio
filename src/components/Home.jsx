@@ -37,29 +37,41 @@ const Planee = () => {
 function ScrollContent({ setPercen }) {
   const scroll = useScroll();
   useFrame(() => {
-    setPercen(scroll.offset * 100);
+    setPercen(scroll.offset);
   }, []);
 
 };
 
-
 function ScrollContent2({ setPercen }) {
-  const scroll = useScroll();
-  const lastScroll = useRef(scroll.offset);
+  const scrollContainerRef = useRef(null);
 
   useEffect(() => {
-    // Esta función se ejecutará en cada renderización
     const handleScrollChange = () => {
-      if (scroll.offset !== lastScroll.current) {
-        const newPercentage = scroll.offset * 100;
+      if (scrollContainerRef.current) {
+        const currentScroll = scrollContainerRef.current.scrollTop;
+        const maxScroll = scrollContainerRef.current.scrollHeight - scrollContainerRef.current.clientHeight;
+        const newPercentage = (currentScroll / maxScroll) * 100;
+
         setPercen(newPercentage);
-        lastScroll.current = scroll.offset; // Actualizar el ref con el nuevo desplazamiento
       }
     };
 
-    handleScrollChange(); // Llamar a la función en cada renderización
-  });
+    const scrollContainer = scrollContainerRef.current;
+    if (scrollContainer) {
+      scrollContainer.addEventListener('scroll', handleScrollChange);
+    }
 
+    return () => {
+      if (scrollContainer) {
+        scrollContainer.removeEventListener('scroll', handleScrollChange);
+      }
+    };
+  }, [setPercen]);
+
+  return (
+    <ScrollControls ref={scrollContainerRef} eps={0.00001} pages={3} distance={8} maxSpeed={15} >
+    </ScrollControls>
+  );
 }
 
 const CircularImage = ({ imageSrc, position, scale }) => {
@@ -86,6 +98,8 @@ const Img = ({ imageSrc, position, scale }) => {
   );
 };
 
+
+
 const Home = () => {
   const lightRef = useRef();
   const lightRef2 = useRef();
@@ -95,6 +109,7 @@ const Home = () => {
   const githubRef = useRef();
   const cvRef = useRef();
   const iphoneRef = useRef();
+  const [iphoneRotate, setIphoneRotate] = useState(0);
 
   const [dpr, setDpr] = useState([1, 2]); // Valores mínimos y máximos de dpr
   const [resolution, setResolution] = useState(1.2); // Valores mínimos y máximos de dpr
@@ -107,13 +122,11 @@ const Home = () => {
     setTargetPos([point.x, point.y, point.z]);
   };
 
-
   // Configura el raycaster
   const raycaster = new THREE.Raycaster();
   const mouse = new THREE.Vector2();
 
   function onMouseClick(event) {
-    console.log(window.innerWidth);
     // Calcula la posición del mouse en coordenadas normalizadas (-1 a +1) para ambos ejes
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -146,6 +159,8 @@ const Home = () => {
 
   }
 
+
+
   useEffect(() => {
     // Ajusta el dpr basado en el ancho de la ventana, pero con límites
     const width = window.innerWidth;
@@ -153,6 +168,16 @@ const Home = () => {
     setDpr([newDpr, newDpr]);
   }, []);
 
+  // *Mover IPHONE
+  // useEffect(() => {
+  //   // Configurar un intervalo
+  //   const interval = setInterval(() => {
+  //     setIphoneRotate(v => (v + 0.02) % (2 * Math.PI)); // Ajusta este valor según sea necesario
+  //   }, 50); // Ajusta el intervalo de tiempo según sea necesario
+
+  //   // Limpiar el intervalo cuando el componente se desmonte
+  //   return () => clearInterval(interval);
+  // }, []);
 
   useEffect(() => {
     window.addEventListener('click', onMouseClick, false);
@@ -162,15 +187,71 @@ const Home = () => {
     };
   }, []);
 
+
+  const calculateIntersect2 = (x, y) => {
+    const mouse = new THREE.Vector2();
+
+    mouse.x = (x / window.innerWidth) * 2 - 1;
+    mouse.y = -(y / window.innerHeight) * 2 + 1;
+    raycaster.setFromCamera(mouse, cameraRef.current);
+
+    const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+    const intersectPoint = new THREE.Vector3();
+
+    if (raycaster.ray.intersectPlane(plane, intersectPoint)) {
+      if (handleIntersection) {
+        handleIntersection(intersectPoint);
+      }
+    }
+  };
+
+  const calculateIntersect = (x, y) => {
+    const mouse = new THREE.Vector2();
+
+    mouse.x = (x / window.innerWidth) * 2 - 1;
+    mouse.y = -(y / window.innerHeight) * 2 + 1;
+
+    raycaster.setFromCamera(mouse, cameraRef.current);
+    raycaster.ray.direction.normalize();
+
+    const intersectPoint = raycaster.ray.origin.sub(raycaster.ray.direction.multiplyScalar(raycaster.ray.origin.y / raycaster.ray.direction.y));
+    setTargetPos([intersectPoint.x, intersectPoint.y, intersectPoint.z]);
+
+
+  };
+
+  const handlePointerMove = (event) => {
+    if (cameraRef.current) {
+      // Obtiene las coordenadas del cursor
+      let x;
+      let y;
+      const { clientX, clientY } = event;
+      if (event.touches) {
+        // Manejo del evento táctil
+        const touch = event.touches[0];
+        x = touch.clientX;
+        y = touch.clientY;
+      } else {
+        x = event.clientX;
+        y = event.clientY;
+      }
+
+      // Llama a tu función de cálculo o lógica con estas coordenadas
+      calculateIntersect(x, y);
+    }
+  };
+
   return (
 
     <section className="w-full h-screen">
-      <Canvas dpr={dpr} shadows={true} className="w-full h-screen bg-black" camera={({ far: 40, setFocalLength: 555, zoom: (window.innerWidth / window.innerHeight) / 1.6 })}>
+      <Canvas dpr={dpr} shadows={true} className="w-full h-screen bg-black"
+        onPointerMove={handlePointerMove} onTouchMove={handlePointerMove}
 
-        <Raycaster externalCamera={cameraRef} onIntersect={handleIntersection} />
+        camera={({ isPerspectiveCamera: true, far: 90, setFocalLength: 555, zoom: (window.innerWidth / window.innerHeight) / 1.6 })}>
+
+        {/* <Raycaster externalCamera={cameraRef} onIntersect={handleIntersection} /> */}
 
         <CameraController scrollValue={scrollValue} cameraRef={cameraRef} />
-
         <ScrollControls eps={0.00001} pages={3} distance={8} maxSpeed={15} >
           <ScrollContent setPercen={setScrollValue} />
         </ScrollControls>
@@ -182,11 +263,9 @@ const Home = () => {
         </mesh> */}
 
         <mesh className="PUNTERO">
-          <pointLight ref={lightRef} castShadow={true} intensity={5} position={[targetPos[0], 0.05, targetPos[2]]}
+          <pointLight ref={lightRef} castShadow={true} intensity={5} position={[targetPos[0], 0.1, targetPos[2]]}
             color={new THREE.Color(0x223060)} />
-          <pointLight ref={lightRef2} castShadow={true} intensity={22} position={[targetPos[0], 0.6, targetPos[2]]}
-            color={new THREE.Color(0x223060)} />
-          <pointLight ref={lightRef3} castShadow={true} intensity={44} position={[targetPos[0], 2, targetPos[2]]}
+          <pointLight ref={lightRef2} castShadow={true} intensity={25} position={[targetPos[0], 0.7, targetPos[2]]}
             color={new THREE.Color(0x223060)} />
         </mesh>
 
@@ -300,54 +379,54 @@ const Home = () => {
             font={fontTitle} size={0.3} height={0.05}
             colorPri={new THREE.Color(0xdddddd)} colorSec={new THREE.Color(0x333333)}
           />
+          <mesh className="Name" position={[-3.5, 0, 0.8]}>
 
-          <pointLight intensity={400} position={[2, 4, 3.5]}
-            color={new THREE.Color(0x223060)} />
-          <pointLight intensity={110} position={[2, 2, 3.5]}
-            color={new THREE.Color(0x223060)} />
+            <TextAdvance position={[0, 0, 0]}
+              text={"Name"}
+              font={fontText} size={0.16} height={0.05}
+              colorPri={"white"} colorSec={new THREE.Color(0x223060)}
+            />
+            <RoundedBox position={[1.5, -2.4, 0.35]} rotation={[Math.PI / 2, 0, 0]}
+              args={[4.3, 1, 5]} radius={0.5}>
+              <meshPhongMaterial color={"white"} />
+            </RoundedBox>
+          </mesh>
+          <mesh className="E-mail" position={[-3.5, 0, 1.9]}>
+            <TextAdvance position={[0, 0, 0]}
+              text={"E-mail"}
+              font={fontText} size={0.16} height={0.05}
+              colorPri={"white"} colorSec={new THREE.Color(0x223060)}
+            />
+            <RoundedBox position={[1.5, -2.4, 0.4]} rotation={[Math.PI / 2, 0, 0]}
+              args={[4.3, 1, 5]} radius={0.5}>
+              <meshPhongMaterial color={"white"} />
+            </RoundedBox>
+          </mesh>
+          <mesh className="Message" position={[0, 0, 0]}>
+            <TextAdvance position={[-3.5, 0, 3]}
+              text={"Message"}
+              font={fontText} size={0.16} height={0.05}
+              colorPri={"white"} colorSec={new THREE.Color(0x223060)}
+            />
+            <RoundedBox position={[-2, -2.4, 4]} rotation={[Math.PI / 2, 0, 0]}
+              args={[5, 3, 5]} radius={1}>
+              <meshStandardMaterial color={"white"} />
+            </RoundedBox>
+          </mesh>
+          <mesh className="Iphone" position={[0, 0, 0]}>
+            <pointLight intensity={400} position={[2, 4, 3.5]}
+              color={new THREE.Color(0x223060)} />
+            <pointLight intensity={110} position={[2, 2, 3.5]}
+              color={new THREE.Color(0x223060)} />
 
-          <Iphone ref={iphoneRef} position={[2, 0.68, 3]} rotation={[0, 0, scrollValue * Math.PI / 4 + 22]} scale={1.5} />
-
-          <TextAdvance position={[-3.5, 0, 1.2]}
-            text={"Name"}
-            font={fontText} size={0.16} height={0.05}
-            colorPri={"white"} colorSec={new THREE.Color(0x223060)}
-          />
-          <RoundedBox position={[-2, -2.4, 1.55]} rotation={[Math.PI / 2, 0, 0]}
-            args={[4.3, 1, 5]} radius={0.5}>
-            <meshStandardMaterial color={"white"} />
-          </RoundedBox>
-
-          <TextAdvance position={[-3.5, 0, 2.1]}
-            text={"E-mail"}
-            font={fontText} size={0.16} height={0.05}
-            colorPri={"white"} colorSec={new THREE.Color(0x223060)}
-          />
-          <RoundedBox position={[-2, -2.4, 2.5]} rotation={[Math.PI / 2, 0, 0]}
-            args={[4.3, 1, 5]} radius={0.5}>
-            <meshStandardMaterial color={"white"} />
-          </RoundedBox>
-          <TextAdvance position={[-3.5, 0, 3]}
-            text={"Message"}
-            font={fontText} size={0.16} height={0.05}
-            colorPri={"white"} colorSec={new THREE.Color(0x223060)}
-          />
-          <RoundedBox position={[-2, -2.4, 4]} rotation={[Math.PI / 2, 0, 0]}
-            args={[5, 3, 5]} radius={1}>
-            <meshStandardMaterial color={"white"} />
-          </RoundedBox>
-
-
+            <Iphone ref={iphoneRef} position={[2, 0.68, 3]} rotation={[0, 0, scrollValue * 100 * Math.PI / 4 + 22 + iphoneRotate]} scale={1.5} />
+          </mesh>
         </mesh>
-
-
-
-
 
         {/* <Planee ref={planoRef}></Planee> */}
 
         <mesh className="Floor" receiveShadow={true} castShadow={true}>
-          <Plane args={[100, 200]} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 35]}>
+          <Plane args={[500, 500]} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 35]}>
             <meshStandardMaterial attach="material" color={new THREE.Color(0x444444)}
             />
             {/* <MeshReflectorMaterial

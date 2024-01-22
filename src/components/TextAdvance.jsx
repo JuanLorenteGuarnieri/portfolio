@@ -14,14 +14,14 @@ const TextAdvance = ({ text, position, font, size, height, colorPri, colorSec })
           height={height * 0.7}
           size={size}>
           {text}
-          <meshStandardMaterial attach="material" color={colorSec} />
+          <meshPhongMaterial attach="material" color={colorSec} />
         </Text3D>
         <Text3D position={position} rotation={[-Math.PI / 2, 0, 0]}
           font={font}
           height={height}
           size={size}>
           {text}
-          <meshStandardMaterial attach="material" color={colorPri} />
+          <meshPhongMaterial attach="material" color={colorPri} />
         </Text3D>
       </mesh>
     </>
