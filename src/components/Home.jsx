@@ -36,6 +36,11 @@ import { Doc } from '../../public/models/Doc';
 import { Play } from '../../public/models/Play';
 import { RusticSpaceShip } from '../../public/models/RusticSpaceShip';
 import HUD from './HUD';
+import ContactMe from './ContactMe';
+import Text3DForm from './Text3DForm';
+import { Piano } from '../../public/models/Piano';
+import { Chess } from '../../public/models/Chess';
+import { RubikCube } from '../../public/models/Rubiks_cube';
 
 function ScrollContent({ setPercen }) {
   const scroll = useScroll();
@@ -228,11 +233,12 @@ const Home = () => {
         onPointerMove={handlePointerMove} onTouchMove={handlePointerMove}
         camera={({ isPerspectiveCamera: true, near: 0.1, far: 8, setFocalLength: 555, zoom: (window.innerWidth / window.innerHeight) / 1.6 })}>
 
-        <PerformanceMonitor factor={1} onChange={({ factor }) => setDpr(round(0.5 + 0 * factor, 1))} />
+        <PerformanceMonitor factor={1} onChange={({ factor }) => setDpr(0.5 + 0 * factor, 1)} />
         <Suspense fallback={<Loader />}>
 
           {/* <Raycaster externalCamera={cameraRef} onIntersect={handleIntersection} /> */}
-          <HUD />
+          {/* <HUD />
+          <ContactMe /> */}
 
 
           <mesh className="CONFIG">
@@ -526,6 +532,11 @@ const Home = () => {
                 font={fontText} size={0.16} height={0.05}
                 colorPri={"white"} colorSec={new THREE.Color(0x223060)}
               />
+              <Text3DForm position={[-0.1, 0, 0.42]} align="left"
+                text={"Name"}
+                font={fontText} size={0.16} height={0.1}
+                colorPri={new THREE.Color(0x424050)} isEditable={"true"}
+              />
               <RoundedBox position={[1.5, -2.4, 0.35]} rotation={[Math.PI / 2, 0, 0]}
                 args={[4.3, 1, 5]} radius={0.5}>
                 <meshPhongMaterial color={"white"} />
@@ -566,11 +577,25 @@ const Home = () => {
           </mesh>
 
           <mesh className="INTEREST" position={[0, 0, 33.9]}>
+            <pointLight intensity={500} position={[0, 3, 4]}
+              color={new THREE.Color(0x223060)} />
             <TextAdvance position={[0, 0, 0]}
               text={"???"}
               font={fontTitle} size={0.3} height={0.05}
               colorPri={new THREE.Color(0xdddddd)} colorSec={new THREE.Color(0x333333)}
             />
+            <Bvh firstHitOnly >
+              <Piano scale={1.3} position={[4, -0.19, 3]} rotation={[0, -Math.PI / 3, 0]} />
+              <Chess scale={2} position={[-2.1, 0, 2.9]} rotation={[0, 0, 0]} />
+              <Float
+                speed={4} // Animation speed, defaults to 1
+                rotationIntensity={0.1} // XYZ rotation intensity, defaults to 1
+                floatIntensity={0.4} // Up/down float intensity, works like a multiplier with floatingRange,defaults to 1
+                floatingRange={[0, 1]} // Range of y-axis values the object will float within, defaults to [-0.1,0.1]
+              >
+                <RubikCube scale={0.13} position={[-3.7, 0, 5.2]} rotation={[0, Math.PI / 6, 0]} />
+              </Float>
+            </Bvh>
 
           </mesh>
 
