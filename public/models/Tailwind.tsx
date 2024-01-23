@@ -28,7 +28,7 @@ export const Tailwind = forwardRef<Group, LogoProps>((props, ref) => {
   const { nodes, materials } = useGLTF('models/tailwind.glb') as GLTFResult
   return (
     <group ref={ref} {...props} dispose={null}>
-      <mesh geometry={nodes.Curve005.geometry} material={materials.Mat} position={[-0.015, 0, -0.015]} scale={1.628} />
+      <mesh castShadow receiveShadow geometry={nodes.Curve005.geometry} material={materials.Mat} position={[-0.015, 0, -0.015]} scale={1.628} />
     </group>
   )
 });

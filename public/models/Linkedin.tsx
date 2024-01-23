@@ -11,33 +11,28 @@ import { Group } from 'three';
 
 type GLTFResult = GLTF & {
   nodes: {
-    Objeto_1: THREE.Mesh
-    Objeto_2: THREE.Mesh
-    Objeto_3: THREE.Mesh
-    Objeto_4: THREE.Mesh
+    XMLID_802_: THREE.Mesh
+    XMLID_803_: THREE.Mesh
+    XMLID_804_: THREE.Mesh
   }
   materials: {
-    'Tinta (1)': THREE.MeshStandardMaterial
-    'Tinta (3)': THREE.MeshStandardMaterial
+    Mat: THREE.MeshStandardMaterial
   }
 }
 
 type ContextType = Record<string, React.ForwardRefExoticComponent<JSX.IntrinsicElements['mesh']>>
 
-
 type LogoProps = JSX.IntrinsicElements['group'] & {
   // Aquí puedes añadir cualquier otra prop personalizada si es necesario
 };
-
 
 export const Linkedin = forwardRef<Group, LogoProps>((props, ref) => {
   const { nodes, materials } = useGLTF('models/linkedin.glb') as GLTFResult
   return (
     <group ref={ref} {...props} dispose={null}>
-      <mesh geometry={nodes.Objeto_1.geometry} material={materials['Tinta (1)']} position={[0, 0, 0.025]} rotation={[Math.PI / 2, 0, 0]} scale={[0.01, 0.219, 0.01]} />
-      <mesh geometry={nodes.Objeto_2.geometry} material={materials['Tinta (3)']} rotation={[Math.PI / 2, 0, 0]} scale={[0.01, 0.021, 0.01]} />
-      <mesh geometry={nodes.Objeto_3.geometry} material={materials['Tinta (3)']} rotation={[Math.PI / 2, 0, 0]} scale={[0.01, 0.021, 0.01]} />
-      <mesh geometry={nodes.Objeto_4.geometry} material={materials['Tinta (3)']} rotation={[Math.PI / 2, 0, 0]} scale={[0.01, 0.021, 0.01]} />
+      <mesh castShadow receiveShadow geometry={nodes.XMLID_802_.geometry} material={materials.Mat} position={[-0.012, 0, 0.01]} scale={0.112} />
+      <mesh castShadow receiveShadow geometry={nodes.XMLID_803_.geometry} material={materials.Mat} position={[-0.012, 0, 0.01]} scale={0.112} />
+      <mesh castShadow receiveShadow geometry={nodes.XMLID_804_.geometry} material={materials.Mat} position={[-0.012, 0, 0.01]} scale={0.112} />
     </group>
   )
 });

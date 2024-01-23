@@ -26,7 +26,7 @@ export const Unreal = forwardRef<Group, LogoProps>((props, ref) => {
   const { nodes, materials } = useGLTF('models/unreal.glb') as GLTFResult
   return (
     <group ref={ref} {...props} dispose={null}>
-      <mesh geometry={nodes.Curve002.geometry} material={materials.Mat} position={[-0.016, 0, 0.015]} scale={0.141} />
+      <mesh castShadow receiveShadow geometry={nodes.Curve002.geometry} material={materials.Mat} position={[-0.016, 0, 0.015]} scale={0.141} />
     </group>
   )
 });

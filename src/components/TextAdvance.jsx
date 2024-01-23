@@ -17,30 +17,6 @@ const TextAdvance = ({ text, position, align = 'center', font, size, height, col
   // Usa la ref para acceder a las dimensiones del texto
   const textRef = useRef();
 
-  // Calcula la posición centrada
-  const centeredPosition = useMemo(() => {
-    if (textRef.current) {
-      const textSize = new THREE.Box3().setFromObject(textRef.current).getSize(new THREE.Vector3());
-      return [
-        position[0] - textSize.x / 2,
-        position[1] - textSize.y / 2,
-        position[2]
-      ];
-    }
-    return position;
-  }, [position, text]);
-
-  const rightAlignedPosition = useMemo(() => {
-    if (textRef.current) {
-      const textSize = new THREE.Box3().setFromObject(textRef.current).getSize(new THREE.Vector3());
-      return [
-        position[0] - textSize.x, // Desplazar completamente a la izquierda de la posición
-        position[1] - textSize.y / 2, // Mantener el desplazamiento vertical como en el centrado
-        position[2]
-      ];
-    }
-    return position;
-  }, [position, text]);
 
   const getPositionBasedOnAlignment = (alignment) => {
     const textSize = textRef.current ? new THREE.Box3().setFromObject(textRef.current).getSize(new THREE.Vector3()) : new THREE.Vector3();
@@ -60,12 +36,12 @@ const TextAdvance = ({ text, position, align = 'center', font, size, height, col
 
   return (
     <>
-      <mesh receiveShadow={true} castShadow={true}>
-        <Text3D ref={textRef} position={getPositionBasedOnAlignment(align)} rotation={[-Math.PI / 2, 0, 0]} {...textProps}>
+      <mesh >
+        {/* <Text3D  position={getPositionBasedOnAlignment(align)} rotation={[-Math.PI / 2, 0, 0]} {...textProps}>
           {text}
           <meshPhongMaterial attach="material" color={colorSec} />
-        </Text3D>
-        <Text3D position={getPositionBasedOnAlignment(align)} rotation={[-Math.PI / 2, 0, 0]}
+        </Text3D> */}
+        <Text3D ref={textRef} castShadow receiveShadow position={getPositionBasedOnAlignment(align)} rotation={[-Math.PI / 2, 0, 0]}
           font={font}
           height={height}
           size={size}>
