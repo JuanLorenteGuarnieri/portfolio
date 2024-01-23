@@ -29,8 +29,8 @@ export const Reacts = forwardRef<Group, LogoProps>((props, ref) => {
   const { nodes, materials } = useGLTF('models/react.glb') as GLTFResult
   return (
     <group ref={ref} {...props} dispose={null}>
-      <mesh geometry={nodes.Curve008.geometry} material={materials.Mat} position={[-0.019, 0, 0.022]} />
-      <mesh geometry={nodes.Curve009.geometry} material={materials.Mat} position={[-0.019, 0, 0.022]} />
+      <mesh castShadow receiveShadow geometry={nodes.Curve008.geometry} material={materials.Mat} position={[-0.019, 0, 0.022]} />
+      <mesh castShadow receiveShadow geometry={nodes.Curve009.geometry} material={materials.Mat} position={[-0.019, 0, 0.022]} />
     </group>
   )
 });

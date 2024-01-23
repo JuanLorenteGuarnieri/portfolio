@@ -26,7 +26,7 @@ export const Threejs = forwardRef<Group, LogoProps>((props, ref) => {
   const { nodes, materials } = useGLTF('models/threejs.glb') as GLTFResult
   return (
     <group ref={ref} {...props} dispose={null}>
-      <mesh geometry={nodes.Curve004.geometry} material={materials.Mat} position={[-0.016, 0, 0.017]} scale={0.368} />
+      <mesh castShadow receiveShadow geometry={nodes.Curve004.geometry} material={materials.Mat} position={[-0.016, 0, 0.017]} scale={0.368} />
     </group>
   )
 });

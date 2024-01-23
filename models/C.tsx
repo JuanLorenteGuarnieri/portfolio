@@ -33,10 +33,10 @@ export const C = forwardRef<Group, LogoProps>((props, ref) => {
   const { nodes, materials } = useGLTF('models/c.glb') as GLTFResult
   return (
     <group ref={ref} {...props} dispose={null}>
-      <mesh geometry={nodes.Curve011.geometry} material={materials['Mat.001']} position={[-0.013, 0, 0.013]} scale={0.767} />
-      <mesh geometry={nodes.Curve012.geometry} material={materials['Mat.002']} position={[-0.013, 0, 0.013]} scale={0.767} />
-      <mesh geometry={nodes.Curve013.geometry} material={materials.Mat} position={[-0.013, 0, 0.013]} scale={0.767} />
-      <mesh geometry={nodes.Curve014.geometry} material={materials.Mat} position={[-0.013, 0, 0.013]} scale={0.767} />
+      <mesh castShadow receiveShadow geometry={nodes.Curve011.geometry} material={materials['Mat.001']} position={[-0.013, 0, 0.013]} scale={0.767} />
+      <mesh castShadow receiveShadow geometry={nodes.Curve012.geometry} material={materials['Mat.002']} position={[-0.013, 0, 0.013]} scale={0.767} />
+      <mesh castShadow receiveShadow geometry={nodes.Curve013.geometry} material={materials.Mat} position={[-0.013, 0, 0.013]} scale={0.767} />
+      <mesh castShadow receiveShadow geometry={nodes.Curve014.geometry} material={materials.Mat} position={[-0.013, 0, 0.013]} scale={0.767} />
     </group>
   )
 });

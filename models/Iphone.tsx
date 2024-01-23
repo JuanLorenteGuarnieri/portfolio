@@ -29,7 +29,7 @@ export const Iphone = forwardRef<Group, LogoProps>((props, ref) => {
   const { nodes, materials } = useGLTF('models/iphone.glb') as GLTFResult
   return (
     <group ref={ref} {...props} dispose={null}>
-      <mesh geometry={nodes.Iphone.geometry} material={materials['Material.001']} rotation={[0, 0, Math.PI]} scale={0.05} />
+      <mesh castShadow receiveShadow geometry={nodes.Iphone.geometry} material={materials['Material.001']} rotation={[0, 0, Math.PI]} scale={0.05} />
     </group>
   )
 });

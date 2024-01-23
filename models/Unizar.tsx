@@ -32,11 +32,11 @@ export const Unizar = forwardRef<Group, LogoProps>((props, ref) => {
   const { nodes, materials } = useGLTF('models/unizar.glb') as GLTFResult
   return (
     <group ref={ref} {...props} dispose={null}>
-      <mesh geometry={nodes.path102.geometry} material={materials['SVGMat.022']} position={[-0.025, 0, 0.033]} />
-      <mesh geometry={nodes.path106.geometry} material={materials['SVGMat.022']} position={[-0.025, 0, 0.033]} />
-      <mesh geometry={nodes.path110.geometry} material={materials['SVGMat.022']} position={[-0.025, 0, 0.033]} />
-      <mesh geometry={nodes.path114.geometry} material={materials['SVGMat.022']} position={[-0.025, 0, 0.033]} />
-      <mesh geometry={nodes.path118.geometry} material={materials['SVGMat.022']} position={[-0.025, 0, 0.033]} />
+      <mesh castShadow receiveShadow geometry={nodes.path102.geometry} material={materials['SVGMat.022']} position={[-0.025, 0, 0.033]} />
+      <mesh castShadow receiveShadow geometry={nodes.path106.geometry} material={materials['SVGMat.022']} position={[-0.025, 0, 0.033]} />
+      <mesh castShadow receiveShadow geometry={nodes.path110.geometry} material={materials['SVGMat.022']} position={[-0.025, 0, 0.033]} />
+      <mesh castShadow receiveShadow geometry={nodes.path114.geometry} material={materials['SVGMat.022']} position={[-0.025, 0, 0.033]} />
+      <mesh castShadow receiveShadow geometry={nodes.path118.geometry} material={materials['SVGMat.022']} position={[-0.025, 0, 0.033]} />
     </group>
   )
 });

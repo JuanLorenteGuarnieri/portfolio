@@ -28,7 +28,7 @@ export const Git = forwardRef<Group, LogoProps>((props, ref) => {
   const { nodes, materials } = useGLTF('models/git.glb') as GLTFResult
   return (
     <group ref={ref} {...props} dispose={null}>
-      <mesh geometry={nodes.Curve010.geometry} material={materials.Mat} position={[-0.014, 0, 0.013]} scale={1.572} />
+      <mesh castShadow receiveShadow geometry={nodes.Curve010.geometry} material={materials.Mat} position={[-0.014, 0, 0.013]} scale={1.572} />
     </group>
   )
 });
