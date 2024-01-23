@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, Suspense } from 'react';
 import font from '../assets/fonts/BungeeSpice.json';
 import font2 from '../assets/fonts/Audiowide.json';
 import fontUbuntuBold from '../assets/fonts/Ubuntu/Ubuntu_Bold.json';
@@ -9,7 +9,7 @@ import fontUbuntuMediumItalic from '../assets/fonts/Ubuntu/Ubuntu_Medium_Italic.
 import fontEmoji from '../assets/fonts/Noto_Color_Emoji/Noto_Color_Emoji.json';
 import * as THREE from 'three';
 import { Canvas, extend, useFrame, useThree } from '@react-three/fiber';
-import { Plane, Box, ScrollControls, useScroll, Text3D, SpotLight, Float, ContactShadows, Shadow, Svg, Gltf, useTexture, Grid, RoundedBox, } from '@react-three/drei';
+import { Plane, Box, ScrollControls, useScroll, Text3D, SpotLight, Float, ContactShadows, Shadow, Svg, Gltf, useTexture, Grid, RoundedBox, Bvh, useDetectGPU, } from '@react-three/drei';
 import CameraController from './CameraController';
 import SpotLightAberration from './SpotLightAberration';
 import { Logo } from '../../public/models/Logo';
@@ -20,9 +20,17 @@ import { Github } from '../../public/models/Github';
 import { CV } from '../../public/models/Cv';
 import TextAdvance from './TextAdvance';
 
-import perfil from '../../public/perfil.png'
-import eina from '../../public/eina_logo.png'
 import { Iphone } from '../../public/models/Iphone';
+import { Profile } from '../../public/models/Profile';
+import { Unizar } from '../../public/models/Unizar';
+import { Vscode } from '../../public/models/Vscode';
+import { Blender } from '../../public/models/Blender';
+import { Unreal } from '../../public/models/Unreal';
+import { C } from '../../public/models/C';
+import { Git } from '../../public/models/Git';
+import { Tailwind } from '../../public/models/Tailwind';
+import { Threejs } from '../../public/models/Threejs';
+import { Reacts } from '../../public/models/React';
 
 const Planee = () => {
   return (
@@ -101,6 +109,8 @@ const Img = ({ imageSrc, position, scale }) => {
 
 
 const Home = () => {
+  const GPUTier = useDetectGPU()
+
   const lightRef = useRef();
   const lightRef2 = useRef();
   const lightRef3 = useRef();
@@ -244,192 +254,230 @@ const Home = () => {
   return (
 
     <section className="w-full h-screen">
-      <Canvas dpr={dpr} shadows={true} className="w-full h-screen bg-black"
-        onPointerMove={handlePointerMove} onTouchMove={handlePointerMove}
+      {(GPUTier.tier === "0" || GPUTier.isMobile) ? <Fallback /> :
+        <Canvas dpr={dpr} shadows={true} className="w-full h-screen bg-black"
+          onPointerMove={handlePointerMove} onTouchMove={handlePointerMove}
 
-        camera={({ isPerspectiveCamera: true, far: 90, setFocalLength: 555, zoom: (window.innerWidth / window.innerHeight) / 1.6 })}>
+          camera={({ isPerspectiveCamera: true, far: 90, setFocalLength: 555, zoom: (window.innerWidth / window.innerHeight) / 1.6 })}>
+          <Suspense fallback={null}>
+            {/* <Bvh firstHitOnly > */}
 
-        {/* <Raycaster externalCamera={cameraRef} onIntersect={handleIntersection} /> */}
+            {/* <Raycaster externalCamera={cameraRef} onIntersect={handleIntersection} /> */}
 
-        <CameraController scrollValue={scrollValue} cameraRef={cameraRef} />
-        <ScrollControls eps={0.00001} pages={3} distance={8} maxSpeed={15} >
-          <ScrollContent setPercen={setScrollValue} />
-        </ScrollControls>
+            <CameraController scrollValue={scrollValue} cameraRef={cameraRef} />
+            <ScrollControls eps={0.00001} pages={3} distance={8} maxSpeed={15} >
+              <ScrollContent setPercen={setScrollValue} />
+            </ScrollControls>
 
-        <ambientLight intensity={0.5} />
+            <ambientLight intensity={0.5} />
 
-        {/* <mesh className="GRID" position={[0, 0.1, 0]}>
-          <Grid args={[20, 100, 20, 100]} />
-        </mesh> */}
-
-        <mesh className="PUNTERO">
-          <pointLight ref={lightRef} castShadow={true} intensity={5} position={[targetPos[0], 0.1, targetPos[2]]}
-            color={new THREE.Color(0x223060)} />
-          <pointLight ref={lightRef2} castShadow={true} intensity={25} position={[targetPos[0], 0.7, targetPos[2]]}
-            color={new THREE.Color(0x223060)} />
-        </mesh>
-
-        <mesh className="TITLE" position={[0, 0, -3]}>
-          <mesh className="LOGO" position={[0, 0, 0.5]}>
-            <pointLight intensity={200} position={[0, 1, 0.5]}
-              color={new THREE.Color(0x223060)} />
-            <pointLight intensity={200} position={[0, 1, 0]}
-              color={new THREE.Color(0x223060)} />
-            <mesh position={[0, 0.2, 1]} scale={0.65} rotation={[-Math.PI / 3, 0, 0]}>
-              <Logo scale={[1, 1., 0.5]} />
-              <Float
-                speed={6} // Animation speed, defaults to 1
-                rotationIntensity={0.3} // XYZ rotation intensity, defaults to 1
-                floatIntensity={0.01} // Up/down float intensity, works like a multiplier with floatingRange,defaults to 1
-                floatingRange={[-0.2, 0.1]} // Range of y-axis values the object will float within, defaults to [-0.1,0.1]
-              >
-                <LogoGema />
-              </Float>
+            <mesh className="GRID" position={[0, 0.1, 0]}>
+              <Grid args={[20, 100, 20, 100]} />
             </mesh>
-          </mesh>
 
-          <TextAdvance position={[-3.05, 0, 2.3]}
-            text={"Juan Lorente"}
-            font={fontTitle} size={0.73} height={0.1}
-            colorPri={new THREE.Color(0xdddddd)} colorSec={new THREE.Color(0x333333)}
-          />
-          <TextAdvance position={[-2.7, 0, 2.8]}
-            text={"Computer Ghraphics & Videogames developer"}
-            font={fontText} size={0.16} height={0.05}
-            colorPri={"white"} colorSec={new THREE.Color(0x223060)}
-          />
-          <mesh position={[0.37, -0.01, 3.3]} scale={[0.4, 0.4, 2]} rotation={[-Math.PI / 2, 0, 0]}>
-            <Linkedin ref={linkedinRef} />
-            <Github ref={githubRef} />
-            <CV ref={cvRef} position={[-11.1, -0.85, 0]} scale={[5, 5, 1]} />
-          </mesh>
-        </mesh>
+            <mesh className="PUNTERO">
+              <pointLight ref={lightRef} castShadow={true} intensity={5} position={[targetPos[0], 0.1, targetPos[2]]}
+                color={new THREE.Color(0x223060)} />
+              <pointLight ref={lightRef2} castShadow={true} intensity={25} position={[targetPos[0], 0.7, targetPos[2]]}
+                color={new THREE.Color(0x223060)} />
+            </mesh>
 
-        <mesh className="ABOUT" position={[0, 0, 3]}>
-          <TextAdvance position={[-0.83, 0, 0]}
-            text={"ABOUT"}
-            font={fontTitle} size={0.3} height={0.05}
-            colorPri={new THREE.Color(0xdddddd)} colorSec={new THREE.Color(0x333333)}
-          />
-          <CircularImage receiveShadow={true} castShadow={true}
-            imageSrc={perfil}
-            position={[-3.2, 0.001, 1]} scale={0.8} />
+            <mesh className="TITLE" position={[0, 0, -3]}>
+              <mesh className="LOGO" position={[0, 0, 0.5]}>
+                <pointLight intensity={200} position={[0, 1, 0.5]}
+                  color={new THREE.Color(0x223060)} />
+                <pointLight intensity={200} position={[0, 1, 0]}
+                  color={new THREE.Color(0x223060)} />
+                <mesh position={[0, 0.2, 1]} scale={0.65} rotation={[-Math.PI / 3, 0, 0]}>
+                  <Logo scale={[1, 1., 0.5]} />
+                  <Float
+                    speed={6} // Animation speed, defaults to 1
+                    rotationIntensity={0.3} // XYZ rotation intensity, defaults to 1
+                    floatIntensity={0.01} // Up/down float intensity, works like a multiplier with floatingRange,defaults to 1
+                    floatingRange={[-0.2, 0.1]} // Range of y-axis values the object will float within, defaults to [-0.1,0.1]
+                  >
+                    <LogoGema />
+                  </Float>
+                </mesh>
+              </mesh>
 
-          <pointLight intensity={200} position={[-3, 2, 1]}
-            color={new THREE.Color(0x223060)} />
-          <TextAdvance position={[-2, 0, 0.8]}
-            text={"I'm a 21-year-old programmer from Spain, \npassionate about computer graphics and \nvideogame development. \n\nI'm in my final year of Computer \nEngineering and always on the lookout for \nprojects that challenge my creativity and \ntechnical skills."}
-            font={fontText} size={0.16} height={0.05}
-            colorPri={"white"} colorSec={new THREE.Color(0x223060)}
-          />
-        </mesh>
+              <TextAdvance position={[0, 0, 2.4]}
+                text={"Juan Lorente"}
+                font={fontTitle} size={0.73} height={0.1}
+                colorPri={new THREE.Color(0xdddddd)} colorSec={new THREE.Color(0x333333)}
+              />
+              <TextAdvance position={[0, 0, 2.8]}
+                text={"Computer Ghraphics & Videogames developer"}
+                font={fontText} size={0.16} height={0.05}
+                colorPri={"white"} colorSec={new THREE.Color(0x223060)}
+              />
+              <mesh position={[0.37, -0.01, 3.3]} scale={[0.4, 0.4, 2]} rotation={[-Math.PI / 2, 0, 0]}>
+                <Linkedin ref={linkedinRef} />
+                <Github ref={githubRef} />
+                <CV ref={cvRef} position={[-11.1, -0.85, 0]} scale={[5, 5, 1]} />
+              </mesh>
+            </mesh>
 
-        <mesh className="EDUCATION" position={[0, 0, 9]}>
-          <TextAdvance position={[-1.3, 0, 0]}
-            text={"EDUCATION"}
-            font={fontTitle} size={0.3} height={0.05}
-            colorPri={new THREE.Color(0xdddddd)} colorSec={new THREE.Color(0x333333)}
-          />
-          <Img receiveShadow={true} castShadow={true}
-            imageSrc={eina}
-            position={[-3, 0.1, 1]} scale={1} />
-          <TextAdvance position={[-2, 0, 0.8]}
-            text={"Computer Engineering - University of Zaragoza"}
-            font={fontText} size={0.16} height={0.05}
-            colorPri={"white"} colorSec={new THREE.Color(0x223060)}
-          />
-          <TextAdvance position={[-0.41, 0, 1.3]}
-            text={"Sep 2020 - present"}
-            font={fontText} size={0.16} height={0.05}
-            colorPri={new THREE.Color(0xcccccc)} colorSec={new THREE.Color(0x223060)}
-          />
-        </mesh>
+            <mesh className="ABOUT" position={[0, 0, 3]}>
+              <TextAdvance position={[0, 0, 0]}
+                text={"ABOUT"}
+                font={fontTitle} size={0.3} height={0.05}
+                colorPri={new THREE.Color(0xdddddd)} colorSec={new THREE.Color(0x333333)}
+              />
+              <Profile scale={9} position={[-3.2, 0.001, 2.2]} rotation={[-Math.PI / 2, 0, 0]} />
+              <pointLight intensity={200} position={[0, 2, 1.5]}
+                color={new THREE.Color(0x223060)} />
+              <pointLight intensity={30} position={[-3.5, 1, 1.3]}
+                color={new THREE.Color(0x223060)} />
+              <TextAdvance position={[0.75, 0, 0.8]}
+                text={"I'm a 21-year-old programmer from Spain, \npassionate about computer graphics and \nvideogame development. \n\nI'm in my final year of Computer \nEngineering and always on the lookout for \nprojects that challenge my creativity and \ntechnical skills."}
+                font={fontText} size={0.16} height={0.05}
+                colorPri={"white"} colorSec={new THREE.Color(0x223060)}
+              />
+            </mesh>
 
-        <mesh className="CERTIFICATES" position={[0, 0, 13]}>
-          <TextAdvance position={[-1.3, 0, 0]}
-            text={"CERTIFICATES"}
-            font={fontTitle} size={0.3} height={0.05}
-            colorPri={new THREE.Color(0xdddddd)} colorSec={new THREE.Color(0x333333)}
-          />
+            <mesh className="EDUCATION" position={[0, 0, 7.8]}>
+              <TextAdvance position={[0, 0, 0]}
+                text={"EDUCATION"}
+                font={fontTitle} size={0.3} height={0.05}
+                colorPri={new THREE.Color(0xdddddd)} colorSec={new THREE.Color(0x333333)}
+              />
+              <pointLight intensity={150} position={[0.5, 2, 1]}
+                color={new THREE.Color(0x223060)} />
+              <pointLight intensity={20} position={[-1.85, 1, 1.07]}
+                color={new THREE.Color(0x223060)} />
+              <Unizar scale={20} position={[-1.85, -0.09, 1.07]} rotation={[0, 0, 0]} />
+              <TextAdvance position={[-0.8, 0, 0.7]} align="left"
+                text={"Computer Engineering \nUniversity of Zaragoza"}
+                font={fontText} size={0.16} height={0.05}
+                colorPri={"white"} colorSec={new THREE.Color(0x223060)}
+              />
+              <TextAdvance position={[-0.8, 0, 1.4]} align="left"
+                text={"2020 - 2024"}
+                font={fontText} size={0.16} height={0.05}
+                colorPri={new THREE.Color(0xaaaaaa)} colorSec={new THREE.Color(0x223060)}
+              />
+            </mesh>
 
-        </mesh>
+            <mesh className="CERTIFICATES" position={[0, 0, 13]}>
+              <TextAdvance position={[0, 0, 0]}
+                text={"CERTIFICATES"}
+                font={fontTitle} size={0.3} height={0.05}
+                colorPri={new THREE.Color(0xdddddd)} colorSec={new THREE.Color(0x333333)}
+              />
 
-        <mesh className="PROJECTS" position={[0, 0, 16]}>
-          <TextAdvance position={[-1.3, 0, 0]}
-            text={"PROJECTS"}
-            font={fontTitle} size={0.3} height={0.05}
-            colorPri={new THREE.Color(0xdddddd)} colorSec={new THREE.Color(0x333333)}
-          />
+            </mesh>
 
-        </mesh>
+            <mesh className="PROJECTS" position={[0, 0, 16]}>
+              <TextAdvance position={[0, 0, 0]}
+                text={"PROJECTS"}
+                font={fontTitle} size={0.3} height={0.05}
+                colorPri={new THREE.Color(0xdddddd)} colorSec={new THREE.Color(0x333333)}
+              />
 
-        <mesh className="SKILLS & TOOLS" position={[0, 0, 20]}>
-          <TextAdvance position={[-1.3, 0, 0]}
-            text={"SKILLS & TOOLS"}
-            font={fontTitle} size={0.3} height={0.05}
-            colorPri={new THREE.Color(0xdddddd)} colorSec={new THREE.Color(0x333333)}
-          />
+            </mesh>
 
-        </mesh>
+            <mesh className="SKILLS & TOOLS" position={[0, 0, 20]}>
+              <TextAdvance position={[0, 0, 0]}
+                text={"SKILLS & TOOLS"}
+                font={fontTitle} size={0.3} height={0.05}
+                colorPri={new THREE.Color(0xdddddd)} colorSec={new THREE.Color(0x333333)}
+              />
+              <Bvh firstHitOnly >
+                <C scale={20} position={[-3.5, -0.08, 1.5]} rotation={[0, 0, 0]} />
 
-        <mesh className="CONTACT ME" position={[0, 0, 25]}>
+                <pointLight intensity={15} position={[-3.5, 1, 1.5]}
+                  color={new THREE.Color(0x223060)} />
 
-          <TextAdvance position={[-1.475, 0, 0]}
-            text={"CONTACT ME"}
-            font={fontTitle} size={0.3} height={0.05}
-            colorPri={new THREE.Color(0xdddddd)} colorSec={new THREE.Color(0x333333)}
-          />
-          <mesh className="Name" position={[-3.5, 0, 0.8]}>
+                <Blender scale={20} position={[-2.5, -0.08, 1.5]} rotation={[0, 0, 0]} />
+                <pointLight intensity={15} position={[-2.5, 1, 1.5]}
+                  color={new THREE.Color(0x223060)} />
 
-            <TextAdvance position={[0, 0, 0]}
-              text={"Name"}
-              font={fontText} size={0.16} height={0.05}
-              colorPri={"white"} colorSec={new THREE.Color(0x223060)}
-            />
-            <RoundedBox position={[1.5, -2.4, 0.35]} rotation={[Math.PI / 2, 0, 0]}
-              args={[4.3, 1, 5]} radius={0.5}>
-              <meshPhongMaterial color={"white"} />
-            </RoundedBox>
-          </mesh>
-          <mesh className="E-mail" position={[-3.5, 0, 1.9]}>
-            <TextAdvance position={[0, 0, 0]}
-              text={"E-mail"}
-              font={fontText} size={0.16} height={0.05}
-              colorPri={"white"} colorSec={new THREE.Color(0x223060)}
-            />
-            <RoundedBox position={[1.5, -2.4, 0.4]} rotation={[Math.PI / 2, 0, 0]}
-              args={[4.3, 1, 5]} radius={0.5}>
-              <meshPhongMaterial color={"white"} />
-            </RoundedBox>
-          </mesh>
-          <mesh className="Message" position={[0, 0, 0]}>
-            <TextAdvance position={[-3.5, 0, 3]}
-              text={"Message"}
-              font={fontText} size={0.16} height={0.05}
-              colorPri={"white"} colorSec={new THREE.Color(0x223060)}
-            />
-            <RoundedBox position={[-2, -2.4, 4]} rotation={[Math.PI / 2, 0, 0]}
-              args={[5, 3, 5]} radius={1}>
-              <meshStandardMaterial color={"white"} />
-            </RoundedBox>
-          </mesh>
-          <mesh className="Iphone" position={[0, 0, 0]}>
-            <pointLight intensity={400} position={[2, 4, 3.5]}
-              color={new THREE.Color(0x223060)} />
-            <pointLight intensity={110} position={[2, 2, 3.5]}
-              color={new THREE.Color(0x223060)} />
+                <Unreal scale={20} position={[-1.5, -0.08, 1.5]} rotation={[0, 0, 0]} />
+                <pointLight intensity={15} position={[-1.5, 1, 1.5]}
+                  color={new THREE.Color(0x223060)} />
 
-            <Iphone ref={iphoneRef} position={[2, 0.68, 3]} rotation={[0, 0, scrollValue * 100 * Math.PI / 4 + 22 + iphoneRotate]} scale={1.5} />
-          </mesh>
-        </mesh>
+                <Vscode scale={20} position={[-0.5, -0.08, 1.5]} rotation={[0, 0, 0]} />
+                <pointLight intensity={15} position={[-0.5, 1, 1.5]}
+                  color={new THREE.Color(0x223060)} />
 
-        {/* <Planee ref={planoRef}></Planee> */}
+                <Git scale={20} position={[0.5, -0.08, 1.5]} rotation={[0, 0, 0]} />
+                <pointLight intensity={15} position={[0.5, 1, 1.5]}
+                  color={new THREE.Color(0x223060)} />
 
-        <mesh className="Floor" receiveShadow={true} castShadow={true}>
-          <Plane args={[500, 500]} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 35]}>
-            <meshStandardMaterial attach="material" color={new THREE.Color(0x444444)}
-            />
-            {/* <MeshReflectorMaterial
+                <Threejs scale={20} position={[1.5, -0.08, 1.5]} rotation={[0, 0, 0]} />
+                <pointLight intensity={15} position={[1.5, 1, 1.5]}
+                  color={new THREE.Color(0x223060)} />
+
+                <Reacts scale={20} position={[2.5, -0.08, 1.5]} rotation={[0, 0, 0]} />
+                <pointLight intensity={15} position={[2.5, 1, 1.5]}
+                  color={new THREE.Color(0x223060)} />
+
+                <Tailwind scale={20} position={[3.5, -0.08, 1.5]} rotation={[0, 0, 0]} />
+                <pointLight intensity={15} position={[3.5, 1, 1.5]}
+                  color={new THREE.Color(0x223060)} />
+
+              </Bvh>
+            </mesh>
+
+            <mesh className="CONTACT ME" position={[0, 0, 24]}>
+
+              <TextAdvance position={[0, 0, 0]}
+                text={"CONTACT ME"}
+                font={fontTitle} size={0.3} height={0.05}
+                colorPri={new THREE.Color(0xdddddd)} colorSec={new THREE.Color(0x333333)}
+              />
+              <mesh className="Name" position={[-3.5, 0, 0.8]}>
+
+                <TextAdvance position={[0, 0, 0]} align="left"
+                  text={"Name"}
+                  font={fontText} size={0.16} height={0.05}
+                  colorPri={"white"} colorSec={new THREE.Color(0x223060)}
+                />
+                <RoundedBox position={[1.5, -2.4, 0.35]} rotation={[Math.PI / 2, 0, 0]}
+                  args={[4.3, 1, 5]} radius={0.5}>
+                  <meshPhongMaterial color={"white"} />
+                </RoundedBox>
+              </mesh>
+              <mesh className="E-mail" position={[-3.5, 0, 1.9]}>
+                <TextAdvance position={[0, 0, 0]} align="left"
+                  text={"E-mail"}
+                  font={fontText} size={0.16} height={0.05}
+                  colorPri={"white"} colorSec={new THREE.Color(0x223060)}
+                />
+                <RoundedBox position={[1.5, -2.4, 0.4]} rotation={[Math.PI / 2, 0, 0]}
+                  args={[4.3, 1, 5]} radius={0.5}>
+                  <meshPhongMaterial color={"white"} />
+                </RoundedBox>
+              </mesh>
+              <mesh className="Message" position={[0, 0, 0]}>
+                <TextAdvance position={[-3.5, 0, 3]} align="left"
+                  text={"Message"}
+                  font={fontText} size={0.16} height={0.05}
+                  colorPri={"white"} colorSec={new THREE.Color(0x223060)}
+                />
+                <RoundedBox position={[-2, -2.4, 4]} rotation={[Math.PI / 2, 0, 0]}
+                  args={[5, 3, 5]} radius={1}>
+                  <meshStandardMaterial color={"white"} />
+                </RoundedBox>
+              </mesh>
+              <mesh className="Iphone" position={[0, 0, 0]}>
+                <pointLight intensity={400} position={[2, 4, 3.5]}
+                  color={new THREE.Color(0x223060)} />
+                <pointLight intensity={110} position={[2, 2, 3.5]}
+                  color={new THREE.Color(0x223060)} />
+
+                <Iphone ref={iphoneRef} position={[2, 0.68, 3]} rotation={[0, 0, scrollValue * 100 * Math.PI / 4 + 22 + iphoneRotate]} scale={1.5} />
+              </mesh>
+            </mesh>
+
+            {/* <Planee ref={planoRef}></Planee> */}
+
+            <mesh className="Floor" receiveShadow={true} castShadow={true}>
+              <Plane args={[500, 500]} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 35]}>
+                <meshStandardMaterial attach="material" color={new THREE.Color(0x444444)}
+                />
+                {/* <MeshReflectorMaterial
               blur={[0, 0]} // Blur ground reflections (width, height), 0 skips blur
               mixBlur={0} // How much blur mixes with surface roughness (default = 1)
               mixStrength={1} // Strength of the reflections
@@ -445,10 +493,13 @@ const Home = () => {
               debug={0} // Depending on the assigned value, one of the following channels is shown: 0 = no debug 1 = depth channel 2 = base channel 3 = distortion channel 4 = lod channel (based on the roughness)
               reflectorOffset={0} // Offsets the virtual camera that projects the reflection. Useful when the reflective surface is some distance from the object's origin (default = 0)
             /> */}
-          </Plane>
-        </mesh>
+              </Plane>
+            </mesh>
 
-      </Canvas>
+            {/* </Bvh> */}
+          </Suspense>
+        </Canvas>
+      }
     </section >
   );
 };
