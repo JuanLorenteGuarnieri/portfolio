@@ -1,7 +1,8 @@
 import React, { useRef, useState, useEffect, Suspense } from 'react';
 import * as THREE from 'three';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Plane, ScrollControls, useScroll, Float, Grid, Bvh, useDetectGPU, Sphere, Preload, PerformanceMonitor, } from '@react-three/drei';
+import emailjs from '@emailjs/browser';
+import { Plane, ScrollControls, useScroll, Float, Grid, Bvh, useDetectGPU, Sphere, Preload, PerformanceMonitor } from '@react-three/drei';
 import fontTitle from '../assets/fonts/Encode_Sans_Semi_Expanded/Encode_Sans_Semi_Expanded_Bold.json';
 import fontText from '../assets/fonts/Source_Code_Pro/static/Source_Code_Pro_Regular.json';
 
@@ -35,13 +36,14 @@ import TextAdvance from './TextAdvance';
 import Loader from './Loader';
 import Text3DForm from './Text3DForm';
 import CameraController from './CameraController';
+import { Send } from '../../public/models/Send';
 
 /*
     TODO añadir animacion introduccion para evitar problemas de carga
         cambiar loading inicial
         cambiar navbar a uno lateral
         cambiar icono real por busto
-        controlador form (añadir \n, comprobar entradas antes de enviar, api correo, donde pulsas empiezas a borrar, <- y -> para moverse )
+        controlador form (donde pulsas empiezas a borrar, <- y -> para moverse )
         zoom/camara para que sea responsive
         optimizar codigo
         optimizar modelos 3d
@@ -51,7 +53,7 @@ function ScrollContent({ setPercen }) {
   const scroll = useScroll();
   useFrame(() => {
     setPercen(scroll.offset);
-  }, []);
+  }, [setPercen]);
 
 };
 
@@ -99,18 +101,90 @@ const Home = () => {
   const githubRef = useRef();
   const cvRef = useRef();
   const iphoneRef = useRef();
+  const sendFormRef = useRef();
+  const unizarRef = useRef();
+  const rayTracerGitRef = useRef();
+  const rayTracerDocRef = useRef();
+  const spaceGitRef = useRef();
+  const spaceDocRef = useRef();
+  const spacePlayRef = useRef();
+  const chessRef = useRef();
+  const pianoRef = useRef();
+  const rubikRef = useRef();
+  const psychologyRef = useRef();
 
   const form1Ref = useRef();
   const form2Ref = useRef();
   const form3Ref = useRef();
-
-
 
   const [dpr, setDpr] = useState(1);
   const [typeForm, setTypeForm] = useState(0);
 
   const [targetPos, setTargetPos] = useState(0);
   const [scrollValue, setScrollValue] = useState(0);
+
+
+  // Estados para almacenar los valores de los inputs
+  const [userName, setUserName] = useState('');
+  const [userEmail, setUserEmail] = useState('');
+  const [message, setMessage] = useState('');
+
+  const changeUserName = (n) => {
+    setUserName(n);
+  };
+
+  const changeUserEmail = (n) => {
+    setUserEmail(n);
+  };
+
+  const changeMessage = (n) => {
+    setMessage(n);
+  };
+
+  // Función para comprobar si el email es válido
+  const emailIncorrecto = (email) => {
+    // Expresión regular para validar el formato del email
+    const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    return !regex.test(email);
+  };
+
+  // Función para comprobar si el nombre de usuario es válido (letras, números y espacios permitidos)
+  const nombreUsuarioInvalido = (nombre) => {
+    const regex = /^[a-zA-Z0-9 ]+$/;
+    return !regex.test(nombre);
+  };
+
+  var sendEmail = () => {
+    // Crear un objeto de datos para el correo electrónico
+    var templateParams = {
+      user_name: userName,
+      user_email: userEmail,
+      message: message,
+    };
+
+    if (userName === '' || userEmail === '' || message === '') {
+      console.log('Por favor, rellene todos los campos.');
+      return;
+    }
+    if (emailIncorrecto(userEmail)) {
+      console.log('El email proporcionado no es válido.');
+      return;
+    }
+    if (nombreUsuarioInvalido(userName)) {
+      console.log('El nombre de usuario no es válido.');
+      return;
+    }
+
+    emailjs.send('service_4bprkd7', 'template_ri6j7pk', templateParams, 'PIjQsVkt3UW5dD4Vy')
+      .then((result) => {
+        console.log(result.text);
+        changeUserName('');
+        changeUserEmail('');
+        changeMessage('');
+      }, (error) => {
+        console.log(error.text);
+      });
+  };
 
   // Configura el raycaster
   const raycaster = new THREE.Raycaster();
@@ -124,7 +198,7 @@ const Home = () => {
     setTargetPos([point.x, point.y, point.z]);
   };
 
-  const handleKeyDown = (event) => {
+  const handleKeyDown = (event) => { // Previene la acción predeterminada (scroll)
     // Comprueba si la tecla presionada es la tecla Espacio
     if (event.keyCode === 32) {
       event.preventDefault(); // Previene la acción predeterminada (scroll)
@@ -141,8 +215,7 @@ const Home = () => {
     };
   }, []);
 
-  function onMouseClick(event) {  // Comprobar pulsar link
-
+  const onMouseClick = (event) => {  // Comprobar pulsar link
     // Calcula la posición del mouse en coordenadas normalizadas (-1 a +1) para ambos ejes
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -150,69 +223,103 @@ const Home = () => {
     // Actualiza el rayo con la posición del mouse y la cámara
     raycaster.setFromCamera(mouse, cameraRef.current);
 
-    // Realiza la intersección
     let intersects = raycaster.intersectObject(githubRef.current);
-
-    // Comprueba si hay intersecciones
     if (intersects.length > 0) {
       window.open('https://github.com/JuanLorenteGuarnieri', '_blank');
       return;
     }
 
     intersects = raycaster.intersectObject(linkedinRef.current);
-    // Comprueba si hay intersecciones
     if (intersects.length > 0) {
       window.open('https://www.linkedin.com/in/juanlorenteguarnieri/', '_blank');
       return;
     }
-    intersects = raycaster.intersectObject(cvRef.current);
 
-    // Comprueba si hay intersecciones
+    intersects = raycaster.intersectObject(cvRef.current);
     if (intersects.length > 0) {
       window.open('https://juanlorenteguarnieri.github.io/portfolio/CV.pdf', '_blank');
       return;
     }
 
     intersects = raycaster.intersectObject(form1Ref.current);
-
-    // Comprueba si hay intersecciones
     if (intersects.length > 0) {
       changeTypeForm(1);
       return;
     }
 
     intersects = raycaster.intersectObject(form2Ref.current);
-
-    // Comprueba si hay intersecciones
     if (intersects.length > 0) {
       changeTypeForm(2);
       return;
     }
 
     intersects = raycaster.intersectObject(form3Ref.current);
-
-    // Comprueba si hay intersecciones
     if (intersects.length > 0) {
       changeTypeForm(3);
       return;
     }
 
-  }
+    intersects = raycaster.intersectObject(sendFormRef.current);
+    if (intersects.length > 0) {
+      sendEmail();
+      return;
+    }
 
-  //* AUTO ESCALABLE RESOLUCION SEGUN ASPECT RATIO
-  // useEffect(() => {
-  //   // Ajusta el dpr basado en el ancho de la ventana, pero con límites
-  //   const width = window.innerWidth;
-  //   const newDpr = resolution * Math.min(Math.max(width / 1600, 0.5), 1); // Límites entre 1 y 2
-  //   setDpr([newDpr, newDpr]);
-  // }, []);
+    intersects = raycaster.intersectObject(iphoneRef.current);
+    if (intersects.length > 0) {
+      window.open('https://unizar.es/', '_blank');
+      return;
+    }
+
+    intersects = raycaster.intersectObject(unizarRef.current);
+    if (intersects.length > 0) {
+      window.open('https://unizar.es/', '_blank');
+      return;
+    }
+
+    intersects = raycaster.intersectObject(rayTracerGitRef.current);
+    if (intersects.length > 0) {
+      window.open('https://github.com/JuanLorenteGuarnieri', '_blank');
+      return;
+    }
+
+    intersects = raycaster.intersectObject(rayTracerDocRef.current);
+    if (intersects.length > 0) {
+      window.open('https://github.com/JuanLorenteGuarnieri', '_blank');
+      return;
+    }
+
+    intersects = raycaster.intersectObject(chessRef.current);
+    if (intersects.length > 0) {
+      window.open('https://www.chess.com/member/qassiel', '_blank');
+      return;
+    }
+
+    intersects = raycaster.intersectObject(pianoRef.current);
+    if (intersects.length > 0) {
+      window.open('https://recursivearts.com/es/virtual-piano/', '_blank');
+      return;
+    }
+
+    intersects = raycaster.intersectObject(rubikRef.current);
+    if (intersects.length > 0) {
+      window.open('https://rubikscu.be/', '_blank');
+      return;
+    }
+
+    intersects = raycaster.intersectObject(psychologyRef.current);
+    if (intersects.length > 0) {
+      window.open('https://www.amazon.com/Laws-Human-Nature-Robert-Greene/dp/0525428143', '_blank');
+      return;
+    }
+  }
 
   useEffect(() => {
     window.addEventListener('click', onMouseClick, false);
     return () => {
       window.removeEventListener('click', onMouseClick, false);
     };
-  }, []);
+  }, [userName, userEmail, message]);
 
 
 
@@ -251,8 +358,7 @@ const Home = () => {
   const handlePointerMove = (event) => {
     if (cameraRef.current) {
       // Obtiene las coordenadas del cursor
-      let x;
-      let y;
+      let x, x_old, y, y_old;
       const { clientX, clientY } = event;
       if (event.touches) {
         // Manejo del evento táctil
@@ -265,7 +371,11 @@ const Home = () => {
       }
 
       // Llama a tu función de cálculo o lógica con estas coordenadas
-      calculateIntersect(x, y);
+      if (x != x_old || y != y_old) {
+        calculateIntersect(x, y);
+        x = x_old;
+        y = y_old;
+      }
     }
   };
 
@@ -277,12 +387,8 @@ const Home = () => {
 
         <Suspense fallback={<Loader />}>
 
-          {/* <Raycaster externalCamera={cameraRef} onIntersect={handleIntersection} /> */}
-          {/* <HUD />
-          <ContactMe /> */}
-
           <mesh className="CONFIG">
-            <PerformanceMonitor factor={0} onChange={({ factor }) => setDpr(Math.max(0.5, Math.min(0.5 + 1 * factor, 1.2)), 1)} />
+            <PerformanceMonitor factor={0.5} onChange={({ factor }) => setDpr(Math.max(0.5, Math.min(0.5 + 1.1 * factor, 1.2)), 1)} />
 
             <CameraController scrollValue={scrollValue} cameraRef={cameraRef} />
             <ScrollControls eps={0.00001} pages={3} distance={3} maxSpeed={15} >
@@ -291,9 +397,9 @@ const Home = () => {
             <ambientLight intensity={0.5} />
           </mesh>
 
-          {/* <mesh className="GRID" position={[0, 0.1, 0]}>
+          <mesh className="GRID" position={[0, 0.1, 0]}>
             <Grid args={[20, 100, 20, 100]} />
-          </mesh> */}
+          </mesh>
 
           <mesh className="POINTER">
             <pointLight ref={lightRef} castShadow={true} intensity={25} position={[targetPos[0], 0.4, targetPos[2]]}
@@ -375,7 +481,7 @@ const Home = () => {
             <pointLight intensity={20} position={[-1.85, 1, 1.07]}
               color={new THREE.Color(0x223060)} />
             <Bvh firstHitOnly >
-              <Unizar scale={20} position={[-1.85, -0.09, 1.07]} rotation={[0, 0, 0]} />
+              <Unizar ref={unizarRef} scale={20} position={[-1.85, -0.09, 1.07]} rotation={[0, 0, 0]} />
             </Bvh>
             <TextAdvance position={[-0.8, 0, 0.7]} align="left"
               text={"Computer Engineering \nUniversity of Zaragoza"}
@@ -462,8 +568,8 @@ const Home = () => {
 
               <mesh className="LINKS" position={[0, 0, 2.3]}>
                 <Bvh firstHitOnly >
-                  <Doc ref={null} scale={12} position={[0.7, -0.08, 0]} rotation={[0, 0, 0]} />
-                  <Github ref={null} scale={12} position={[0, -0.08, 0]} rotation={[0, 0, 0]} />
+                  <Doc ref={rayTracerDocRef} scale={12} position={[0.7, -0.08, 0]} rotation={[0, 0, 0]} />
+                  <Github ref={rayTracerGitRef} scale={12} position={[0, -0.08, 0]} rotation={[0, 0, 0]} />
                 </Bvh>
               </mesh>
 
@@ -576,8 +682,8 @@ const Home = () => {
                 colorPri={"white"} colorSec={new THREE.Color(0x223060)}
               />
               <Text3DForm position={[-0.2, 0, 0.6]} align="left"
-                text={"Name"} id={1} typeForm={typeForm} change={changeTypeForm}
-                font={fontText} size={0.16} height={0.05}
+                id={1} typeForm={typeForm} change={changeTypeForm}
+                font={fontText} size={0.14} height={0.05} text={userName} setText={changeUserName}
                 colorPri={new THREE.Color(0x424050)} isEditable={"true"} //
               />
               <Box1 ref={form1Ref} position={[-2, -0.14, 1.13]} scale={[20, 20, 15]} />
@@ -589,8 +695,8 @@ const Home = () => {
                 colorPri={"white"} colorSec={new THREE.Color(0x223060)}
               />
               <Text3DForm position={[-0.2, 0, 0.6]} align="left"
-                text={"E-mail"} id={2} typeForm={typeForm} change={changeTypeForm}
-                font={fontText} size={0.16} height={0.05}
+                id={2} typeForm={typeForm} change={changeTypeForm}
+                font={fontText} size={0.14} height={0.05} text={userEmail} setText={changeUserEmail}
                 colorPri={new THREE.Color(0x424050)} isEditable={"true"} //
               />
               <Box1 ref={form2Ref} position={[-2, -0.14, 1.13]} scale={[20, 20, 15]} />
@@ -602,12 +708,12 @@ const Home = () => {
                 font={fontText} size={0.16} height={0.05}
                 colorPri={"white"} colorSec={new THREE.Color(0x223060)}
               />
-              <Text3DForm position={[-0.2, 0, 0.6]} align="left"
-                text={"Message"} id={3} typeForm={typeForm} change={changeTypeForm}
-                font={fontText} size={0.16} height={0.05}
+              <Text3DForm position={[-0.15, 0, 0.6]} align="left"
+                id={3} typeForm={typeForm} change={changeTypeForm} text={message} setText={changeMessage}
+                font={fontText} size={0.14} height={0.05} textParagraph={true} maxLengthCharacters={140}
                 colorPri={new THREE.Color(0x424050)} isEditable={"true"} //
               />
-              <Box2 ref={form3Ref} position={[-2, -0.14, 1.3]} scale={[20, 20, 18]} />
+              <Box2 ref={form3Ref} position={[-2, -0.14, 1.2]} scale={[20, 20, 16]} />
 
             </mesh>
             <mesh className="Iphone" position={[0, 0, 0]}>
@@ -615,7 +721,11 @@ const Home = () => {
                 color={new THREE.Color(0x223060)} />
               <pointLight intensity={110} position={[2, 2, 3.5]}
                 color={new THREE.Color(0x223060)} />
+
+              <pointLight intensity={15} position={[-3.5, 1, 1.1]}
+                color={new THREE.Color(0x223060)} />
               <Bvh firstHitOnly >
+                <Send ref={sendFormRef} scale={20} position={[0.5, -0.08, 4.6]} rotation={[0, 0, 0]} />
                 <Iphone ref={iphoneRef} position={[2, 0.68, 3]} rotation={[0, 0, scrollValue * 30 * Math.PI / 4 + 4.1]} scale={1.5} />
 
               </Bvh>
@@ -646,17 +756,17 @@ const Home = () => {
             </mesh>
             <mesh className="MODELS">
               <Bvh firstHitOnly >
-                <Piano scale={1.3} position={[4.8, -0.19, 2.1]} rotation={[0, -Math.PI / 3, 0]} />
-                <Chess scale={2.4} position={[-4.5, 0, 5]} rotation={[0, 0, 0]} />
+                <Piano ref={pianoRef} scale={1.3} position={[4.8, -0.19, 2.1]} rotation={[0, -Math.PI / 3, 0]} />
+                <Chess ref={chessRef} scale={2.4} position={[-4.5, 0, 5]} rotation={[0, 0, 0]} />
                 <Float
                   speed={4} // Animation speed, defaults to 1
                   rotationIntensity={0.3} // XYZ rotation intensity, defaults to 1
                   floatIntensity={0.4} // Up/down float intensity, works like a multiplier with floatingRange,defaults to 1
                   floatingRange={[0, 1]} // Range of y-axis values the object will float within, defaults to [-0.1,0.1]
                 >
-                  <RubikCube scale={0.15} position={[-4.8, 0, 2.3]} rotation={[0, Math.PI / 6, 0]} />
+                  <RubikCube ref={rubikRef} scale={0.15} position={[-4.8, 0, 2.3]} rotation={[0, Math.PI / 6, 0]} />
                 </Float>
-                <Book scale={0.065} position={[4.7, 0, 5]} rotation={[0, -1.7, 0]} />
+                <Book ref={psychologyRef} scale={0.065} position={[4.7, 0, 5]} rotation={[0, -1.7, 0]} />
               </Bvh>
             </mesh>
 

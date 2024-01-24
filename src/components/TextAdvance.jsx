@@ -1,9 +1,11 @@
-import React, { useRef, useMemo } from 'react';
+import React, { useRef, useEffect, useMemo, useState } from 'react';
 import { Text3D } from '@react-three/drei';
 import * as THREE from 'three';
 
-const TextAdvance = ({ text, position, align = 'center', font, size, height, colorPri, colorSec }) => {
-  // Calcula las dimensiones del texto
+const TextAdvance = ({ text, position, align = 'center', font, size, height, colorPri }) => {
+  const textRef = useRef();
+  const [textPosition, setTextPosition] = useState(position); // Estado para almacenar la posición actualizada del texto
+
   const textProps = useMemo(() => ({
     font,
     size,
@@ -14,37 +16,40 @@ const TextAdvance = ({ text, position, align = 'center', font, size, height, col
     bevelThickness: height * 0.25
   }), [font, size, height]);
 
-  // Usa la ref para acceder a las dimensiones del texto
-  const textRef = useRef();
+  useEffect(() => {
+    if (textRef.current) {
+      const textSize = new THREE.Box3().setFromObject(textRef.current).getSize(new THREE.Vector3());
 
+      let newPosition;
+      switch (align) {
+        case 'left':
+          newPosition = position;
+          break;
+        case 'center':
+          newPosition = [position[0] - textSize.x / 2, position[1] - textSize.y / 2, position[2]];
+          break;
+        case 'right':
+          newPosition = [position[0] - textSize.x, position[1] - textSize.y / 2, position[2]];
+          break;
+        default:
+          newPosition = position;
+      }
 
-  const getPositionBasedOnAlignment = (alignment) => {
-    const textSize = textRef.current ? new THREE.Box3().setFromObject(textRef.current).getSize(new THREE.Vector3()) : new THREE.Vector3();
-
-    switch (alignment) {
-      case 'left':
-        return position;
-      case 'center':
-        return [position[0] - textSize.x / 2, position[1] - textSize.y / 2, position[2]];
-      case 'right':
-        return [position[0] - textSize.x, position[1] - textSize.y / 2, position[2]];
-      default:
-        return position;
+      setTextPosition(newPosition);
     }
-  };
-
+  }, [textRef.current, align, position]); // Dependencias del efecto
 
   return (
     <>
-      <mesh >
-        {/* <Text3D  position={getPositionBasedOnAlignment(align)} rotation={[-Math.PI / 2, 0, 0]} {...textProps}>
-          {text}
-          <meshPhongMaterial attach="material" color={colorSec} />
-        </Text3D> */}
-        <Text3D ref={textRef} castShadow receiveShadow position={getPositionBasedOnAlignment(align)} rotation={[-Math.PI / 2, 0, 0]}
-          font={font}
-          height={height}
-          size={size}>
+      <mesh>
+        <Text3D
+          ref={textRef}
+          castShadow
+          receiveShadow
+          position={textPosition}
+          rotation={[-Math.PI / 2, 0, 0]}
+          {...textProps}
+        >
           {text}
           <meshPhongMaterial attach="material" color={colorPri} />
         </Text3D>
