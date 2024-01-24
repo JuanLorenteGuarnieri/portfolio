@@ -31,19 +31,21 @@ import { RubikCube } from '../../public/models/Rubiks_cube';
 import { Book } from '../../public/models/Book';
 import { Box1 } from '../../public/models/Box1';
 import { Box2 } from '../../public/models/Box2';
+import { Send } from '../../public/models/Send';
+import { Iphone2 } from '../../public/models/Iphone2';
+
 
 import TextAdvance from './TextAdvance';
 import Loader from './Loader';
 import Text3DForm from './Text3DForm';
 import CameraController from './CameraController';
-import { Send } from '../../public/models/Send';
-
 /*
     TODO añadir animacion introduccion para evitar problemas de carga
         cambiar loading inicial
         cambiar navbar a uno lateral
         cambiar icono real por busto
         controlador form (donde pulsas empiezas a borrar, <- y -> para moverse )
+        cambiar scroll
         zoom/camara para que sea responsive
         optimizar codigo
         optimizar modelos 3d
@@ -89,7 +91,6 @@ function ScrollContent2({ setPercen }) {
   );
 }
 
-
 const Home = () => {
   const GPUTier = useDetectGPU()
 
@@ -122,6 +123,7 @@ const Home = () => {
 
   const [targetPos, setTargetPos] = useState(0);
   const [scrollValue, setScrollValue] = useState(0);
+  const scrollRef = useRef();
 
 
   // Estados para almacenar los valores de los inputs
@@ -216,6 +218,10 @@ const Home = () => {
   }, []);
 
   const onMouseClick = (event) => {  // Comprobar pulsar link
+    scrollTo({
+      left: 2,
+      top: 55
+    });
     // Calcula la posición del mouse en coordenadas normalizadas (-1 a +1) para ambos ejes
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -231,7 +237,7 @@ const Home = () => {
 
     intersects = raycaster.intersectObject(linkedinRef.current);
     if (intersects.length > 0) {
-      window.open('https://www.linkedin.com/in/juanlorenteguarnieri/', '_blank');
+      window.open('https://www.linkedin.com/in/juanlorenteguarnieri/en/', '_blank');
       return;
     }
 
@@ -267,7 +273,7 @@ const Home = () => {
 
     intersects = raycaster.intersectObject(iphoneRef.current);
     if (intersects.length > 0) {
-      window.open('https://unizar.es/', '_blank');
+      window.open('https://linktr.ee/JuanLorente', '_blank');
       return;
     }
 
@@ -379,6 +385,22 @@ const Home = () => {
     }
   };
 
+
+  // Función para ajustar la posición del scroll
+  const scrollToHalf = () => {
+    if (scrollRef.current) {
+      const scroll = useScroll();
+
+      const halfway = scrollRef.current.range / 2;
+      scrollRef.current.scrollTo(halfway);
+    }
+  }
+
+  useEffect(() => {
+    // Puedes llamar a scrollToHalf aquí para navegar a la mitad al cargar
+    scrollToHalf();
+  }, []);
+
   return (
     <section className="w-full h-screen">
       <Canvas dpr={dpr} shadows={true} className="w-full h-screen bg-black"
@@ -388,18 +410,18 @@ const Home = () => {
         <Suspense fallback={<Loader />}>
 
           <mesh className="CONFIG">
-            <PerformanceMonitor factor={0.5} onChange={({ factor }) => setDpr(Math.max(0.5, Math.min(0.5 + 1.1 * factor, 1.2)), 1)} />
+            <PerformanceMonitor factor={0.1} onChange={({ factor }) => setDpr(Math.max(0.5, Math.min(0.5 + 0.5 * factor, 1)), 1)} />
 
             <CameraController scrollValue={scrollValue} cameraRef={cameraRef} />
-            <ScrollControls eps={0.00001} pages={3} distance={3} maxSpeed={15} >
+            <ScrollControls pages={3} distance={3} damping={0.3} maxSpeed={15} >
               <ScrollContent setPercen={setScrollValue} />
             </ScrollControls>
             <ambientLight intensity={0.5} />
           </mesh>
 
-          <mesh className="GRID" position={[0, 0.1, 0]}>
+          {/* <mesh className="GRID" position={[0, 0.1, 0]}>
             <Grid args={[20, 100, 20, 100]} />
-          </mesh>
+          </mesh> */}
 
           <mesh className="POINTER">
             <pointLight ref={lightRef} castShadow={true} intensity={25} position={[targetPos[0], 0.4, targetPos[2]]}
@@ -578,8 +600,7 @@ const Home = () => {
             <mesh className="VIDEOGAME" position={[0, 0, 2.7]}>
 
               <mesh className="MODEL" >
-
-                <pointLight intensity={20} position={[2.8, 1, 1.3]}
+                <pointLight intensity={30} position={[-3.3, 1, 1.4]}
                   color={new THREE.Color(0x223060)} />
                 <Bvh firstHitOnly >
                   <Float
@@ -588,7 +609,7 @@ const Home = () => {
                     floatIntensity={0.01} // Up/down float intensity, works like a multiplier with floatingRange,defaults to 1
                     floatingRange={[-0.2, 0.1]} // Range of y-axis values the object will float within, defaults to [-0.1,0.1]
                   >
-                    <RusticSpaceShip position={[2.5, 0.45, 1.8]} />
+                    <RusticSpaceShip position={[-3.5, 0.45, 1.8]} />
                   </Float>
                 </Bvh>
               </mesh>
@@ -605,12 +626,12 @@ const Home = () => {
                 colorPri={"white"} colorSec={new THREE.Color(0x223060)}
               />
 
-              <Threejs scale={20} position={[-3, -0.08, 1.58]} rotation={[0, 0, 0]} />
-              <pointLight intensity={15} position={[-3, 1, 1.58]}
+              <Threejs scale={20} position={[3, -0.08, 1.58]} rotation={[0, 0, 0]} />
+              <pointLight intensity={15} position={[3, 1, 1.58]}
                 color={new THREE.Color(0x223060)} />
 
-              <Reacts scale={20} position={[-4, -0.08, 1.58]} rotation={[0, 0, 0]} />
-              <pointLight intensity={15} position={[-4, 1, 1.58]}
+              <Reacts scale={20} position={[4, -0.08, 1.58]} rotation={[0, 0, 0]} />
+              <pointLight intensity={15} position={[4, 1, 1.58]}
                 color={new THREE.Color(0x223060)} />
 
               {/* <mesh className="LINKS" position={[0, 0, 2.3]}>
@@ -726,17 +747,11 @@ const Home = () => {
                 color={new THREE.Color(0x223060)} />
               <Bvh firstHitOnly >
                 <Send ref={sendFormRef} scale={20} position={[0.5, -0.08, 4.6]} rotation={[0, 0, 0]} />
-                <Iphone ref={iphoneRef} position={[2, 0.68, 3]} rotation={[0, 0, scrollValue * 30 * Math.PI / 4 + 4.1]} scale={1.5} />
+                <Iphone2 ref={iphoneRef} position={[2, 0.68, 3]} rotation={[0, 0, scrollValue * 30 * Math.PI / 4 + 4.1]} scale={1.5} />
 
               </Bvh>
             </mesh>
           </mesh>
-
-          <TextAdvance position={[0, 0, 30.9]}
-            text={"???"}
-            font={fontTitle} size={0.3} height={0.05}
-            colorPri={new THREE.Color(0xdddddd)} colorSec={new THREE.Color(0x333333)}
-          />
 
           <mesh className="INTEREST" position={[0, 0, 35.9]}>
             <TextAdvance position={[0, 0, 0]}
@@ -808,7 +823,6 @@ const Home = () => {
             </Plane>
           </mesh>
 
-          <Preload all />
         </Suspense>
       </Canvas>
     </section >

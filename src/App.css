@@ -54,3 +54,84 @@ body {
   background: #1775bd;
   animation: loading 2s forwards cubic-bezier(0, 0, 0, 0);
 }
+
+nav {
+  position: fixed;
+  height: 350px;
+  left: 20px;
+  top: 0;
+  bottom: 0;
+  margin: auto 0;
+  background-color: #23436529;
+  padding: 20px 10px;
+  border-radius: 30px;
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-flow: column;
+  height: 100%;
+}
+
+nav ul li {
+  width: 100%;
+}
+
+nav ul li a {
+  text-decoration: none;
+  color: #ffffff77;
+  display: flex;
+  align-items: center;
+  cursor: none;
+  /* cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewport="0 0 24 24" style="fill:black;"><circle cx="12" cy="12" r="10" fill="white"/></svg>') 12 12, auto; */
+  width: 100%;
+  transition: 0.2s all ease;
+}
+
+nav ul li a svg {
+  width: 30px;
+  height: 30px;
+}
+
+nav ul li a svg path {
+  transition: 0.2s all ease;
+}
+
+nav ul li a span {
+  position: absolute;
+  background-color: #23436529;
+  padding: 2px 15px;
+  border-radius: 30px;
+  margin-left: 10px;
+  font-weight: 500;
+  font-size: 15px;
+  visibility: hidden;
+  opacity: 0;
+  transition: 0.2s all ease;
+}
+
+nav ul li a.active,
+nav ul li a:hover {
+  color: #ffffff;
+}
+
+nav ul li a.active span,
+nav ul li a:hover span {
+  opacity: 1;
+  visibility: visible;
+  margin-left: 50px;
+}
+
+nav.active ul li a span {
+  position: relative;
+  opacity: 1;
+  visibility: visible;
+  margin-left: 0;
+}
+
+nav.active ul li a:hover span {
+  margin-left: 0;
+}
