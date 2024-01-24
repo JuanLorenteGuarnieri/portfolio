@@ -1,26 +1,15 @@
 import React, { useRef, useState, useEffect, Suspense } from 'react';
-import font from '../assets/fonts/BungeeSpice.json';
-import font2 from '../assets/fonts/Audiowide.json';
-import fontUbuntuBold from '../assets/fonts/Ubuntu/Ubuntu_Bold.json';
+import * as THREE from 'three';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { Plane, ScrollControls, useScroll, Float, Grid, Bvh, useDetectGPU, Sphere, Preload, PerformanceMonitor, } from '@react-three/drei';
 import fontTitle from '../assets/fonts/Encode_Sans_Semi_Expanded/Encode_Sans_Semi_Expanded_Bold.json';
 import fontText from '../assets/fonts/Source_Code_Pro/static/Source_Code_Pro_Regular.json';
-import fontUbuntuMedium from '../assets/fonts/Ubuntu/Ubuntu_Medium_Regular.json';
-import fontUbuntuMediumItalic from '../assets/fonts/Ubuntu/Ubuntu_Medium_Italic.json';
-import fontEmoji from '../assets/fonts/Noto_Color_Emoji/Noto_Color_Emoji.json';
-import * as THREE from 'three';
-import { Canvas, extend, useFrame, useThree } from '@react-three/fiber';
-import { Plane, Box, ScrollControls, useScroll, Text3D, SpotLight, Float, ContactShadows, Shadow, Svg, Gltf, useTexture, Grid, RoundedBox, Bvh, useDetectGPU, useProgress, Html, Sphere, Preload, PerformanceMonitor, } from '@react-three/drei';
-import CameraController from './CameraController';
-import SpotLightAberration from './SpotLightAberration';
+
 import { Logo } from '../../public/models/Logo';
 import { LogoGema } from '../../public/models/LogoGema';
-import Raycaster from './Raycaster';
 import { Linkedin } from '../../public/models/Linkedin';
 import { Github } from '../../public/models/Github';
 import { CV } from '../../public/models/Cv';
-import TextAdvance from './TextAdvance';
-import Loader from './Loader';
-
 import { Iphone } from '../../public/models/Iphone';
 import { Profile } from '../../public/models/Profile';
 import { Unizar } from '../../public/models/Unizar';
@@ -35,12 +24,28 @@ import { Reacts } from '../../public/models/React';
 import { Doc } from '../../public/models/Doc';
 import { Play } from '../../public/models/Play';
 import { RusticSpaceShip } from '../../public/models/RusticSpaceShip';
-import HUD from './HUD';
-import ContactMe from './ContactMe';
-import Text3DForm from './Text3DForm';
 import { Piano } from '../../public/models/Piano';
 import { Chess } from '../../public/models/Chess';
 import { RubikCube } from '../../public/models/Rubiks_cube';
+import { Book } from '../../public/models/Book';
+import { Box1 } from '../../public/models/Box1';
+import { Box2 } from '../../public/models/Box2';
+
+import TextAdvance from './TextAdvance';
+import Loader from './Loader';
+import Text3DForm from './Text3DForm';
+import CameraController from './CameraController';
+
+/*
+    TODO añadir animacion introduccion para evitar problemas de carga
+        cambiar loading inicial
+        cambiar navbar a uno lateral
+        cambiar icono real por busto
+        controlador form (añadir \n, comprobar entradas antes de enviar, api correo, donde pulsas empiezas a borrar, <- y -> para moverse )
+        zoom/camara para que sea responsive
+        optimizar codigo
+        optimizar modelos 3d
+*/
 
 function ScrollContent({ setPercen }) {
   const scroll = useScroll();
@@ -94,24 +99,50 @@ const Home = () => {
   const githubRef = useRef();
   const cvRef = useRef();
   const iphoneRef = useRef();
-  const [iphoneRotate, setIphoneRotate] = useState(0);
 
-  const [dpr, setDpr] = useState(1); // Valores mínimos y máximos de dpr
-  const [resolution, setResolution] = useState(1.2); // Valores mínimos y máximos de dpr
+  const form1Ref = useRef();
+  const form2Ref = useRef();
+  const form3Ref = useRef();
+
+
+
+  const [dpr, setDpr] = useState(1);
+  const [typeForm, setTypeForm] = useState(0);
 
   const [targetPos, setTargetPos] = useState(0);
   const [scrollValue, setScrollValue] = useState(0);
-
-
-  const handleIntersection = (point) => {
-    setTargetPos([point.x, point.y, point.z]);
-  };
 
   // Configura el raycaster
   const raycaster = new THREE.Raycaster();
   const mouse = new THREE.Vector2();
 
-  function onMouseClick(event) {
+  const changeTypeForm = (n) => {
+    setTypeForm(n);
+  };
+
+  const handleIntersection = (point) => {
+    setTargetPos([point.x, point.y, point.z]);
+  };
+
+  const handleKeyDown = (event) => {
+    // Comprueba si la tecla presionada es la tecla Espacio
+    if (event.keyCode === 32) {
+      event.preventDefault(); // Previene la acción predeterminada (scroll)
+    }
+  };
+
+  useEffect(() => {
+    // Agrega el manejador de eventos al montar el componente
+    window.addEventListener('keydown', handleKeyDown);
+
+    // Elimina el manejador de eventos al desmontar el componente
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
+  function onMouseClick(event) {  // Comprobar pulsar link
+
     // Calcula la posición del mouse en coordenadas normalizadas (-1 a +1) para ambos ejes
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -120,30 +151,53 @@ const Home = () => {
     raycaster.setFromCamera(mouse, cameraRef.current);
 
     // Realiza la intersección
-    const intersectsGithub = raycaster.intersectObject(githubRef.current);
+    let intersects = raycaster.intersectObject(githubRef.current);
 
     // Comprueba si hay intersecciones
-    if (intersectsGithub.length > 0) {
+    if (intersects.length > 0) {
       window.open('https://github.com/JuanLorenteGuarnieri', '_blank');
       return;
     }
 
-    const intersectsLinkedin = raycaster.intersectObject(linkedinRef.current);
+    intersects = raycaster.intersectObject(linkedinRef.current);
     // Comprueba si hay intersecciones
-    if (intersectsLinkedin.length > 0) {
+    if (intersects.length > 0) {
       window.open('https://www.linkedin.com/in/juanlorenteguarnieri/', '_blank');
       return;
     }
-    const intersectsCV = raycaster.intersectObject(cvRef.current);
+    intersects = raycaster.intersectObject(cvRef.current);
 
     // Comprueba si hay intersecciones
-    if (intersectsCV.length > 0) {
+    if (intersects.length > 0) {
       window.open('https://juanlorenteguarnieri.github.io/portfolio/CV.pdf', '_blank');
       return;
     }
 
-  }
+    intersects = raycaster.intersectObject(form1Ref.current);
 
+    // Comprueba si hay intersecciones
+    if (intersects.length > 0) {
+      changeTypeForm(1);
+      return;
+    }
+
+    intersects = raycaster.intersectObject(form2Ref.current);
+
+    // Comprueba si hay intersecciones
+    if (intersects.length > 0) {
+      changeTypeForm(2);
+      return;
+    }
+
+    intersects = raycaster.intersectObject(form3Ref.current);
+
+    // Comprueba si hay intersecciones
+    if (intersects.length > 0) {
+      changeTypeForm(3);
+      return;
+    }
+
+  }
 
   //* AUTO ESCALABLE RESOLUCION SEGUN ASPECT RATIO
   // useEffect(() => {
@@ -153,24 +207,13 @@ const Home = () => {
   //   setDpr([newDpr, newDpr]);
   // }, []);
 
-  // *Mover IPHONE
-  // useEffect(() => {
-  //   // Configurar un intervalo
-  //   const interval = setInterval(() => {
-  //     setIphoneRotate(v => (v + 0.02) % (2 * Math.PI)); // Ajusta este valor según sea necesario
-  //   }, 50); // Ajusta el intervalo de tiempo según sea necesario
-
-  //   // Limpiar el intervalo cuando el componente se desmonte
-  //   return () => clearInterval(interval);
-  // }, []);
-
   useEffect(() => {
     window.addEventListener('click', onMouseClick, false);
-
     return () => {
       window.removeEventListener('click', onMouseClick, false);
     };
   }, []);
+
 
 
   const calculateIntersect2 = (x, y) => {
@@ -227,21 +270,20 @@ const Home = () => {
   };
 
   return (
-
     <section className="w-full h-screen">
       <Canvas dpr={dpr} shadows={true} className="w-full h-screen bg-black"
         onPointerMove={handlePointerMove} onTouchMove={handlePointerMove}
         camera={({ isPerspectiveCamera: true, near: 0.1, far: 8, setFocalLength: 555, zoom: (window.innerWidth / window.innerHeight) / 1.6 })}>
 
-        <PerformanceMonitor factor={1} onChange={({ factor }) => setDpr(0.5 + 0 * factor, 1)} />
         <Suspense fallback={<Loader />}>
 
           {/* <Raycaster externalCamera={cameraRef} onIntersect={handleIntersection} /> */}
           {/* <HUD />
           <ContactMe /> */}
 
-
           <mesh className="CONFIG">
+            <PerformanceMonitor factor={0} onChange={({ factor }) => setDpr(Math.max(0.5, Math.min(0.5 + 1 * factor, 1.2)), 1)} />
+
             <CameraController scrollValue={scrollValue} cameraRef={cameraRef} />
             <ScrollControls eps={0.00001} pages={3} distance={3} maxSpeed={15} >
               <ScrollContent setPercen={setScrollValue} />
@@ -520,83 +562,133 @@ const Home = () => {
 
           <mesh className="CONTACT ME" position={[0, 0, 20.9]}>
 
+            <pointLight intensity={400} position={[-2.5, 4, 3.5]}
+              color={new THREE.Color(0x223060)} />
             <TextAdvance position={[0, 0, 0]}
               text={"CONTACT ME"}
               font={fontTitle} size={0.3} height={0.05}
               colorPri={new THREE.Color(0xdddddd)} colorSec={new THREE.Color(0x333333)}
             />
             <mesh className="Name" position={[-3.5, 0, 0.8]}>
-
-              <TextAdvance position={[0, -0.03, 0]} align="left"
+              <TextAdvance position={[0, -0.03, 0.15]} align="left"
                 text={"Name"}
                 font={fontText} size={0.16} height={0.05}
                 colorPri={"white"} colorSec={new THREE.Color(0x223060)}
               />
-              <Text3DForm position={[-0.1, 0, 0.42]} align="left"
-                text={"Name"}
-                font={fontText} size={0.16} height={0.1}
-                colorPri={new THREE.Color(0x424050)} isEditable={"true"}
+              <Text3DForm position={[-0.2, 0, 0.6]} align="left"
+                text={"Name"} id={1} typeForm={typeForm} change={changeTypeForm}
+                font={fontText} size={0.16} height={0.05}
+                colorPri={new THREE.Color(0x424050)} isEditable={"true"} //
               />
-              <RoundedBox position={[1.5, -2.4, 0.35]} rotation={[Math.PI / 2, 0, 0]}
-                args={[4.3, 1, 5]} radius={0.5}>
-                <meshPhongMaterial color={"white"} />
-              </RoundedBox>
+              <Box1 ref={form1Ref} position={[-2, -0.14, 1.13]} scale={[20, 20, 15]} />
             </mesh>
             <mesh className="E-mail" position={[-3.5, 0, 1.9]}>
-              <TextAdvance position={[0, -0.03, 0]} align="left"
+              <TextAdvance position={[0, -0.03, 0.15]} align="left"
                 text={"E-mail"}
                 font={fontText} size={0.16} height={0.05}
                 colorPri={"white"} colorSec={new THREE.Color(0x223060)}
               />
-              <RoundedBox position={[1.5, -2.4, 0.4]} rotation={[Math.PI / 2, 0, 0]}
-                args={[4.3, 1, 5]} radius={0.5}>
-                <meshPhongMaterial color={"white"} />
-              </RoundedBox>
+              <Text3DForm position={[-0.2, 0, 0.6]} align="left"
+                text={"E-mail"} id={2} typeForm={typeForm} change={changeTypeForm}
+                font={fontText} size={0.16} height={0.05}
+                colorPri={new THREE.Color(0x424050)} isEditable={"true"} //
+              />
+              <Box1 ref={form2Ref} position={[-2, -0.14, 1.13]} scale={[20, 20, 15]} />
+
             </mesh>
-            <mesh className="Message" position={[0, 0, 0]}>
-              <TextAdvance position={[-3.5, -0.03, 3]} align="left"
+            <mesh className="Message" position={[-3.5, 0, 3]}>
+              <TextAdvance position={[0, -0.03, 0.15]} align="left"
                 text={"Message"}
                 font={fontText} size={0.16} height={0.05}
                 colorPri={"white"} colorSec={new THREE.Color(0x223060)}
               />
-              <RoundedBox position={[-2, -2.4, 4]} rotation={[Math.PI / 2, 0, 0]}
-                args={[5, 3, 5]} radius={1}>
-                <meshStandardMaterial color={"white"} />
-              </RoundedBox>
+              <Text3DForm position={[-0.2, 0, 0.6]} align="left"
+                text={"Message"} id={3} typeForm={typeForm} change={changeTypeForm}
+                font={fontText} size={0.16} height={0.05}
+                colorPri={new THREE.Color(0x424050)} isEditable={"true"} //
+              />
+              <Box2 ref={form3Ref} position={[-2, -0.14, 1.3]} scale={[20, 20, 18]} />
+
             </mesh>
             <mesh className="Iphone" position={[0, 0, 0]}>
-              <pointLight intensity={400} position={[2, 4, 3.5]}
+              <pointLight intensity={300} position={[2, 4, 3.5]}
                 color={new THREE.Color(0x223060)} />
               <pointLight intensity={110} position={[2, 2, 3.5]}
                 color={new THREE.Color(0x223060)} />
               <Bvh firstHitOnly >
-                <Iphone ref={iphoneRef} position={[2, 0.68, 3]} rotation={[0, 0, scrollValue * 30 * Math.PI / 4 + Math.PI + iphoneRotate]} scale={1.5} />
+                <Iphone ref={iphoneRef} position={[2, 0.68, 3]} rotation={[0, 0, scrollValue * 30 * Math.PI / 4 + 4.1]} scale={1.5} />
 
               </Bvh>
             </mesh>
           </mesh>
 
-          <mesh className="INTEREST" position={[0, 0, 33.9]}>
-            <pointLight intensity={500} position={[0, 3, 4]}
-              color={new THREE.Color(0x223060)} />
+          <TextAdvance position={[0, 0, 30.9]}
+            text={"???"}
+            font={fontTitle} size={0.3} height={0.05}
+            colorPri={new THREE.Color(0xdddddd)} colorSec={new THREE.Color(0x333333)}
+          />
+
+          <mesh className="INTEREST" position={[0, 0, 35.9]}>
             <TextAdvance position={[0, 0, 0]}
-              text={"???"}
+              text={"INTERESTS"}
               font={fontTitle} size={0.3} height={0.05}
               colorPri={new THREE.Color(0xdddddd)} colorSec={new THREE.Color(0x333333)}
             />
-            <Bvh firstHitOnly >
-              <Piano scale={1.3} position={[4, -0.19, 3]} rotation={[0, -Math.PI / 3, 0]} />
-              <Chess scale={2} position={[-2.1, 0, 2.9]} rotation={[0, 0, 0]} />
-              <Float
-                speed={4} // Animation speed, defaults to 1
-                rotationIntensity={0.1} // XYZ rotation intensity, defaults to 1
-                floatIntensity={0.4} // Up/down float intensity, works like a multiplier with floatingRange,defaults to 1
-                floatingRange={[0, 1]} // Range of y-axis values the object will float within, defaults to [-0.1,0.1]
-              >
-                <RubikCube scale={0.13} position={[-3.7, 0, 5.2]} rotation={[0, Math.PI / 6, 0]} />
-              </Float>
-            </Bvh>
+            <mesh className="LIGHTS">
+              <pointLight intensity={100} position={[2.5, 2, 2.5]}
+                color={new THREE.Color(0x223060)} />
+              <pointLight intensity={100} position={[2.5, 2, 4.8]}
+                color={new THREE.Color(0x223060)} />
+              <pointLight intensity={100} position={[-2.5, 2, 2.5]}
+                color={new THREE.Color(0x223060)} />
+              <pointLight intensity={100} position={[-2.5, 2, 4.8]}
+                color={new THREE.Color(0x223060)} />
+            </mesh>
+            <mesh className="MODELS">
+              <Bvh firstHitOnly >
+                <Piano scale={1.3} position={[4.8, -0.19, 2.1]} rotation={[0, -Math.PI / 3, 0]} />
+                <Chess scale={2.4} position={[-4.5, 0, 5]} rotation={[0, 0, 0]} />
+                <Float
+                  speed={4} // Animation speed, defaults to 1
+                  rotationIntensity={0.3} // XYZ rotation intensity, defaults to 1
+                  floatIntensity={0.4} // Up/down float intensity, works like a multiplier with floatingRange,defaults to 1
+                  floatingRange={[0, 1]} // Range of y-axis values the object will float within, defaults to [-0.1,0.1]
+                >
+                  <RubikCube scale={0.15} position={[-4.8, 0, 2.3]} rotation={[0, Math.PI / 6, 0]} />
+                </Float>
+                <Book scale={0.065} position={[4.7, 0, 5]} rotation={[0, -1.7, 0]} />
+              </Bvh>
+            </mesh>
 
+            <mesh className="TEXT">
+              <TextAdvance position={[2.5, 0, 2.5]}
+                text={"PIANO"}
+                font={fontText} size={0.17} height={0.05}
+                colorPri={"white"} colorSec={new THREE.Color(0x223060)}
+              />
+              <TextAdvance position={[2.5, 0, 2.8]}
+                text={"10 years EXP"}
+                font={fontText} size={0.16} height={0.05}
+                colorPri={"white"} colorSec={new THREE.Color(0x223060)}
+              />
+              <TextAdvance position={[-2.5, 0, 2.66]}
+                text={"RUBIK's solver"}
+                font={fontText} size={0.16} height={0.05}
+                colorPri={"white"} colorSec={new THREE.Color(0x223060)}
+              />
+
+              <TextAdvance position={[-2.5, 0, 5]}
+                text={"CHESS +833 games"}
+                font={fontText} size={0.16} height={0.05}
+                colorPri={"white"} colorSec={new THREE.Color(0x223060)}
+              />
+
+              <TextAdvance position={[2.5, 0, 5]}
+                text={"PSYCHOLOGY reader"}
+                font={fontText} size={0.16} height={0.05}
+                colorPri={"white"} colorSec={new THREE.Color(0x223060)}
+              />
+            </mesh>
           </mesh>
 
           <mesh className="FLOOR" >
