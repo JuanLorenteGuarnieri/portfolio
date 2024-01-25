@@ -42,56 +42,14 @@ import CameraController from './CameraController';
 /*
     TODO añadir animacion introduccion para evitar problemas de carga
         cambiar loading inicial
-        cambiar navbar a uno lateral
         cambiar icono real por busto
         controlador form (donde pulsas empiezas a borrar, <- y -> para moverse )
-        cambiar scroll
         zoom/camara para que sea responsive
         optimizar codigo
         optimizar modelos 3d
 */
 
-function ScrollContent({ setPercen }) {
-  const scroll = useScroll();
-  useFrame(() => {
-    setPercen(scroll.offset);
-  }, [setPercen]);
-
-};
-
-function ScrollContent2({ setPercen }) {
-  const scrollContainerRef = useRef(null);
-
-  useEffect(() => {
-    const handleScrollChange = () => {
-      if (scrollContainerRef.current) {
-        const currentScroll = scrollContainerRef.current.scrollTop;
-        const maxScroll = scrollContainerRef.current.scrollHeight - scrollContainerRef.current.clientHeight;
-        const newPercentage = (currentScroll / maxScroll) * 100;
-
-        setPercen(newPercentage);
-      }
-    };
-
-    const scrollContainer = scrollContainerRef.current;
-    if (scrollContainer) {
-      scrollContainer.addEventListener('scroll', handleScrollChange);
-    }
-
-    return () => {
-      if (scrollContainer) {
-        scrollContainer.removeEventListener('scroll', handleScrollChange);
-      }
-    };
-  }, [setPercen]);
-
-  return (
-    <ScrollControls ref={scrollContainerRef} eps={0.00001} pages={3} distance={8} maxSpeed={15} >
-    </ScrollControls>
-  );
-}
-
-const Home = () => {
+const Home = ({ scrollValue, setScrollValue }) => {
   const GPUTier = useDetectGPU()
 
   const lightRef = useRef();
@@ -122,7 +80,6 @@ const Home = () => {
   const [typeForm, setTypeForm] = useState(0);
 
   const [targetPos, setTargetPos] = useState(0);
-  const [scrollValue, setScrollValue] = useState(0);
   const scrollRef = useRef();
 
 
@@ -218,10 +175,7 @@ const Home = () => {
   }, []);
 
   const onMouseClick = (event) => {  // Comprobar pulsar link
-    scrollTo({
-      left: 2,
-      top: 55
-    });
+
     // Calcula la posición del mouse en coordenadas normalizadas (-1 a +1) para ambos ejes
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -385,37 +339,20 @@ const Home = () => {
     }
   };
 
-
-  // Función para ajustar la posición del scroll
-  const scrollToHalf = () => {
-    if (scrollRef.current) {
-      const scroll = useScroll();
-
-      const halfway = scrollRef.current.range / 2;
-      scrollRef.current.scrollTo(halfway);
-    }
-  }
-
-  useEffect(() => {
-    // Puedes llamar a scrollToHalf aquí para navegar a la mitad al cargar
-    scrollToHalf();
-  }, []);
-
   return (
+
     <section className="w-full h-screen">
       <Canvas dpr={dpr} shadows={true} className="w-full h-screen bg-black"
+        style={{ position: 'fixed', top: 0, left: 0, zIndex: 1 }}
+
         onPointerMove={handlePointerMove} onTouchMove={handlePointerMove}
-        camera={({ isPerspectiveCamera: true, near: 0.1, far: 8, setFocalLength: 555, zoom: (window.innerWidth / window.innerHeight) / 1.6 })}>
+        camera={({ isPerspectiveCamera: true, near: 0.1, far: 15, setFocalLength: 555, zoom: (window.innerWidth / window.innerHeight) / 1.6 })}>
 
         <Suspense fallback={<Loader />}>
 
           <mesh className="CONFIG">
             <PerformanceMonitor factor={0.1} onChange={({ factor }) => setDpr(Math.max(0.5, Math.min(0.5 + 0.5 * factor, 1)), 1)} />
-
             <CameraController scrollValue={scrollValue} cameraRef={cameraRef} />
-            <ScrollControls pages={3} distance={3} damping={0.3} maxSpeed={15} >
-              <ScrollContent setPercen={setScrollValue} />
-            </ScrollControls>
             <ambientLight intensity={0.5} />
           </mesh>
 

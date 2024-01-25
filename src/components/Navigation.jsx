@@ -1,22 +1,21 @@
 import React from 'react'
 
 const Navigation = ({ action }) => {
-  function changeColorRed() { action("red") };
-  function changeColorBlue() { action("blue") };
-  function changeColorGreen() { action("green") }
-  function changeColorYellow() { action("yellow") }
-  function changeColorWhite() { action("white") }
-  function changeColorBlack() { action("black") }
-  function changeColorGrey() { action("grey") }
+  function changeScroll(scrollPosition, e) {
+    e.preventDefault();
+    e.stopPropagation();
+    action(scrollPosition);
+  };
 
 
   return (
-    <nav id="menuBar">
+    <nav id="menuBar"
+      style={{ position: 'fixed', top: 0, left: 0, zIndex: 1, height: '45%' }}>
       <ul>
-        <li onClick={changeColorRed}>
+        <li onClick={(e) => changeScroll('0', e)}>
           <a >
             <svg version="1.0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900.000000 900.000000"
-              preserveAspectRatio="xMidYMid meet" fill="currentColor" className="w-5 h-5">
+              preserveAspectRatio="xMidYMid meet" fill="currentColor" className="w-5 h-5" >
               <g transform="translate(-100,900) scale(0.12,-0.12)"
                 stroke="none">
                 <path d="M3514 7251 c-28 -16 -64 -46 -80 -66 -16 -20 -34 -42 -39 -48 -15
@@ -89,11 +88,11 @@ const Navigation = ({ action }) => {
                           -56 72 -65 81 -9 9 -39 47 -65 83 -27 36 -52 66 -57 66 -4 0 -8 4 -8 9 0 5
                           -10 25 -22 45 -28 43 -68 49 -86 14z"/>
               </g>
-            </svg>
+            </svg >
             <span>Title</span>
-          </a>
-        </li>
-        <li onClick={changeColorBlue}>
+          </a >
+        </li >
+        <li onClick={(e) => changeScroll('1500', e)}>
           <a >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
               <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clipRule="evenodd" />
@@ -101,7 +100,7 @@ const Navigation = ({ action }) => {
             <span>About</span>
           </a>
         </li>
-        <li onClick={changeColorYellow}>
+        <li onClick={(e) => changeScroll('2200', e)}>
           <a >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
               <path d="M11.7 2.805a.75.75 0 0 1 .6 0A60.65 60.65 0 0 1 22.83 8.72a.75.75 0 0 1-.231 1.337 49.948 49.948 0 0 0-9.902 3.912l-.003.002c-.114.06-.227.119-.34.18a.75.75 0 0 1-.707 0A50.88 50.88 0 0 0 7.5 12.173v-.224c0-.131.067-.248.172-.311a54.615 54.615 0 0 1 4.653-2.52.75.75 0 0 0-.65-1.352 56.123 56.123 0 0 0-4.78 2.589 1.858 1.858 0 0 0-.859 1.228 49.803 49.803 0 0 0-4.634-1.527.75.75 0 0 1-.231-1.337A60.653 60.653 0 0 1 11.7 2.805Z" />
@@ -111,7 +110,7 @@ const Navigation = ({ action }) => {
             <span>Education</span>
           </a>
         </li>
-        <li onClick={changeColorGreen}>
+        <li onClick={(e) => changeScroll('3300', e)}>
           <a >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
               <path d="M19.906 9c.382 0 .749.057 1.094.162V9a3 3 0 0 0-3-3h-3.879a.75.75 0 0 1-.53-.22L11.47 3.66A2.25 2.25 0 0 0 9.879 3H6a3 3 0 0 0-3 3v3.162A3.756 3.756 0 0 1 4.094 9h15.812ZM4.094 10.5a2.25 2.25 0 0 0-2.227 2.568l.857 6A2.25 2.25 0 0 0 4.951 21H19.05a2.25 2.25 0 0 0 2.227-1.932l.857-6a2.25 2.25 0 0 0-2.227-2.568H4.094Z" />
@@ -120,7 +119,7 @@ const Navigation = ({ action }) => {
             <span>Projects</span>
           </a>
         </li>
-        <li onClick={changeColorWhite}>
+        <li onClick={(e) => changeScroll('4300', e)}>
           <a >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
               <path fillRule="evenodd" d="M12 6.75a5.25 5.25 0 0 1 6.775-5.025.75.75 0 0 1 .313 1.248l-3.32 3.319c.063.475.276.934.641 1.299.365.365.824.578 1.3.64l3.318-3.319a.75.75 0 0 1 1.248.313 5.25 5.25 0 0 1-5.472 6.756c-1.018-.086-1.87.1-2.309.634L7.344 21.3A3.298 3.298 0 1 1 2.7 16.657l8.684-7.151c.533-.44.72-1.291.634-2.309A5.342 5.342 0 0 1 12 6.75ZM4.117 19.125a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Z" clipRule="evenodd" />
@@ -130,7 +129,7 @@ const Navigation = ({ action }) => {
             <span>Skills</span>
           </a>
         </li>
-        <li onClick={changeColorBlack}>
+        <li onClick={(e) => changeScroll('5400', e)}>
           <a >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
               <path d="M1.5 8.67v8.58a3 3 0 0 0 3 3h15a3 3 0 0 0 3-3V8.67l-8.928 5.493a3 3 0 0 1-3.144 0L1.5 8.67Z" />
@@ -139,7 +138,7 @@ const Navigation = ({ action }) => {
             <span>Contact</span>
           </a>
         </li>
-        <li onClick={changeColorGrey}>
+        <li onClick={(e) => changeScroll('8500', e)}>
           <a >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
               <path fillRule="evenodd" d="M19.952 1.651a.75.75 0 0 1 .298.599V16.303a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.403-4.909l2.311-.66a1.5 1.5 0 0 0 1.088-1.442V6.994l-9 2.572v9.737a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.402-4.909l2.31-.66a1.5 1.5 0 0 0 1.088-1.442V5.25a.75.75 0 0 1 .544-.721l10.5-3a.75.75 0 0 1 .658.122Z" clipRule="evenodd" />
@@ -147,8 +146,8 @@ const Navigation = ({ action }) => {
             <span>Interests</span>
           </a>
         </li>
-      </ul>
-    </nav>
+      </ul >
+    </nav >
   );
 };
 
