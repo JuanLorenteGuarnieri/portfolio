@@ -19,7 +19,7 @@ const App = () => {
   };
 
   const [scrollY, setScrollY] = useState('0');
-  const maxY = 9200;
+  const maxY = 9000;
   const changeScroll = (n) => {
     setScrollY(n);
     window.scroll({
@@ -36,7 +36,7 @@ const App = () => {
     const onScroll = (e) => {
       // Calcula el valor de desplazamiento y actualiza la cámara o la escena
       setScrollY(window.scrollY);
-      setScrollValue(window.scrollY / 8500);
+      setScrollValue(window.scrollY);
     };
 
     window.addEventListener('scroll', onScroll, false);
@@ -47,15 +47,18 @@ const App = () => {
     };
   }, []);
 
+
+  const isMobileDevice = () => {
+    return /Mobi|Android/i.test(navigator.userAgent);
+  };
+  const showCursor = !isMobileDevice();
+
+
   return (
     <>
-
-      <CustomCursor color={col} size={5} />
-      <Home setScrollValue={changeScrollValue} scrollValue={scrollValue} />
+      {showCursor && <CustomCursor color={col} size={5} />}
+      <Home scrollValue={scrollValue} maxY={maxY} changeScroll={changeScroll} />
       <div style={{ height: maxY + 'px' }} />
-
-      <Navigation action={changeScroll} />
-
     </>
 
   )

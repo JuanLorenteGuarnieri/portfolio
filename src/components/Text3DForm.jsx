@@ -7,17 +7,37 @@ const Text3DInteractive = ({ id, change, typeForm, font, height, size, colorPri,
   const textRef = useRef();
   const [textProps, setTextProps] = useState({ font, size, height });
   const { gl } = useThree();
+  const [cursorPosition, setCursorPosition] = useState(0);
+  const [sizeRatio, setSizeRatio] = useState(1);
+
+  const cursorRef = useRef();
+  const [showCursor, setShowCursor] = useState(true);
+
 
   const handleKeyDown = (e) => {
     if (!(typeForm == id)) return;
 
     if (e.key === 'Enter') {
       gl.domElement.removeAttribute('tabindex');
-      change(0);
+      setCursorPosition(text.length);
+      change(id + 1);
     } else if (e.key === 'Backspace') {
-      setText(text.slice(0, -1));
-    } else if (e.key.length === 1 && maxLengthCharacters > text.length) { // Filtra teclas de control como 'Shift' o 'Ctrl'
-      setText(text + e.key);
+      if (cursorPosition > 0) {
+        const newText = text.substring(0, cursorPosition - 1) + text.substring(cursorPosition);
+        setText(newText);
+        setCursorPosition(cursorPosition - 1);
+      }
+    } else if (e.key === 'ArrowLeft') {
+      console.log('<-');
+      setCursorPosition(Math.max(0, cursorPosition - 1));
+    } else if (e.key === 'ArrowRight') {
+      console.log('->');
+
+      setCursorPosition(Math.min(text.length, cursorPosition + 1));
+    } else if (e.key.length === 1 && maxLengthCharacters > text.length) {
+      const newText = text.substring(0, cursorPosition) + e.key + text.substring(cursorPosition);
+      setText(newText);
+      setCursorPosition(cursorPosition + 1);
     }
   };
 
@@ -27,16 +47,34 @@ const Text3DInteractive = ({ id, change, typeForm, font, height, size, colorPri,
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [text, gl.domElement, typeForm]);
+  }, [text, gl.domElement, typeForm, cursorPosition]);
 
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (typeForm == id) {
+
+        setShowCursor(prev => !prev);
+      } else {
+        setCursorPosition(text.length);
+        setShowCursor(false);
+      }
+    }, 500); // Parpadea cada segundo
+
+    return () => clearInterval(interval);
+  }, [id, typeForm]);
 
   // Ajusta el tamaño del texto en función del número de caracteres
   useEffect(() => {
     const textLength = text.length;
     if (textLength > maxCharacters && !textParagraph) {
       const newSize = Math.max(size * (maxCharacters / textLength), 0.1); // Asegura un tamaño mínimo
+      setSizeRatio(newSize / size);
       setTextProps({ font, size: newSize, height });
     } else {
+      if (textLength <= maxCharacters) {
+        setSizeRatio(1);
+      }
       setTextProps({ font, size, height });
     }
   }, [text, font, height, size, maxCharacters]);
@@ -67,15 +105,30 @@ const Text3DInteractive = ({ id, change, typeForm, font, height, size, colorPri,
             {text.slice(112, 140)}
             <meshPhongMaterial attach="material" color={colorPri} />
           </Text3D>
+          {showCursor && (
+            <Text3D ref={cursorRef} castShadow receiveShadow position={[position[0] - 0.05 + 0.1161 * (cursorPosition % 28), position[1], position[2] + 0.3 * Math.floor(cursorPosition / 28)]} rotation={[-Math.PI / 2, 0, 0]} {...textProps}>
+              {'|'}
+              <meshPhongMaterial attach="material" color={colorPri} />
+            </Text3D>
+          )}
         </group>
       );
     } else {
       // Comportamiento cuando textParagraph es false
       return (
-        <Text3D ref={textRef} castShadow receiveShadow position={position} rotation={[-Math.PI / 2, 0, 0]} {...textProps}>
-          {text}
-          <meshPhongMaterial attach="material" color={colorPri} />
-        </Text3D>
+        <group>
+          <Text3D ref={textRef} castShadow receiveShadow position={position} rotation={[-Math.PI / 2, 0, 0]} {...textProps}>
+            {text}
+            <meshPhongMaterial attach="material" color={colorPri} />
+          </Text3D>
+          {showCursor && (
+            <Text3D ref={cursorRef} castShadow receiveShadow position={[position[0] - 0.05 + 0.116 * cursorPosition * sizeRatio, position[1], position[2]]} rotation={[-Math.PI / 2, 0, 0]} {...textProps}>
+              {'|'}
+              <meshPhongMaterial attach="material" color={colorPri} />
+            </Text3D>
+          )}
+        </group>
+
       );
     }
   };

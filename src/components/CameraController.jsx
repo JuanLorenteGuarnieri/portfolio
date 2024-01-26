@@ -3,7 +3,7 @@ import { useThree } from '@react-three/fiber';
 
 
 
-const CameraController = ({ scrollValue, cameraRef }) => {
+const CameraController = ({ scrollValue, cameraRef, maxY }) => {
   let { camera, gl } = useThree();
 
   // Esta función ajusta el FOV de la cámara basado en el ancho de la ventana
@@ -11,6 +11,7 @@ const CameraController = ({ scrollValue, cameraRef }) => {
 
     camera.zoom = (window.innerWidth / window.innerHeight) / 1.6;
     // camera.fov = (window.innerHeight / window.innerWidth) * 40;
+    camera.lookAt(0, 0, camera.position.z - 2 + Math.min(0.5, window.innerHeight / window.innerWidth));
 
   };
 
@@ -21,8 +22,8 @@ const CameraController = ({ scrollValue, cameraRef }) => {
 
     // Configura la posición inicial y la dirección de la mirada de la cámara
     camera.zoom = (window.innerWidth / window.innerHeight) / 1.6;
-    camera.position.set(0, 5, 0);
-    camera.lookAt(0, 0, -2);
+    camera.position.set(0, 5, 25);
+    camera.lookAt(0, 0, 23);
 
     adjustCameraFOV();
     window.addEventListener('resize', adjustCameraFOV);
@@ -31,13 +32,13 @@ const CameraController = ({ scrollValue, cameraRef }) => {
     return () => {
       window.removeEventListener('resize', adjustCameraFOV);
     };
-  }, [camera, gl]);
+  }, [camera, gl, window.innerWidth, window.innerHeight]);
 
   useEffect(() => {
     // Actualiza la posición en el eje X basándose en scrollValue
     if (cameraRef.current) {
 
-      cameraRef.current.position.z = scrollValue * 100 * 0.415;
+      cameraRef.current.position.z = scrollValue * 0.00461 + 25;
     }
   }, [scrollValue]);
 
