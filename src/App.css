@@ -216,7 +216,7 @@ nav.active ul li a:hover span {
 }
 
 .fadeOutIn {
-  animation: fadeOutIn 5s ease-in-out;
+  animation: fadeOutIn 8s ease-in-out;
 }
 
 @keyframes rotate {

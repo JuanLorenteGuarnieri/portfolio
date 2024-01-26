@@ -33,6 +33,7 @@ import { Box1 } from '../../public/models/Box1';
 import { Box2 } from '../../public/models/Box2';
 import { Send } from '../../public/models/Send';
 import { Iphone2 } from '../../public/models/Iphone2';
+import { Juan } from '../../public/models/Juan2';
 
 
 import TextAdvance from './TextAdvance';
@@ -40,57 +41,50 @@ import Loader from './Loader';
 import Text3DForm from './Text3DForm';
 import CameraController from './CameraController';
 import Navigation, { Navigations } from './Navigation';
-import { logo } from '../assets';
 /*
-        añadir info de vuelta en el form (rojo error tipo) y (verde se ha enviado)
-        cambiar icono real por busto
         cambiar intro
         optimizar codigo
         optimizar modelos 3d
 */
 
 const Home = ({ scrollValue, maxY, changeScroll }) => {
+  // CONFIGURATION
   const GPUTier = useDetectGPU()
-
-  const lightRef = useRef();
-  const lightRef2 = useRef();
-  const lightRef3 = useRef();
   const cameraRef = React.useRef();
-  const linkedinRef = useRef();
-  const githubRef = useRef();
-  const cvRef = useRef();
+  const [dpr, setDpr] = useState(1);
+  const [targetPos, setTargetPos] = useState(0);
+
+  const lightRef = useRef(), lightRef2 = useRef(), lightRef3 = useRef();
+
+  // TITLE
+  const linkedinRef = useRef(), githubRef = useRef(), cvRef = useRef();
+
+
+  //EDUCATION
+  const unizarRef = useRef();
+
+  // PROYECTS
+  const rayTracerGitRef = useRef(), rayTracerDocRef = useRef();
+  const spaceGitRef = useRef(), spaceDocRef = useRef(), spacePlayRef = useRef();
+
+  // CONTACT
   const iphoneRef = useRef();
   const sendFormRef = useRef();
-  const unizarRef = useRef();
-  const rayTracerGitRef = useRef();
-  const rayTracerDocRef = useRef();
-  const spaceGitRef = useRef();
-  const spaceDocRef = useRef();
-  const spacePlayRef = useRef();
-  const chessRef = useRef();
-  const pianoRef = useRef();
-  const rubikRef = useRef();
-  const psychologyRef = useRef();
-
-  const hiddenInputRef1 = useRef();
-  const hiddenInputRef2 = useRef();
-  const hiddenInputRef3 = useRef();
-
-  const form1Ref = useRef();
-  const form2Ref = useRef();
-  const form3Ref = useRef();
-
-  const [dpr, setDpr] = useState(1);
+  //         FORMS
   const [typeForm, setTypeForm] = useState(0);
 
-  const [targetPos, setTargetPos] = useState(0);
-  const scrollRef = useRef();
-
-
-  // Estados para almacenar los valores de los inputs
+  const hiddenInputRef1 = useRef(), hiddenInputRef2 = useRef(), hiddenInputRef3 = useRef();
+  const form1Ref = useRef(), form2Ref = useRef(), form3Ref = useRef();
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
   const [message, setMessage] = useState('');
+
+  const [feedback, setFeedback] = useState('');
+  const [colorFeedback, setcolorFeedback] = useState(0x5cae5e);
+
+  // INTEREST
+  const chessRef = useRef(), pianoRef = useRef(), rubikRef = useRef(), psychologyRef = useRef();
+
 
   const changeUserName = (n) => {
     setUserName(n);
@@ -126,26 +120,34 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
     };
 
     if (userName === '' || userEmail === '' || message === '') {
-      console.log('Por favor, rellene todos los campos.');
+      setFeedback('Complete all the fields');
+      setcolorFeedback(0xff4440);
       return;
     }
     if (emailIncorrecto(userEmail)) {
-      console.log('El email proporcionado no es válido.');
+      setFeedback('The email is not valid');
+      setcolorFeedback(0xff4440);
       return;
     }
     if (nombreUsuarioInvalido(userName)) {
-      console.log('El nombre de usuario no es válido.');
+      setFeedback('The username is not valid');
+      setcolorFeedback(0xff4440);
       return;
     }
 
     emailjs.send('service_4bprkd7', 'template_ri6j7pk', templateParams, 'PIjQsVkt3UW5dD4Vy')
       .then((result) => {
-        console.log(result.text);
+        setFeedback('Email sent');
+        setcolorFeedback(0x5cae5e);
         changeUserName('');
         changeUserEmail('');
         changeMessage('');
+        setTimeout(() => {
+          setFeedback('');
+        }, 5000);
       }, (error) => {
-        console.log(error.text);
+        setFeedback(error.text);
+        setcolorFeedback(0xff4440);
       });
   };
 
@@ -179,6 +181,7 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
     };
   }, []);
 
+  // ANIMATIONS
   const [animationKey, setAnimationKey] = useState(0);
   const [animationClass, setAnimationClass] = useState('fadeIn1'); // Inicializa con la animación inicial
 
@@ -193,10 +196,10 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
     setIsAnimationDone(true);
   };
 
-  useEffect(() => {
+  useEffect(() => { //RESET ANIMATION (when all loaded and intro finished)
     if (isContentLoaded && isAnimationDone) {
-      setAnimationKey(prevKey => prevKey + 1); // Incrementa la clave para reiniciar la animación
       setAnimationClass('fadeOutIn');
+      setAnimationKey(prevKey => prevKey + 1); // Incrementa la clave para reiniciar la animación
     }
   }, [isContentLoaded, isAnimationDone]);
 
@@ -317,7 +320,7 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
     }
   }
 
-  useEffect(() => {
+  useEffect(() => { // DETECT CLICK
     window.addEventListener('click', onMouseClick, false);
     return () => {
       window.removeEventListener('click', onMouseClick, false);
@@ -358,7 +361,7 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
 
   };
 
-  const handlePointerMove = (event) => {
+  const handlePointerMove = (event) => { //RECHARGE LIGHT CURSOR WHEN MOVING
     if (cameraRef.current) {
       // Obtiene las coordenadas del cursor
       let x, x_old, y, y_old;
@@ -373,7 +376,6 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
         y = event.clientY;
       }
 
-      // Llama a tu función de cálculo o lógica con estas coordenadas
       if (x != x_old || y != y_old) {
         calculateIntersect(x, y);
         x = x_old;
@@ -401,7 +403,7 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
 
   const [key, setKey] = useState(0);
 
-  useEffect(() => {
+  useEffect(() => { //detect rotate screen orientation
     const handleOrientationChange = () => {
       if (window.screen.orientation.type == "portrait-primary" || window.screen.orientation.type == "portrait-secondary") {
         setIsPhoneVertical(true);
@@ -423,9 +425,9 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
         window.removeEventListener('orientationchange', handleOrientationChange);
       }
     };
-  }, [window.innerHeight, window.innerWidth, ondeviceorientation, isPhoneVertical]);
+  }, [isPhoneVertical]);
 
-  useEffect(() => {
+  useEffect(() => { //focus/blur inputs
     if (typeForm === 0) {
       hiddenInputRef1.current && hiddenInputRef1.current.blur();
       hiddenInputRef2.current && hiddenInputRef2.current.blur();
@@ -453,12 +455,12 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
           key={animationKey}
           style={{ position: 'fixed', top: 0, left: 0, zIndex: 1 }}
           onPointerMove={handlePointerMove} onTouchMove={handlePointerMove}
-          camera={({ isPerspectiveCamera: true, near: 0.1, far: 15, setFocalLength: 555, zoom: (window.innerWidth / window.innerHeight) / 1.6 })}>
+          camera={({ isPerspectiveCamera: true, near: 0.1, far: 9, setFocalLength: 555, zoom: (window.innerWidth / window.innerHeight) / 1.6 })}>
           {isContentLoaded && isAnimationDone ?
             (!(window.screen.orientation.type == "portrait-primary" || window.screen.orientation.type == "portrait-secondary") ? (
               <Suspense fallback={null} >
                 <mesh className="CONFIG">
-                  <PerformanceMonitor factor={0.1} onChange={({ factor }) => setDpr(Math.max(0.5, Math.min(factor / 2, 1)), 1)} />
+                  <PerformanceMonitor factor={0.1} onChange={({ factor }) => setDpr(Math.max(0.6, Math.min(factor / 2, 1)), 1)} />
                   <CameraController scrollValue={scrollValue} cameraRef={cameraRef} maxY={maxY} />
                   <ambientLight intensity={0.5} />
                 </mesh>
@@ -523,11 +525,12 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
                     colorPri={new THREE.Color(0xdddddd)} colorSec={new THREE.Color(0x333333)}
                   />
                   <Bvh firstHitOnly >
-                    <Profile scale={9} position={[-3.2, 0.001, 2.2]} rotation={[-Math.PI / 2, 0, 0]} />
+                    <Juan scale={0.6} position={[-3.2, 0.8, 1.5]} rotation={[-Math.PI / 6 + 0.2, Math.PI / 2 + 0.8, -0.1]} />
+                    {/* <Profile scale={9} position={[-3.2, 0.001, 2.2]} rotation={[-Math.PI / 2, 0, 0]} /> */}
                   </Bvh>
                   <pointLight intensity={200} position={[0, 2, 1.5]}
                     color={new THREE.Color(0x223060)} />
-                  <pointLight intensity={30} position={[-3.5, 1, 1.3]}
+                  <pointLight intensity={200} position={[-3.5, 3, 1.3]}
                     color={new THREE.Color(0x223060)} />
                   <TextAdvance position={[0.75, 0, 0.8]}
                     text={"I'm a 21-year-old programmer from Spain, \npassionate about computer graphics and \nvideogame development. \n\nI'm in my final year of Computer \nEngineering and always on the lookout for \nprojects that challenge my creativity and \ntechnical skills."}
@@ -801,6 +804,11 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
                     <Box2 ref={form3Ref} position={[-2, -0.14, 1.2]} scale={[20, 20, 16]} />
 
                   </mesh>
+                  <TextAdvance position={[-3.5, -0.03, 5.3]} align="left"
+                    text={feedback}
+                    font={fontText} size={0.16} height={0.05}
+                    colorPri={new THREE.Color(colorFeedback)} colorSec={new THREE.Color(0x223060)}
+                  />
                   <mesh className="Iphone" position={[0, 0, 0]}>
                     <pointLight intensity={300} position={[2, 4, 3.5]}
                       color={new THREE.Color(0x223060)} />
@@ -889,9 +897,9 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
 
               </Suspense>
             ) : (
-              <Html center key={key}>
+              <Html center key={key}> {/* ROTATE SCREEN */}
                 <div className="flex justify-center items-center w-full h-full">
-                  <div className="text-center"> {/* Puedes ajustar el padding según sea necesario */}
+                  <div className="text-center">
                     <svg version="1.0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900.000000 900.000000"
                       preserveAspectRatio="xMidYMid meet" fill="currentColor" className='h-55 animate-rotate logo2' >
                       <g transform="translate(-100,900) scale(0.12,-0.12)"
@@ -971,15 +979,12 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
                   </div>
                 </div>
               </Html>
-
             )
-
             ) : (
               <Loader action={changeAnimationDone} />
             )}
         </Canvas>
-        <input
-          ref={hiddenInputRef1}
+        <input ref={hiddenInputRef1}
           type="text"
           className="opacity-0"
           style={{ position: "absolute", top: scrollValue, left: "0px" }}
@@ -994,8 +999,7 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
           }}
           aria-hidden="true" // Ocultar a lectores de pantalla
         />
-        <input
-          ref={hiddenInputRef2}
+        <input ref={hiddenInputRef2}
           type="text"
           className="opacity-0"
           style={{ position: "absolute", top: scrollValue, left: "0px" }}
@@ -1010,8 +1014,7 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
           }}
           aria-hidden="true" // Ocultar a lectores de pantalla
         />
-        <input
-          ref={hiddenInputRef3}
+        <input ref={hiddenInputRef3}
           type="text"
           className="opacity-0"
           style={{ position: "absolute", top: scrollValue, left: "0px" }}
@@ -1026,7 +1029,7 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
           }}
           aria-hidden="true" // Ocultar a lectores de pantalla
         />
-        <Navigation cond={isAnimationDone && !(window.screen.orientation.type == "portrait-primary" || window.screen.orientation.type == "portrait-secondary")} action={changeScroll} action2={changeContentLoaded} />
+        <Navigation cond={isAnimationDone && !(window.screen.orientation.type == "portrait-primary" || window.screen.orientation.type == "portrait-secondary")} action={changeScroll} scrollValue={scrollValue} action2={changeContentLoaded} />
       </section >
     </>
   );

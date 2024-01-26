@@ -1,7 +1,7 @@
 import { useProgress } from "@react-three/drei";
 import React, { useEffect, useState } from "react";
 
-const Navigation = ({ action, action2, cond }) => {
+const Navigation = ({ action, action2, cond, scrollValue }) => {
   const { progress } = useProgress();
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -15,12 +15,16 @@ const Navigation = ({ action, action2, cond }) => {
 
   return (
     <>
-      {isLoaded && cond && <Navigations action={action} />}
+      {isLoaded && cond && <Navigations action={action} scrollValue={scrollValue} />}
     </>
   );
 };
 
-const Navigations = ({ action }) => {
+const Navigations = ({ action, scrollValue }) => {
+  const [section, setSection] = useState(0); // Inicializa con la animación inicial
+  const sectionTitle = '0', sectionAbout = '1500', sectionEducation = '2250', sectionProyects = '3300';
+  const sectionSkills = '4500', sectionContact = '5500', sectionInterest = '8800';
+
 
   function changeScroll(scrollPosition, e) {
     e.preventDefault();
@@ -28,14 +32,18 @@ const Navigations = ({ action }) => {
     action(scrollPosition);
   };
 
+  useEffect(() => {
+
+  }, [scrollValue]);
+
   return (
 
     <nav id="menuBar" className="fadeIn fixed top-0 left-0 z-10 h-55 md:h-45 lg:h-35 xl:h-25 fadeIn">
       <ul className="list-none justify-between items-center">
-        <li onClick={(e) => changeScroll('0', e)}>
+        <li onClick={(e) => changeScroll(sectionTitle, e)}>
           <a >
             <svg version="1.0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900.000000 900.000000"
-              preserveAspectRatio="xMidYMid meet" fill="currentColor" className="w-4 h-4 md:w-5 md:h-5" >
+              preserveAspectRatio="xMidYMid meet" fill={scrollValue >= sectionTitle && scrollValue < sectionAbout ? ("#ffffff") : ("currentColor")} className="w-4 h-4 md:w-5 md:h-5" >
               <g transform="translate(-100,900) scale(0.12,-0.12)"
                 stroke="none">
                 <path d="M3514 7251 c-28 -16 -64 -46 -80 -66 -16 -20 -34 -42 -39 -48 -15
@@ -112,17 +120,17 @@ const Navigations = ({ action }) => {
             <span>Title</span>
           </a >
         </li >
-        <li onClick={(e) => changeScroll('1500', e)}>
+        <li onClick={(e) => changeScroll(sectionAbout, e)}>
           <a >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 md:w-5 md:h-5">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={scrollValue >= sectionAbout && scrollValue < sectionEducation ? ("#ffffff") : ("currentColor")} className="w-4 h-4 md:w-5 md:h-5">
               <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clipRule="evenodd" />
             </svg>
             <span>About</span>
           </a>
         </li>
-        <li onClick={(e) => changeScroll('2250', e)}>
+        <li onClick={(e) => changeScroll(sectionEducation, e)}>
           <a >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 md:w-5 md:h-5">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={scrollValue >= sectionEducation && scrollValue < sectionProyects ? ("#ffffff") : ("currentColor")} className="w-4 h-4 md:w-5 md:h-5">
               <path d="M11.7 2.805a.75.75 0 0 1 .6 0A60.65 60.65 0 0 1 22.83 8.72a.75.75 0 0 1-.231 1.337 49.948 49.948 0 0 0-9.902 3.912l-.003.002c-.114.06-.227.119-.34.18a.75.75 0 0 1-.707 0A50.88 50.88 0 0 0 7.5 12.173v-.224c0-.131.067-.248.172-.311a54.615 54.615 0 0 1 4.653-2.52.75.75 0 0 0-.65-1.352 56.123 56.123 0 0 0-4.78 2.589 1.858 1.858 0 0 0-.859 1.228 49.803 49.803 0 0 0-4.634-1.527.75.75 0 0 1-.231-1.337A60.653 60.653 0 0 1 11.7 2.805Z" />
               <path d="M13.06 15.473a48.45 48.45 0 0 1 7.666-3.282c.134 1.414.22 2.843.255 4.284a.75.75 0 0 1-.46.711 47.87 47.87 0 0 0-8.105 4.342.75.75 0 0 1-.832 0 47.87 47.87 0 0 0-8.104-4.342.75.75 0 0 1-.461-.71c.035-1.442.121-2.87.255-4.286.921.304 1.83.634 2.726.99v1.27a1.5 1.5 0 0 0-.14 2.508c-.09.38-.222.753-.397 1.11.452.213.901.434 1.346.66a6.727 6.727 0 0 0 .551-1.607 1.5 1.5 0 0 0 .14-2.67v-.645a48.549 48.549 0 0 1 3.44 1.667 2.25 2.25 0 0 0 2.12 0Z" />
               <path d="M4.462 19.462c.42-.419.753-.89 1-1.395.453.214.902.435 1.347.662a6.742 6.742 0 0 1-1.286 1.794.75.75 0 0 1-1.06-1.06Z" />
@@ -130,18 +138,18 @@ const Navigations = ({ action }) => {
             <span>Education</span>
           </a>
         </li>
-        <li onClick={(e) => changeScroll('3400', e)}>
+        <li onClick={(e) => changeScroll(sectionProyects, e)}>
           <a >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 md:w-5 md:h-5">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={scrollValue >= sectionProyects && scrollValue < sectionSkills ? ("#ffffff") : ("currentColor")} className="w-4 h-4 md:w-5 md:h-5">
               <path d="M19.906 9c.382 0 .749.057 1.094.162V9a3 3 0 0 0-3-3h-3.879a.75.75 0 0 1-.53-.22L11.47 3.66A2.25 2.25 0 0 0 9.879 3H6a3 3 0 0 0-3 3v3.162A3.756 3.756 0 0 1 4.094 9h15.812ZM4.094 10.5a2.25 2.25 0 0 0-2.227 2.568l.857 6A2.25 2.25 0 0 0 4.951 21H19.05a2.25 2.25 0 0 0 2.227-1.932l.857-6a2.25 2.25 0 0 0-2.227-2.568H4.094Z" />
             </svg>
 
             <span>Projects</span>
           </a>
         </li>
-        <li onClick={(e) => changeScroll('4500', e)}>
+        <li onClick={(e) => changeScroll(sectionSkills, e)}>
           <a >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 md:w-5 md:h-5">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={scrollValue >= sectionSkills && scrollValue < sectionContact ? ("#ffffff") : ("currentColor")} className="w-4 h-4 md:w-5 md:h-5">
               <path fillRule="evenodd" d="M12 6.75a5.25 5.25 0 0 1 6.775-5.025.75.75 0 0 1 .313 1.248l-3.32 3.319c.063.475.276.934.641 1.299.365.365.824.578 1.3.64l3.318-3.319a.75.75 0 0 1 1.248.313 5.25 5.25 0 0 1-5.472 6.756c-1.018-.086-1.87.1-2.309.634L7.344 21.3A3.298 3.298 0 1 1 2.7 16.657l8.684-7.151c.533-.44.72-1.291.634-2.309A5.342 5.342 0 0 1 12 6.75ZM4.117 19.125a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Z" clipRule="evenodd" />
               <path d="m10.076 8.64-2.201-2.2V4.874a.75.75 0 0 0-.364-.643l-3.75-2.25a.75.75 0 0 0-.916.113l-.75.75a.75.75 0 0 0-.113.916l2.25 3.75a.75.75 0 0 0 .643.364h1.564l2.062 2.062 1.575-1.297Z" />
               <path fillRule="evenodd" d="m12.556 17.329 4.183 4.182a3.375 3.375 0 0 0 4.773-4.773l-3.306-3.305a6.803 6.803 0 0 1-1.53.043c-.394-.034-.682-.006-.867.042a.589.589 0 0 0-.167.063l-3.086 3.748Zm3.414-1.36a.75.75 0 0 1 1.06 0l1.875 1.876a.75.75 0 1 1-1.06 1.06L15.97 17.03a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
@@ -149,18 +157,18 @@ const Navigations = ({ action }) => {
             <span>Skills</span>
           </a>
         </li>
-        <li onClick={(e) => changeScroll('5700', e)}>
+        <li onClick={(e) => changeScroll(sectionContact, e)}>
           <a >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 md:w-5 md:h-5">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={scrollValue >= sectionContact && scrollValue < sectionInterest ? ("#ffffff") : ("currentColor")} className="w-4 h-4 md:w-5 md:h-5">
               <path d="M1.5 8.67v8.58a3 3 0 0 0 3 3h15a3 3 0 0 0 3-3V8.67l-8.928 5.493a3 3 0 0 1-3.144 0L1.5 8.67Z" />
               <path d="M22.5 6.908V6.75a3 3 0 0 0-3-3h-15a3 3 0 0 0-3 3v.158l9.714 5.978a1.5 1.5 0 0 0 1.572 0L22.5 6.908Z" />
             </svg>
             <span>Contact</span>
           </a>
         </li>
-        <li onClick={(e) => changeScroll('9000', e)}>
+        <li onClick={(e) => changeScroll(sectionInterest, e)}>
           <a >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 md:w-5 md:h-5">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={scrollValue >= sectionInterest ? ("#ffffff") : ("currentColor")} className="w-4 h-4 md:w-5 md:h-5">
               <path fillRule="evenodd" d="M19.952 1.651a.75.75 0 0 1 .298.599V16.303a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.403-4.909l2.311-.66a1.5 1.5 0 0 0 1.088-1.442V6.994l-9 2.572v9.737a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.402-4.909l2.31-.66a1.5 1.5 0 0 0 1.088-1.442V5.25a.75.75 0 0 1 .544-.721l10.5-3a.75.75 0 0 1 .658.122Z" clipRule="evenodd" />
             </svg>
             <span>Interests</span>
