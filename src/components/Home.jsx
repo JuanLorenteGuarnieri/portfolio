@@ -42,6 +42,7 @@ import CameraController from './CameraController';
 import Navigation, { Navigations } from './Navigation';
 import { logo } from '../assets';
 /*
+        añadir info de vuelta en el form (rojo error tipo) y (verde se ha enviado)
         cambiar icono real por busto
         cambiar intro
         optimizar codigo
@@ -71,7 +72,9 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
   const rubikRef = useRef();
   const psychologyRef = useRef();
 
-  const hiddenInputRef = useRef();
+  const hiddenInputRef1 = useRef();
+  const hiddenInputRef2 = useRef();
+  const hiddenInputRef3 = useRef();
 
   const form1Ref = useRef();
   const form2Ref = useRef();
@@ -424,17 +427,19 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
 
   useEffect(() => {
     if (typeForm === 0) {
-      hiddenInputRef.current && hiddenInputRef.current.blur();
+      hiddenInputRef1.current && hiddenInputRef1.current.blur();
+      hiddenInputRef2.current && hiddenInputRef2.current.blur();
+      hiddenInputRef3.current && hiddenInputRef3.current.blur();
     } else {
       switch (typeForm) {
         case 1:
-          hiddenInputRef.current && hiddenInputRef.current.focus();
+          hiddenInputRef1.current && hiddenInputRef1.current.focus();
           break;
         case 2:
-          hiddenInputRef.current && hiddenInputRef.current.focus();
+          hiddenInputRef2.current && hiddenInputRef2.current.focus();
           break;
         case 3:
-          hiddenInputRef.current && hiddenInputRef.current.focus();
+          hiddenInputRef3.current && hiddenInputRef3.current.focus();
           break;
         // Añadir más casos si es necesario
       }
@@ -974,14 +979,50 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
             )}
         </Canvas>
         <input
-          ref={hiddenInputRef}
+          ref={hiddenInputRef1}
           type="text"
           className="opacity-0"
           style={{ position: "absolute", top: scrollValue, left: "0px" }}
 
           onChange={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
+            if (!isMobileDevice()) {
+              e.preventDefault();
+              e.stopPropagation();
+            } else {
+              setUserName(e.target.value);
+            }
+          }}
+          aria-hidden="true" // Ocultar a lectores de pantalla
+        />
+        <input
+          ref={hiddenInputRef2}
+          type="text"
+          className="opacity-0"
+          style={{ position: "absolute", top: scrollValue, left: "0px" }}
+
+          onChange={(e) => {
+            if (!isMobileDevice()) {
+              e.preventDefault();
+              e.stopPropagation();
+            } else {
+              setUserEmail(e.target.value);
+            }
+          }}
+          aria-hidden="true" // Ocultar a lectores de pantalla
+        />
+        <input
+          ref={hiddenInputRef3}
+          type="text"
+          className="opacity-0"
+          style={{ position: "absolute", top: scrollValue, left: "0px" }}
+
+          onChange={(e) => {
+            if (!isMobileDevice()) {
+              e.preventDefault();
+              e.stopPropagation();
+            } else {
+              setMessage(e.target.value);
+            }
           }}
           aria-hidden="true" // Ocultar a lectores de pantalla
         />
