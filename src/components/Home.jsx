@@ -12,7 +12,6 @@ import { Linkedin } from '../../public/models/Linkedin';
 import { Github } from '../../public/models/Github';
 import { CV } from '../../public/models/Cv';
 import { Iphone } from '../../public/models/Iphone';
-import { Profile } from '../../public/models/Profile';
 import { Unizar } from '../../public/models/Unizar';
 import { Vscode } from '../../public/models/Vscode';
 import { Blender } from '../../public/models/Blender';
@@ -32,8 +31,7 @@ import { Book } from '../../public/models/Book';
 import { Box1 } from '../../public/models/Box1';
 import { Box2 } from '../../public/models/Box2';
 import { Send } from '../../public/models/Send';
-import { Iphone2 } from '../../public/models/Iphone2';
-import { Juan } from '../../public/models/Juan2';
+import { Juan } from '../../public/models/Juan';
 
 
 import TextAdvance from './TextAdvance';
@@ -41,11 +39,6 @@ import Loader from './Loader';
 import Text3DForm from './Text3DForm';
 import CameraController from './CameraController';
 import Navigation, { Navigations } from './Navigation';
-/*
-        cambiar intro
-        optimizar codigo
-        optimizar modelos 3d
-*/
 
 const Home = ({ scrollValue, maxY, changeScroll }) => {
   // CONFIGURATION
@@ -55,6 +48,28 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
   const [targetPos, setTargetPos] = useState(0);
 
   const lightRef = useRef(), lightRef2 = useRef(), lightRef3 = useRef();
+
+  // SECTIONS
+  const sectionTitle = '0', sectionAbout = '1500', sectionEducation = '2250', sectionProyects = '3300';
+  const sectionSkills = '4200', sectionContact = '5500', sectionInterest = '8800';
+
+  var whatSection = () => {  // returns the current section
+    if (scrollValue < sectionAbout) {
+      return 1; // Sección Título
+    } else if (scrollValue < sectionEducation) {
+      return 2; // Sección About
+    } else if (scrollValue < sectionProyects) {
+      return 3; // Sección Education
+    } else if (scrollValue < sectionSkills) {
+      return 4; // Sección Proyects
+    } else if (scrollValue < sectionContact) {
+      return 5; // Sección Skills
+    } else if (scrollValue < sectionInterest) {
+      return 6; // Sección Contact
+    } else {
+      return 7; // Sección Interest
+    }
+  };
 
   // TITLE
   const linkedinRef = useRef(), githubRef = useRef(), cvRef = useRef();
@@ -164,14 +179,14 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
     setTargetPos([point.x, point.y, point.z]);
   };
 
-  const handleKeyDown = (event) => { // Previene la acción predeterminada (scroll)
+  const handleKeyDown = (event) => { // Prevent default action for 'Space' (scroll)
     // Comprueba si la tecla presionada es la tecla Espacio
     if (event.keyCode === 32) {
       event.preventDefault(); // Previene la acción predeterminada (scroll)
     }
   };
 
-  useEffect(() => {
+  useEffect(() => { // Listener for handleKeyDown
     // Agrega el manejador de eventos al montar el componente
     window.addEventListener('keydown', handleKeyDown);
 
@@ -457,10 +472,10 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
           onPointerMove={handlePointerMove} onTouchMove={handlePointerMove}
           camera={({ isPerspectiveCamera: true, near: 0.1, far: 9, setFocalLength: 555, zoom: (window.innerWidth / window.innerHeight) / 1.6 })}>
           {isContentLoaded && isAnimationDone ?
-            (!(window.screen.orientation.type == "portrait-primary" || window.screen.orientation.type == "portrait-secondary") ? (
+            (!(window.screen.orientation.type == "portrait-primary" || window.screen.orientation.type == "portrait-secondary" || window.innerHeight > window.innerWidth) ? (
               <Suspense fallback={null} >
                 <mesh className="CONFIG">
-                  <PerformanceMonitor factor={0.1} onChange={({ factor }) => setDpr(Math.max(0.6, Math.min(factor / 2, 1)), 1)} />
+                  <PerformanceMonitor factor={0.5} onChange={({ factor }) => setDpr(Math.max(0.8, Math.min(factor / 2, 1)), 1)} />
                   <CameraController scrollValue={scrollValue} cameraRef={cameraRef} maxY={maxY} />
                   <ambientLight intensity={0.5} />
                 </mesh>
@@ -476,13 +491,13 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
               color={new THREE.Color(0x223060)} /> */}
                 </mesh>
 
-                <mesh className="TITLE" position={[0, 0, 22]}>
+                <mesh className="TITLE" position={[0, 0, 22]} visible={whatSection() < 3}>
 
                   <mesh className="LOGO" position={[0, 0, 0.5]}>
                     <pointLight intensity={200} position={[0, 1, 0.5]}
-                      color={new THREE.Color(0x223060)} />
+                      color={new THREE.Color(0x223060)} visible={whatSection() == 1} />
                     <pointLight intensity={200} position={[0, 1, 0]}
-                      color={new THREE.Color(0x223060)} />
+                      color={new THREE.Color(0x223060)} visible={whatSection() == 1} />
                     <mesh position={[0, 0.2, 1]} scale={0.65} rotation={[-Math.PI / 3, 0, 0]}>
                       <Bvh firstHitOnly >
                         <Logo scale={[1, 1., 0.5]} />
@@ -518,10 +533,10 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
                   </mesh>
                 </mesh>
 
-                <mesh className="ABOUT" position={[0, 0, 28]}>
+                <mesh className="ABOUT" position={[0, 0, 28]} visible={whatSection() < 4}>
                   <TextAdvance position={[0, 0, 0]}
                     text={"ABOUT"}
-                    font={fontTitle} size={0.3} height={0.05}
+                    font={fontTitle} size={0.3} height={0.1}
                     colorPri={new THREE.Color(0xdddddd)} colorSec={new THREE.Color(0x333333)}
                   />
                   <Bvh firstHitOnly >
@@ -529,9 +544,9 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
                     {/* <Profile scale={9} position={[-3.2, 0.001, 2.2]} rotation={[-Math.PI / 2, 0, 0]} /> */}
                   </Bvh>
                   <pointLight intensity={200} position={[0, 2, 1.5]}
-                    color={new THREE.Color(0x223060)} />
-                  <pointLight intensity={200} position={[-3.5, 3, 1.3]}
-                    color={new THREE.Color(0x223060)} />
+                    color={new THREE.Color(0x223060)} visible={whatSection() == 2} />
+                  <pointLight intensity={100} position={[-3.5, 3, 1.3]}
+                    color={new THREE.Color(0x223060)} visible={whatSection() == 2} />
                   <TextAdvance position={[0.75, 0, 0.8]}
                     text={"I'm a 21-year-old programmer from Spain, \npassionate about computer graphics and \nvideogame development. \n\nI'm in my final year of Computer \nEngineering and always on the lookout for \nprojects that challenge my creativity and \ntechnical skills."}
                     font={fontText} size={0.16} height={0.05}
@@ -539,16 +554,16 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
                   />
                 </mesh>
 
-                <mesh className="EDUCATION" position={[0, 0, 32.8]}>
+                <mesh className="EDUCATION" position={[0, 0, 32.8]} visible={whatSection() < 5 && whatSection() > 1}>
                   <TextAdvance position={[0, 0, 0]}
                     text={"EDUCATION"}
-                    font={fontTitle} size={0.3} height={0.05}
+                    font={fontTitle} size={0.3} height={0.1}
                     colorPri={new THREE.Color(0xdddddd)} colorSec={new THREE.Color(0x333333)}
                   />
                   <pointLight intensity={150} position={[0.5, 2, 1]}
-                    color={new THREE.Color(0x223060)} />
+                    color={new THREE.Color(0x223060)} visible={whatSection() == 3} />
                   <pointLight intensity={20} position={[-1.85, 1, 1.07]}
-                    color={new THREE.Color(0x223060)} />
+                    color={new THREE.Color(0x223060)} visible={whatSection() == 3} />
                   <Bvh firstHitOnly >
                     <Unizar ref={unizarRef} scale={20} position={[-1.85, -0.09, 1.07]} rotation={[0, 0, 0]} />
                   </Bvh>
@@ -564,19 +579,19 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
                   />
                 </mesh>
 
-                <mesh className="PROJECTS" position={[0, 0, 35.9]}>
+                <mesh className="PROJECTS" position={[0, 0, 35.9]} visible={whatSection() < 6 && whatSection() > 2}>
                   <TextAdvance position={[0, 0, 0]}
                     text={"PROJECTS"}
-                    font={fontTitle} size={0.3} height={0.05}
+                    font={fontTitle} size={0.3} height={0.1}
                     colorPri={new THREE.Color(0xdddddd)} colorSec={new THREE.Color(0x333333)}
                   />
                   <pointLight intensity={100} position={[0, 2, 2.8]}
-                    color={new THREE.Color(0x223060)} />
+                    color={new THREE.Color(0x223060)} visible={whatSection() == 4} />
                   <mesh className="RAY TRACER" position={[0, 0, 0]}>
 
                     <mesh className="MODEL" position={[-3, 0.4, 2]} rotation={[-Math.PI / 6, Math.PI / 4, 0]}>
                       <pointLight castShadow={true} intensity={1} position={[0, 0.4, 0]} power={55}
-                        color={new THREE.Color(0x223060)} />
+                        color={new THREE.Color(0x223060)} visible={whatSection() == 4} />
                       <Bvh firstHitOnly >
                         <Plane args={[1, 1, 1, 1]} position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]}
                           receiveShadow>
@@ -621,17 +636,17 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
 
                     <TextAdvance position={[0, 0, 0.9]}
                       text={"RAY TRACER"}
-                      font={fontText} size={0.2} height={0.05}
+                      font={fontText} size={0.2} height={0.08}
                       colorPri={"white"} colorSec={new THREE.Color(0x223060)}
                     />
                     <TextAdvance position={[0, 0, 0.9]}
                       text={"__________"}
-                      font={fontText} size={0.2} height={0.05}
+                      font={fontText} size={0.2} height={0.08}
                       colorPri={"white"} colorSec={new THREE.Color(0x223060)}
                     />
                     <TextAdvance position={[0, 0, 0.9]}
                       text={"_________"}
-                      font={fontText} size={0.2} height={0.05}
+                      font={fontText} size={0.2} height={0.08}
                       colorPri={"white"} colorSec={new THREE.Color(0x223060)}
                     />
 
@@ -643,7 +658,7 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
 
                     <C scale={20} position={[3, -0.08, 1.6]} rotation={[0, 0, 0]} />
                     <pointLight intensity={15} position={[3, 1, 1.6]}
-                      color={new THREE.Color(0x223060)} />
+                      color={new THREE.Color(0x223060)} visible={whatSection() == 4} />
 
                     <mesh className="LINKS" position={[0, 0, 2.3]}>
                       <Bvh firstHitOnly >
@@ -658,7 +673,7 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
 
                     <mesh className="MODEL" >
                       <pointLight intensity={30} position={[-3.3, 1, 1.4]}
-                        color={new THREE.Color(0x223060)} />
+                        color={new THREE.Color(0x223060)} visible={whatSection() == 4} />
                       <Bvh firstHitOnly >
                         <Float
                           speed={4} // Animation speed, defaults to 1
@@ -673,17 +688,17 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
 
                     <TextAdvance position={[0, 0, 0.9]}
                       text={"SPACESHIP CONTROLLER"}
-                      font={fontText} size={0.2} height={0.05}
+                      font={fontText} size={0.2} height={0.08}
                       colorPri={"white"} colorSec={new THREE.Color(0x223060)}
                     />
                     <TextAdvance position={[0, 0, 0.9]}
                       text={"____________________"}
-                      font={fontText} size={0.2} height={0.05}
+                      font={fontText} size={0.2} height={0.08}
                       colorPri={"white"} colorSec={new THREE.Color(0x223060)}
                     />
                     <TextAdvance position={[0, 0, 0.9]}
                       text={"___________________"}
-                      font={fontText} size={0.2} height={0.05}
+                      font={fontText} size={0.2} height={0.08}
                       colorPri={"white"} colorSec={new THREE.Color(0x223060)}
                     />
 
@@ -695,11 +710,11 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
 
                     <Threejs scale={20} position={[3, -0.08, 1.58]} rotation={[0, 0, 0]} />
                     <pointLight intensity={15} position={[3, 1, 1.58]}
-                      color={new THREE.Color(0x223060)} />
+                      color={new THREE.Color(0x223060)} visible={whatSection() == 4} />
 
                     <Reacts scale={20} position={[4, -0.08, 1.58]} rotation={[0, 0, 0]} />
                     <pointLight intensity={15} position={[4, 1, 1.58]}
-                      color={new THREE.Color(0x223060)} />
+                      color={new THREE.Color(0x223060)} visible={whatSection() == 4} />
 
                     {/* <mesh className="LINKS" position={[0, 0, 2.3]}>
                 <Bvh firstHitOnly >
@@ -712,55 +727,55 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
 
                 </mesh>
 
-                <mesh className="SKILLS & TOOLS" position={[0, 0, 42.9]}>
+                <mesh className="SKILLS & TOOLS" position={[0, 0, 42.9]} visible={whatSection() < 7 && whatSection() > 3}>
                   <TextAdvance position={[0, 0, 0]}
                     text={"SKILLS & TOOLS"}
-                    font={fontTitle} size={0.3} height={0.05}
+                    font={fontTitle} size={0.3} height={0.1}
                     colorPri={new THREE.Color(0xdddddd)} colorSec={new THREE.Color(0x333333)}
                   />
                   <Bvh firstHitOnly >
                     <C scale={20} position={[-3.5, -0.08, 1.1]} rotation={[0, 0, 0]} />
                     <pointLight intensity={15} position={[-3.5, 1, 1.1]}
-                      color={new THREE.Color(0x223060)} />
+                      color={new THREE.Color(0x223060)} visible={whatSection() == 5} />
 
                     <Blender scale={20} position={[-2.5, -0.08, 1.1]} rotation={[0, 0, 0]} />
                     <pointLight intensity={15} position={[-2.5, 1, 1.1]}
-                      color={new THREE.Color(0x223060)} />
+                      color={new THREE.Color(0x223060)} visible={whatSection() == 5} />
 
                     <Unreal scale={20} position={[-1.5, -0.08, 1.1]} rotation={[0, 0, 0]} />
                     <pointLight intensity={15} position={[-1.5, 1, 1.1]}
-                      color={new THREE.Color(0x223060)} />
+                      color={new THREE.Color(0x223060)} visible={whatSection() == 5} />
 
                     <Vscode scale={20} position={[-0.5, -0.08, 1.1]} rotation={[0, 0, 0]} />
                     <pointLight intensity={15} position={[-0.5, 1, 1.1]}
-                      color={new THREE.Color(0x223060)} />
+                      color={new THREE.Color(0x223060)} visible={whatSection() == 5} />
 
                     <Git scale={20} position={[0.5, -0.08, 1.1]} rotation={[0, 0, 0]} />
                     <pointLight intensity={15} position={[0.5, 1, 1.1]}
-                      color={new THREE.Color(0x223060)} />
+                      color={new THREE.Color(0x223060)} visible={whatSection() == 5} />
 
                     <Threejs scale={20} position={[1.5, -0.08, 1.1]} rotation={[0, 0, 0]} />
                     <pointLight intensity={15} position={[1.5, 1, 1.1]}
-                      color={new THREE.Color(0x223060)} />
+                      color={new THREE.Color(0x223060)} visible={whatSection() == 5} />
 
                     <Reacts scale={20} position={[2.5, -0.08, 1.1]} rotation={[0, 0, 0]} />
                     <pointLight intensity={15} position={[2.5, 1, 1.1]}
-                      color={new THREE.Color(0x223060)} />
+                      color={new THREE.Color(0x223060)} visible={whatSection() == 5} />
 
                     <Tailwind scale={20} position={[3.5, -0.08, 1.1]} rotation={[0, 0, 0]} />
                     <pointLight intensity={15} position={[3.5, 1, 1.1]}
-                      color={new THREE.Color(0x223060)} />
+                      color={new THREE.Color(0x223060)} visible={whatSection() == 5} />
 
                   </Bvh>
                 </mesh>
 
-                <mesh className="CONTACT ME" position={[0, 0, 45.9]}>
+                <mesh className="CONTACT ME" position={[0, 0, 45.9]} visible={whatSection() > 4}>
 
                   <pointLight intensity={400} position={[-2.5, 4, 3.5]}
-                    color={new THREE.Color(0x223060)} />
+                    color={new THREE.Color(0x223060)} visible={whatSection() == 6} />
                   <TextAdvance position={[0, 0, 0]}
                     text={"CONTACT ME"}
-                    font={fontTitle} size={0.3} height={0.05}
+                    font={fontTitle} size={0.3} height={0.1}
                     colorPri={new THREE.Color(0xdddddd)} colorSec={new THREE.Color(0x333333)}
                   />
                   <mesh className="Name" position={[-3.5, 0, 0.8]}>
@@ -811,35 +826,35 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
                   />
                   <mesh className="Iphone" position={[0, 0, 0]}>
                     <pointLight intensity={300} position={[2, 4, 3.5]}
-                      color={new THREE.Color(0x223060)} />
+                      color={new THREE.Color(0x223060)} visible={whatSection() == 6} />
                     <pointLight intensity={110} position={[2, 2, 3.5]}
-                      color={new THREE.Color(0x223060)} />
+                      color={new THREE.Color(0x223060)} visible={whatSection() == 6} />
 
                     <pointLight intensity={15} position={[-3.5, 1, 1.1]}
-                      color={new THREE.Color(0x223060)} />
+                      color={new THREE.Color(0x223060)} visible={whatSection() == 6} />
                     <Bvh firstHitOnly >
                       <Send ref={sendFormRef} scale={20} position={[0.5, -0.08, 4.6]} rotation={[0, 0, 0]} />
-                      <Iphone2 ref={iphoneRef} position={[2, 0.68, 3]} rotation={[0, 0, scrollValue * Math.PI / 1200 + 4.1]} scale={1.5} />
+                      <Iphone ref={iphoneRef} position={[2, 0.68, 3]} rotation={[0, 0, scrollValue * Math.PI / 1200 + 4.1]} scale={1.5} />
 
                     </Bvh>
                   </mesh>
                 </mesh>
 
-                <mesh className="INTEREST" position={[0, 0, 60.9]}>
+                <mesh className="INTEREST" position={[0, 0, 60.9]} visible={whatSection() > 5}>
                   <TextAdvance position={[0, 0, 0]}
                     text={"INTERESTS"}
-                    font={fontTitle} size={0.3} height={0.05}
+                    font={fontTitle} size={0.3} height={0.1}
                     colorPri={new THREE.Color(0xdddddd)} colorSec={new THREE.Color(0x333333)}
                   />
                   <mesh className="LIGHTS">
                     <pointLight intensity={100} position={[2.5, 2, 2.5]}
-                      color={new THREE.Color(0x223060)} />
+                      color={new THREE.Color(0x223060)} visible={whatSection() == 7} />
                     <pointLight intensity={100} position={[2.5, 2, 4.8]}
-                      color={new THREE.Color(0x223060)} />
+                      color={new THREE.Color(0x223060)} visible={whatSection() == 7} />
                     <pointLight intensity={100} position={[-2.5, 2, 2.5]}
-                      color={new THREE.Color(0x223060)} />
+                      color={new THREE.Color(0x223060)} visible={whatSection() == 7} />
                     <pointLight intensity={100} position={[-2.5, 2, 4.8]}
-                      color={new THREE.Color(0x223060)} />
+                      color={new THREE.Color(0x223060)} visible={whatSection() == 7} />
                   </mesh>
                   <mesh className="MODELS">
                     <Bvh firstHitOnly >
@@ -860,29 +875,29 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
                   <mesh className="TEXT">
                     <TextAdvance position={[2.5, 0, 2.5]}
                       text={"PIANO"}
-                      font={fontText} size={0.17} height={0.05}
+                      font={fontText} size={0.17} height={0.08}
                       colorPri={"white"} colorSec={new THREE.Color(0x223060)}
                     />
                     <TextAdvance position={[2.5, 0, 2.8]}
                       text={"10 years EXP"}
-                      font={fontText} size={0.16} height={0.05}
+                      font={fontText} size={0.16} height={0.08}
                       colorPri={"white"} colorSec={new THREE.Color(0x223060)}
                     />
                     <TextAdvance position={[-2.5, 0, 2.66]}
                       text={"RUBIK's solver"}
-                      font={fontText} size={0.16} height={0.05}
+                      font={fontText} size={0.16} height={0.08}
                       colorPri={"white"} colorSec={new THREE.Color(0x223060)}
                     />
 
                     <TextAdvance position={[-2.5, 0, 5]}
                       text={"CHESS +833 games"}
-                      font={fontText} size={0.16} height={0.05}
+                      font={fontText} size={0.16} height={0.08}
                       colorPri={"white"} colorSec={new THREE.Color(0x223060)}
                     />
 
                     <TextAdvance position={[2.5, 0, 5]}
                       text={"PSYCHOLOGY reader"}
-                      font={fontText} size={0.16} height={0.05}
+                      font={fontText} size={0.16} height={0.08}
                       colorPri={"white"} colorSec={new THREE.Color(0x223060)}
                     />
                   </mesh>

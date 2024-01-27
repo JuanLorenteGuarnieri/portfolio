@@ -23,7 +23,7 @@ const Navigation = ({ action, action2, cond, scrollValue }) => {
 const Navigations = ({ action, scrollValue }) => {
   const [section, setSection] = useState(0); // Inicializa con la animación inicial
   const sectionTitle = '0', sectionAbout = '1500', sectionEducation = '2250', sectionProyects = '3300';
-  const sectionSkills = '4500', sectionContact = '5500', sectionInterest = '8800';
+  const sectionSkills = '4200', sectionContact = '5500', sectionInterest = '8800';
 
 
   function changeScroll(scrollPosition, e) {

@@ -12,9 +12,10 @@ import { Group } from 'three';
 type GLTFResult = GLTF & {
   nodes: {
     Iphone: THREE.Mesh
+    Iphone001: THREE.Mesh
   }
   materials: {
-    ['Material.001']: THREE.MeshStandardMaterial
+    ['Material.002']: THREE.MeshStandardMaterial
   }
 }
 
@@ -29,7 +30,8 @@ export const Iphone = forwardRef<Group, LogoProps>((props, ref) => {
   const { nodes, materials } = useGLTF('models/iphone.glb') as GLTFResult
   return (
     <group ref={ref} {...props} dispose={null}>
-      <mesh castShadow receiveShadow geometry={nodes.Iphone.geometry} material={materials['Material.001']} rotation={[0, 0, Math.PI]} scale={0.05} />
+      <mesh geometry={nodes.Iphone.geometry} material={materials['Material.002']} rotation={[0, 0, Math.PI]} scale={0.05} />
+      <mesh geometry={nodes.Iphone001.geometry} material={materials['Material.002']} rotation={[0, 0, Math.PI]} scale={0.05} />
     </group>
   )
 });
