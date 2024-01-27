@@ -9,7 +9,7 @@ const CameraController = ({ scrollValue, cameraRef, maxY }) => {
   // Esta función ajusta el FOV de la cámara basado en el ancho de la ventana
   const adjustCameraFOV = () => {
 
-    camera.zoom = (window.innerWidth / window.innerHeight) / 1.6;
+    camera.zoom = Math.max(1, window.innerWidth / window.innerHeight) / 1.6;
     // camera.fov = (window.innerHeight / window.innerWidth) * 40;
     camera.lookAt(0, 0, camera.position.z - 2 + Math.min(0.5, window.innerHeight / window.innerWidth));
 
@@ -21,7 +21,7 @@ const CameraController = ({ scrollValue, cameraRef, maxY }) => {
     gl.setSize(window.innerWidth, window.innerHeight);
 
     // Configura la posición inicial y la dirección de la mirada de la cámara
-    camera.zoom = (window.innerWidth / window.innerHeight) / 1.6;
+    camera.zoom = Math.max(1, window.innerWidth / window.innerHeight) / 1.6;
     camera.position.set(0, 5, 25);
     camera.lookAt(0, 0, 23);
 
@@ -32,7 +32,7 @@ const CameraController = ({ scrollValue, cameraRef, maxY }) => {
     return () => {
       window.removeEventListener('resize', adjustCameraFOV);
     };
-  }, [camera, gl, window.innerWidth, window.innerHeight]);
+  }, [camera, gl]);
 
   useEffect(() => {
     // Actualiza la posición en el eje X basándose en scrollValue
@@ -40,7 +40,7 @@ const CameraController = ({ scrollValue, cameraRef, maxY }) => {
 
       cameraRef.current.position.z = scrollValue * 0.00461 + 25;
     }
-  }, [scrollValue]);
+  }, [scrollValue, window]);
 
   return null; // Este componente no renderiza nada en sí mismo
 };

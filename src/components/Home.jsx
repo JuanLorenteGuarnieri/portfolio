@@ -407,7 +407,7 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
 
   const enableShadows = !isMobileDevice();
 
-  useEffect(() => {
+  useEffect(() => { // detect if phone is in vertical mode
     if (isMobileDevice() && window.innerHeight / 1.3 > window.innerWidth) {
       setIsPhoneVertical(true);
     }
@@ -595,16 +595,16 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
                       <Bvh firstHitOnly >
                         <Plane args={[1, 1, 1, 1]} position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]}
                           receiveShadow>
-                          <meshPhysicalMaterial color={new THREE.Color(0xffffff)}
+                          <meshPhysicalMaterial color={new THREE.Color(0xffffff)} side={THREE.DoubleSide}
                           />
                         </Plane>
                         <Plane args={[1, 1, 1, 1]} position={[0, 1, 0]} rotation={[Math.PI / 2, 0, 0]}
                           receiveShadow>
-                          <meshPhysicalMaterial color={new THREE.Color(0xffffff)} />
+                          <meshPhysicalMaterial color={new THREE.Color(0xffffff)} side={THREE.DoubleSide} />
                         </Plane>
                         <Plane args={[1, 1, 1, 1]} position={[0, 0.5, -0.5]} rotation={[0, 0, 0]}
                           receiveShadow>
-                          <meshPhysicalMaterial color={new THREE.Color(0xffffff)}
+                          <meshPhysicalMaterial color={new THREE.Color(0xffffff)} side={THREE.DoubleSide}
                           />
                         </Plane>
                         <Plane args={[1, 1, 1, 1]} position={[-0.5, 0.5, 0]} rotation={[0, Math.PI / 2, 0]}
@@ -622,13 +622,13 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
                           <meshPhysicalMaterial
                             color={new THREE.Color(0x444444)}
                             roughness={0}
-                            metalness={0.1}
+                            metalness={0.1} side={THREE.DoubleSide}
                           />
                         </Sphere>
                         <Sphere args={[0.15]} position={[-0.2, 0.15, -0.2]} rotation={[0, -Math.PI / 2, 0]}
                           castShadow >
                           <meshPhysicalMaterial
-                            color={new THREE.Color(0x9db4ec)}
+                            color={new THREE.Color(0x9db4ec)} side={THREE.DoubleSide}
                           />
                         </Sphere>
                       </Bvh>
@@ -913,10 +913,10 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
               </Suspense>
             ) : (
               <Html center key={key}> {/* ROTATE SCREEN */}
-                <div className="flex justify-center items-center w-full h-full">
+                <div className="">
                   <div className="text-center">
                     <svg version="1.0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900.000000 900.000000"
-                      preserveAspectRatio="xMidYMid meet" fill="currentColor" className='h-55 animate-rotate logo2' >
+                      fill="white" className='h-55 animate-rotate logo2' >
                       <g transform="translate(-100,900) scale(0.12,-0.12)"
                         stroke="none">
                         <path d="M3514 7251 c-28 -16 -64 -46 -80 -66 -16 -20 -34 -42 -39 -48 -15
@@ -1044,7 +1044,7 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
           }}
           aria-hidden="true" // Ocultar a lectores de pantalla
         />
-        <Navigation cond={isAnimationDone && !(window.screen.orientation.type == "portrait-primary" || window.screen.orientation.type == "portrait-secondary")} action={changeScroll} scrollValue={scrollValue} action2={changeContentLoaded} />
+        <Navigation cond={isAnimationDone && !((!isMobileDevice() && window.innerHeight > window.innerWidth) || (isMobileDevice() && (window.screen.orientation.type == "portrait-primary" || window.screen.orientation.type == "portrait-secondary")))} action={changeScroll} scrollValue={scrollValue} action2={changeContentLoaded} />
       </section >
     </>
   );
