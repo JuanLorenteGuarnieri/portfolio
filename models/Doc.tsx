@@ -18,6 +18,7 @@ type GLTFResult = GLTF & {
   materials: {
     Mat: THREE.MeshStandardMaterial
     ['Mat.001']: THREE.MeshStandardMaterial
+    ['Mat.002']: THREE.MeshStandardMaterial
   }
 }
 
@@ -31,9 +32,9 @@ export const Doc = forwardRef<Group, LogoProps>((props, ref) => {
   const { nodes, materials } = useGLTF('models/doc.glb') as GLTFResult
   return (
     <group ref={ref} {...props} dispose={null}>
-      <mesh castShadow receiveShadow geometry={nodes.Curve004.geometry} material={materials.Mat} position={[-0.012, 0, 0.014]} scale={0.184} />
-      <mesh castShadow receiveShadow geometry={nodes.Curve005.geometry} material={materials.Mat} position={[-0.012, 0, 0.014]} scale={0.184} />
-      <mesh castShadow receiveShadow geometry={nodes.Curve008.geometry} material={materials['Mat.001']} position={[-0.012, 0, 0.014]} scale={0.185} />
+      <mesh castShadow receiveShadow geometry={nodes.Curve004.geometry} material={materials['Mat.001']} position={[-0.012, 0, 0.014]} scale={0.184} />
+      <mesh castShadow receiveShadow geometry={nodes.Curve005.geometry} material={materials['Mat.001']} position={[-0.012, 0, 0.014]} scale={0.184} />
+      <mesh castShadow receiveShadow geometry={nodes.Curve008.geometry} material={materials['Mat.002']} position={[-0.012, 0, 0.014]} scale={0.185} />
     </group>
   )
 });
