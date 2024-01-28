@@ -485,7 +485,7 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
             </mesh> */}
 
                 <mesh className="POINTER">
-                  <pointLight ref={lightRef} castShadow={true} intensity={25} position={[targetPos[0], 0.4, targetPos[2]]}
+                  <pointLight ref={lightRef} distance={10} castShadow={true} intensity={25} position={[targetPos[0], 0.4, targetPos[2]]}
                     color={new THREE.Color(0x223060)} />
                   {/* <pointLight ref={lightRef2} castShadow={true} intensity={25} position={[targetPos[0], 0.7, targetPos[2]]}
               color={new THREE.Color(0x223060)} /> */}
@@ -540,8 +540,7 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
                     colorPri={new THREE.Color(0xdddddd)} colorSec={new THREE.Color(0x333333)}
                   />
                   <Bvh firstHitOnly >
-                    <Juan scale={0.6} position={[-3.2, 0.8, 1.5]} rotation={[-Math.PI / 6 + 0.2, Math.PI / 2 + 0.8, -0.1]} />
-                    {/* <Profile scale={9} position={[-3.2, 0.001, 2.2]} rotation={[-Math.PI / 2, 0, 0]} /> */}
+                    <Juan scale={0.6} position={[-3.2, 0.8, 1.8]} rotation={[-Math.PI / 6 + 0.2, Math.PI / 2 + 0.8, -0.08]} />
                   </Bvh>
                   <pointLight intensity={200} position={[0, 2, 1.5]}
                     color={new THREE.Color(0x223060)} visible={whatSection() == 2} />
@@ -717,12 +716,12 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
                       color={new THREE.Color(0x223060)} visible={whatSection() == 4} />
 
                     {/* <mesh className="LINKS" position={[0, 0, 2.3]}>
-                <Bvh firstHitOnly >
-                  <Doc ref={null} scale={12} position={[0.7, -0.08, 0]} rotation={[0, 0, 0]} />
-                  <Github ref={null} scale={12} position={[0, -0.08, 0]} rotation={[0, 0, 0]} />
-                  <Play ref={null} scale={12} position={[-0.7, -0.08, 0]} rotation={[0, 0, 0]} />
-                </Bvh>
-              </mesh> */}
+                      <Bvh firstHitOnly >
+                        <Doc ref={null} scale={12} position={[0.7, -0.08, 0]} rotation={[0, 0, 0]} />
+                        <Github ref={null} scale={12} position={[0, -0.08, 0]} rotation={[0, 0, 0]} />
+                        <Play ref={null} scale={12} position={[-0.7, -0.08, 0]} rotation={[0, 0, 0]} />
+                      </Bvh>
+                    </mesh> */}
                   </mesh>
 
                 </mesh>
@@ -814,7 +813,7 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
                     <Text3DForm position={[-0.15, 0, 0.6]} align="left"
                       id={3} typeForm={typeForm} change={changeTypeForm} text={message} setText={changeMessage}
                       font={fontText} size={0.14} height={0.05} textParagraph={true} maxLengthCharacters={140}
-                      colorPri={new THREE.Color(0x424050)} isEditable={"true"} //
+                      colorPri={new THREE.Color(0x424050)} isEditable={"true"}
                     />
                     <Box2 ref={form3Ref} position={[-2, -0.14, 1.2]} scale={[20, 20, 16]} />
 
@@ -858,7 +857,7 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
                   </mesh>
                   <mesh className="MODELS">
                     <Bvh firstHitOnly >
-                      <Piano ref={pianoRef} scale={1.3} position={[4.8, -0.19, 2.1]} rotation={[0, -Math.PI / 3, 0]} />
+                      <Piano ref={pianoRef} position={[4.8, -0.19, 2.1]} rotation={[0, -Math.PI / 3, 0]} />
                       <Chess ref={chessRef} scale={2.4} position={[-4.5, 0, 5]} rotation={[0, 0, 0]} />
                       <Float
                         speed={4} // Animation speed, defaults to 1

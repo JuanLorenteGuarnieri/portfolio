@@ -205,8 +205,7 @@ nav.active ul li a:hover span {
 
 @keyframes fadeOutIn {
 
-  0%,
-  20% {
+  0% {
     opacity: 0;
   }
 

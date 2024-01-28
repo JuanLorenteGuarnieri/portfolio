@@ -4,7 +4,7 @@ Command: npx gltfjsx@6.2.16 piano.glb -t -r ./
 */
 
 import * as THREE from 'three'
-import React, { useRef, forwardRef } from 'react'
+import React, { useRef, forwardRef, useState } from 'react'
 import { useGLTF } from '@react-three/drei'
 import { GLTF } from 'three-stdlib'
 import { Group } from 'three';
@@ -33,27 +33,38 @@ type LogoProps = JSX.IntrinsicElements['group'] & {
 };
 
 export const Piano = forwardRef<Group, LogoProps>((props, ref) => {
+  const [isHovered, setIsHovered] = useState(false);
   const { nodes, materials } = useGLTF('models/piano.glb') as GLTFResult
   return (
-    <group ref={ref} {...props} dispose={null}>
+    <group ref={ref} {...props} dispose={null} scale={isHovered ? 1.35 : 1.3}>
       <group position={[0, -0.001, 0]} scale={0.088}>
-        <mesh castShadow receiveShadow geometry={nodes._1.geometry} position={[-0.06, 12.762, -5.007]} scale={571.937} >
+        <mesh castShadow receiveShadow geometry={nodes._1.geometry} position={[-0.06, 12.762, -5.007]} scale={571.937}
+          onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
+          onPointerLeave={() => setIsHovered(false)} >
           <meshPhysicalMaterial
             color={new THREE.Color(0x000000)}
             roughness={0.6}
             metalness={0.2}
           />
         </mesh>
-        <mesh castShadow receiveShadow geometry={nodes._2.geometry} material={materials['Wood-10']} position={[0.013, 6.591, -5.639]} scale={571.937} />
-        <mesh castShadow receiveShadow geometry={nodes._21.geometry} material={materials['Fluegel-02']} position={[0.013, 6.591, -5.639]} scale={571.937} />
-        <mesh castShadow receiveShadow geometry={nodes._3.geometry} position={[0.013, 9.65, 8.147]} scale={571.937}>
+        <mesh castShadow receiveShadow geometry={nodes._2.geometry} material={materials['Wood-10']} position={[0.013, 6.591, -5.639]} scale={571.937}
+          onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
+          onPointerLeave={() => setIsHovered(false)} />
+        <mesh castShadow receiveShadow geometry={nodes._21.geometry} material={materials['Fluegel-02']} position={[0.013, 6.591, -5.639]} scale={571.937}
+          onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
+          onPointerLeave={() => setIsHovered(false)} />
+        <mesh castShadow receiveShadow geometry={nodes._3.geometry} position={[0.013, 9.65, 8.147]} scale={571.937}
+          onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
+          onPointerLeave={() => setIsHovered(false)} >
           <meshPhysicalMaterial
             color={new THREE.Color(0xaaaaaa)}
             roughness={0.3}
             metalness={0.1}
           />
         </mesh>
-        <mesh castShadow receiveShadow geometry={nodes._4.geometry} material={materials['Fluegel-04']} position={[0.013, 9.79, 7.804]} scale={571.937} />
+        <mesh castShadow receiveShadow geometry={nodes._4.geometry} material={materials['Fluegel-04']} position={[0.013, 9.79, 7.804]} scale={571.937}
+          onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
+          onPointerLeave={() => setIsHovered(false)} />
       </group>
     </group>
   )

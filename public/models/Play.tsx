@@ -4,7 +4,7 @@ Command: npx gltfjsx@6.2.16 play.glb -t -r ./
 */
 
 import * as THREE from 'three'
-import React, { useRef, forwardRef } from 'react'
+import React, { useRef, forwardRef, useState } from 'react'
 import { useGLTF } from '@react-three/drei'
 import { GLTF } from 'three-stdlib'
 import { Group } from 'three';
@@ -25,10 +25,13 @@ type LogoProps = JSX.IntrinsicElements['group'] & {
 };
 
 export const Play = forwardRef<Group, LogoProps>((props, ref) => {
+  const [isHovered, setIsHovered] = useState(false);
   const { nodes, materials } = useGLTF('models/play.glb') as GLTFResult
   return (
     <group ref={ref} {...props} dispose={null}>
-      <mesh castShadow receiveShadow geometry={nodes.Curve.geometry} material={materials.Mat} position={[-0.01, 0, 0.014]} scale={0.671} />
+      <mesh castShadow receiveShadow geometry={nodes.Curve.geometry} material={materials.Mat} position={isHovered ? [-0.011, 0, 0.0118] : [-0.01, 0, 0.011]} scale={isHovered ? 0.7 : 0.651}
+        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
+        onPointerLeave={() => setIsHovered(false)} />
     </group>
   )
 });

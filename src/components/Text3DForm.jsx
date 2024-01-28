@@ -106,7 +106,7 @@ const Text3DInteractive = ({ id, change, typeForm, font, height, size, colorPri,
             <meshPhongMaterial attach="material" color={colorPri} />
           </Text3D>
           {showCursor && (
-            <Text3D ref={cursorRef} castShadow receiveShadow position={[position[0] - 0.05 + 0.1161 * (cursorPosition % 28), position[1], position[2] + 0.3 * Math.floor(cursorPosition / 28)]} rotation={[-Math.PI / 2, 0, 0]} {...textProps}>
+            <Text3D ref={cursorRef} castShadow receiveShadow position={[position[0] - 0.05 + 0.1161 * (Math.floor(cursorPosition / 28) == 5 ? 28 : cursorPosition % 28), position[1], position[2] + 0.3 * Math.min(Math.floor(cursorPosition / 28), 4)]} rotation={[-Math.PI / 2, 0, 0]} {...textProps}>
               {'|'}
               <meshPhongMaterial attach="material" color={colorPri} />
             </Text3D>

@@ -8,7 +8,7 @@ Title: Rubik's Cube
 */
 
 import * as THREE from 'three'
-import React, { useRef, forwardRef } from 'react'
+import React, { useRef, forwardRef, useState } from 'react'
 import { useGLTF } from '@react-three/drei'
 import { GLTF } from 'three-stdlib'
 import { Group } from 'three';
@@ -29,11 +29,15 @@ type LogoProps = JSX.IntrinsicElements['group'] & {
 };
 
 export const RubikCube = forwardRef<Group, LogoProps>((props, ref) => {
+  const [isHovered, setIsHovered] = useState(false);
   const { nodes, materials } = useGLTF('models/rubiks_cube.glb') as GLTFResult
   return (
     <group ref={ref} {...props} dispose={null}>
       <group scale={0.01}>
-        <mesh castShadow receiveShadow geometry={nodes.Baked_baked_0.geometry} material={materials.baked} rotation={[-Math.PI / 2, 0, 0]} scale={100} />
+        <mesh castShadow receiveShadow geometry={nodes.Baked_baked_0.geometry} material={materials.baked}
+          rotation={[-Math.PI / 2, 0, 0]} scale={isHovered ? 105 : 100}
+          onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
+          onPointerLeave={() => setIsHovered(false)} />
       </group>
     </group>
   )
