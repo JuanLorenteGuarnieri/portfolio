@@ -4,7 +4,7 @@ Command: npx gltfjsx@6.2.16 iphone.glb -t -r ./
 */
 
 import * as THREE from 'three'
-import React, { useRef, forwardRef } from 'react'
+import React, { useRef, forwardRef, useState } from 'react'
 import { useGLTF } from '@react-three/drei'
 import { GLTF } from 'three-stdlib'
 import { Group } from 'three';
@@ -27,11 +27,16 @@ type LogoProps = JSX.IntrinsicElements['group'] & {
 
 
 export const Iphone = forwardRef<Group, LogoProps>((props, ref) => {
+  const [isHovered, setIsHovered] = useState(false);
   const { nodes, materials } = useGLTF('models/iphone.glb') as GLTFResult
   return (
     <group ref={ref} {...props} dispose={null}>
-      <mesh geometry={nodes.Iphone.geometry} material={materials['Material.002']} rotation={[0, 0, Math.PI]} scale={0.05} />
-      <mesh geometry={nodes.Iphone001.geometry} material={materials['Material.002']} rotation={[0, 0, Math.PI]} scale={0.05} />
+      <mesh geometry={nodes.Iphone.geometry} material={materials['Material.002']} rotation={[0, 0, Math.PI]} scale={isHovered ? 0.055 : 0.05}
+        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
+        onPointerLeave={() => setIsHovered(false)} />
+      <mesh geometry={nodes.Iphone001.geometry} material={materials['Material.002']} rotation={[0, 0, Math.PI]} scale={isHovered ? 0.055 : 0.05}
+        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
+        onPointerLeave={() => setIsHovered(false)} />
     </group>
   )
 });

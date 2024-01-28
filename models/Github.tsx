@@ -4,7 +4,7 @@ Command: npx gltfjsx@6.2.16 github.glb -t -r ./
 */
 
 import * as THREE from 'three'
-import React, { useRef, forwardRef } from 'react'
+import React, { useRef, forwardRef, useState } from 'react'
 import { useGLTF } from '@react-three/drei'
 import { GLTF } from 'three-stdlib'
 import { Group } from 'three';
@@ -25,10 +25,13 @@ type LogoProps = JSX.IntrinsicElements['group'] & {
 };
 
 export const Github = forwardRef<Group, LogoProps>((props, ref) => {
+  const [isHovered, setIsHovered] = useState(false);
   const { nodes, materials } = useGLTF('models/github.glb') as GLTFResult
   return (
     <group ref={ref} {...props} dispose={null}>
-      <mesh castShadow receiveShadow geometry={nodes.Curve002.geometry} material={materials.Mat} position={[-0.012, 0, 0.012]} scale={0.84} />
+      <mesh castShadow receiveShadow geometry={nodes.Curve002.geometry} material={materials.Mat} position={isHovered ? [-0.012, 0, 0.012] : [-0.011, 0, 0.011]} scale={isHovered ? 0.9 : 0.84}
+        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
+        onPointerLeave={() => setIsHovered(false)} />
     </group>
   )
 });

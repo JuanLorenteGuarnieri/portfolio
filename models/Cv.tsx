@@ -4,7 +4,7 @@ Command: npx gltfjsx@6.2.16 github.glb -t -r ./
 */
 
 import * as THREE from 'three'
-import React, { useRef, forwardRef } from 'react'
+import React, { useRef, forwardRef, useState } from 'react'
 import { useGLTF } from '@react-three/drei'
 import { GLTF } from 'three-stdlib'
 import { Group } from 'three';
@@ -26,11 +26,16 @@ type LogoProps = JSX.IntrinsicElements['group'] & {
 };
 
 export const CV = forwardRef<Group, LogoProps>((props, ref) => {
+  const [isHovered, setIsHovered] = useState(false);
   const { nodes, materials } = useGLTF('models/cv.glb') as GLTFResult
   return (
     <group ref={ref} {...props} dispose={null}>
-      <mesh castShadow receiveShadow geometry={nodes.Curve006.geometry} material={materials.Mat} position={[-0.054, 0, 0.036]} scale={2.057} />
-      <mesh castShadow receiveShadow geometry={nodes.Curve007.geometry} material={materials.Mat} position={[-0.054, 0, 0.036]} scale={2.057} />
+      <mesh castShadow receiveShadow geometry={nodes.Curve006.geometry} material={materials.Mat} position={isHovered ? [-0.06, 0, 0.039] : [-0.054, 0, 0.036]} scale={isHovered ? 2.257 : 2.057}
+        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
+        onPointerLeave={() => setIsHovered(false)} />
+      <mesh castShadow receiveShadow geometry={nodes.Curve007.geometry} material={materials.Mat} position={isHovered ? [-0.06, 0, 0.039] : [-0.054, 0, 0.036]} scale={isHovered ? 2.257 : 2.057}
+        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
+        onPointerLeave={() => setIsHovered(false)} />
     </group>
   )
 });

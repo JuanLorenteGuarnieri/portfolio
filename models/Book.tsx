@@ -4,7 +4,7 @@ Command: npx gltfjsx@6.2.16 book.glb -t -r ./
 */
 
 import * as THREE from 'three'
-import React, { useRef, forwardRef } from 'react'
+import React, { useRef, forwardRef, useState } from 'react'
 import { useGLTF } from '@react-three/drei'
 import { GLTF } from 'three-stdlib'
 import { Group } from 'three';
@@ -25,10 +25,13 @@ type LogoProps = JSX.IntrinsicElements['group'] & {
 };
 
 export const Book = forwardRef<Group, LogoProps>((props, ref) => {
+  const [isHovered, setIsHovered] = useState(false);
   const { nodes, materials } = useGLTF('models/book.glb') as GLTFResult
   return (
     <group ref={ref} {...props} dispose={null}>
-      <mesh geometry={nodes.book_a_0.geometry} material={materials.book_a} position={[10.037, 0, -7.03]} />
+      <mesh geometry={nodes.book_a_0.geometry} material={materials.book_a} position={isHovered ? [11.037, 0, -8.03] : [10.037, 0, -7.03]} scale={isHovered ? 1.1 : 1}
+        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
+        onPointerLeave={() => setIsHovered(false)} />
     </group>
   )
 });
