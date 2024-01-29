@@ -289,14 +289,14 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
 
       intersects = raycaster.intersectObject(rayTracerGitRef.current);
       if (intersects.length > 0) {
-        window.open('https://github.com/JuanLorenteGuarnieri', '_blank');
+        window.open('https://github.com/JuanLorenteGuarnieri/RayTracer', '_blank');
         changeTypeForm(0);
         return;
       }
 
       intersects = raycaster.intersectObject(rayTracerDocRef.current);
       if (intersects.length > 0) {
-        window.open('https://github.com/JuanLorenteGuarnieri', '_blank');
+        window.open('https://github.com/JuanLorenteGuarnieri/RayTracer/blob/main/RayTracer.pdf', '_blank');
         changeTypeForm(0);
         return;
       }
