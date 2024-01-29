@@ -7,14 +7,11 @@ const Loader = ({ action }) => {
   const videoRef = useRef(null);
 
   useEffect(() => {
-    if (videoRef.current) {
-
-      videoRef.current.onended = () => {
-        console.log("Ended");
-        action();
-      };
-    }
-  }, [videoRef.current]);
+    const timer = setTimeout(() => {
+      action();
+    }, 6000);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <Html center>
