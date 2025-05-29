@@ -30,7 +30,7 @@ export const Book = forwardRef<Group, LogoProps>((props, ref) => {
   return (
     <group ref={ref} {...props} dispose={null}>
       <mesh geometry={nodes.book_a_0.geometry} material={materials.book_a} position={isHovered ? [11.037, 0, -8.03] : [10.037, 0, -7.03]} scale={isHovered ? 1.1 : 1}
-        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
+        castShadow receiveShadow onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
         onPointerLeave={() => setIsHovered(false)} />
     </group>
   )

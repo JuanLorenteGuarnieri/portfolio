@@ -22,7 +22,7 @@ const CameraController = ({ scrollValue, cameraRef, maxY }) => {
 
     // Configura la posición inicial y la dirección de la mirada de la cámara
     camera.zoom = Math.max(1, window.innerWidth / window.innerHeight) / 1.6;
-    camera.position.set(0, 5, 25);
+    camera.position.set(0, 5, 24);
     camera.lookAt(0, 0, 23);
 
     adjustCameraFOV();
@@ -38,7 +38,7 @@ const CameraController = ({ scrollValue, cameraRef, maxY }) => {
     // Actualiza la posición en el eje X basándose en scrollValue
     if (cameraRef.current) {
 
-      cameraRef.current.position.z = scrollValue * 0.00461 + 25;
+      cameraRef.current.position.z = scrollValue * 0.00461 + 24.5;
     }
   }, [scrollValue, window]);
 

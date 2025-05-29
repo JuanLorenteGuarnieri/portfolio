@@ -152,68 +152,68 @@ export const Juan = forwardRef<Group, LogoProps>((props, ref) => {
   return (
     <group ref={ref} {...props} dispose={null}>
       <group rotation={[Math.PI / 2, 0, 0]}>
-        <mesh geometry={nodes.mesh.geometry} material={materials.material0000} />
-        <mesh geometry={nodes.mesh_1.geometry} material={materials.material0001} />
-        <mesh geometry={nodes.mesh_2.geometry} material={materials.material0002} />
-        <mesh geometry={nodes.mesh_3.geometry} material={materials.material0003} />
-        <mesh geometry={nodes.mesh_4.geometry} material={materials.material0004} />
-        <mesh geometry={nodes.mesh_5.geometry} material={materials.material0005} />
-        <mesh geometry={nodes.mesh_6.geometry} material={materials.material0006} />
-        <mesh geometry={nodes.mesh_7.geometry} material={materials.material0007} />
-        <mesh geometry={nodes.mesh_8.geometry} material={materials.material0008} />
-        <mesh geometry={nodes.mesh_9.geometry} material={materials.material0009} />
-        <mesh geometry={nodes.mesh_10.geometry} material={materials.material0010} />
-        <mesh geometry={nodes.mesh_11.geometry} material={materials.material0011} />
-        <mesh geometry={nodes.mesh_12.geometry} material={materials.material0012} />
-        <mesh geometry={nodes.mesh_13.geometry} material={materials.material0013} />
-        <mesh geometry={nodes.mesh_14.geometry} material={materials.material0014} />
-        <mesh geometry={nodes.mesh_15.geometry} material={materials.material0015} />
-        <mesh geometry={nodes.mesh_16.geometry} material={materials.material0016} />
-        <mesh geometry={nodes.mesh_17.geometry} material={materials.material0017} />
-        <mesh geometry={nodes.mesh_18.geometry} material={materials.material0018} />
-        <mesh geometry={nodes.mesh_19.geometry} material={materials.material0019} />
-        <mesh geometry={nodes.mesh_20.geometry} material={materials.material0020} />
-        <mesh geometry={nodes.mesh_21.geometry} material={materials.material0021} />
-        <mesh geometry={nodes.mesh_22.geometry} material={materials.material0022} />
-        <mesh geometry={nodes.mesh_23.geometry} material={materials.material0023} />
-        <mesh geometry={nodes.mesh_24.geometry} material={materials.material0024} />
-        <mesh geometry={nodes.mesh_25.geometry} material={materials.material0025} />
-        <mesh geometry={nodes.mesh_26.geometry} material={materials.material0026} />
-        <mesh geometry={nodes.mesh_27.geometry} material={materials.material0027} />
-        <mesh geometry={nodes.mesh_28.geometry} material={materials.material0028} />
-        <mesh geometry={nodes.mesh_29.geometry} material={materials.material0029} />
-        <mesh geometry={nodes.mesh_30.geometry} material={materials.material0030} />
-        <mesh geometry={nodes.mesh_31.geometry} material={materials.material0031} />
-        <mesh geometry={nodes.mesh_32.geometry} material={materials.material0032} />
-        <mesh geometry={nodes.mesh_33.geometry} material={materials.material0033} />
-        <mesh geometry={nodes.mesh_34.geometry} material={materials.material0034} />
-        <mesh geometry={nodes.mesh_35.geometry} material={materials.material0035} />
-        <mesh geometry={nodes.mesh_36.geometry} material={materials.material0036} />
-        <mesh geometry={nodes.mesh_37.geometry} material={materials.material0037} />
-        <mesh geometry={nodes.mesh_38.geometry} material={materials.material0038} />
-        <mesh geometry={nodes.mesh_39.geometry} material={materials.material0039} />
-        <mesh geometry={nodes.mesh_40.geometry} material={materials.material0040} />
-        <mesh geometry={nodes.mesh_41.geometry} material={materials.material0041} />
-        <mesh geometry={nodes.mesh_42.geometry} material={materials.material0042} />
-        <mesh geometry={nodes.mesh_43.geometry} material={materials.material0043} />
-        <mesh geometry={nodes.mesh_44.geometry} material={materials.material0044} />
-        <mesh geometry={nodes.mesh_45.geometry} material={materials.material0045} />
-        <mesh geometry={nodes.mesh_46.geometry} material={materials.material0046} />
-        <mesh geometry={nodes.mesh_47.geometry} material={materials.material0047} />
-        <mesh geometry={nodes.mesh_48.geometry} material={materials.material0048} />
-        <mesh geometry={nodes.mesh_49.geometry} material={materials.material0049} />
-        <mesh geometry={nodes.mesh_50.geometry} material={materials.material0050} />
-        <mesh geometry={nodes.mesh_51.geometry} material={materials.material0051} />
-        <mesh geometry={nodes.mesh_52.geometry} material={materials.material0052} />
-        <mesh geometry={nodes.mesh_53.geometry} material={materials.material0053} />
-        <mesh geometry={nodes.mesh_54.geometry} material={materials.material0054} />
-        <mesh geometry={nodes.mesh_55.geometry} material={materials.material0055} />
-        <mesh geometry={nodes.mesh_56.geometry} material={materials.material0056} />
-        <mesh geometry={nodes.mesh_57.geometry} material={materials.material0057} />
-        <mesh geometry={nodes.mesh_58.geometry} material={materials.material0058} />
-        <mesh geometry={nodes.mesh_59.geometry} material={materials.material0059} />
-        <mesh geometry={nodes.mesh_60.geometry} material={materials.material0060} />
-        <mesh geometry={nodes.mesh_61.geometry} material={materials.material0061} />
+        <mesh geometry={nodes.mesh.geometry} material={materials.material0000} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_1.geometry} material={materials.material0001} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_2.geometry} material={materials.material0002} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_3.geometry} material={materials.material0003} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_4.geometry} material={materials.material0004} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_5.geometry} material={materials.material0005} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_6.geometry} material={materials.material0006} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_7.geometry} material={materials.material0007} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_8.geometry} material={materials.material0008} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_9.geometry} material={materials.material0009} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_10.geometry} material={materials.material0010} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_11.geometry} material={materials.material0011} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_12.geometry} material={materials.material0012} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_13.geometry} material={materials.material0013} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_14.geometry} material={materials.material0014} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_15.geometry} material={materials.material0015} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_16.geometry} material={materials.material0016} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_17.geometry} material={materials.material0017} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_18.geometry} material={materials.material0018} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_19.geometry} material={materials.material0019} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_20.geometry} material={materials.material0020} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_21.geometry} material={materials.material0021} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_22.geometry} material={materials.material0022} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_23.geometry} material={materials.material0023} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_24.geometry} material={materials.material0024} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_25.geometry} material={materials.material0025} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_26.geometry} material={materials.material0026} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_27.geometry} material={materials.material0027} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_28.geometry} material={materials.material0028} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_29.geometry} material={materials.material0029} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_30.geometry} material={materials.material0030} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_31.geometry} material={materials.material0031} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_32.geometry} material={materials.material0032} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_33.geometry} material={materials.material0033} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_34.geometry} material={materials.material0034} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_35.geometry} material={materials.material0035} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_36.geometry} material={materials.material0036} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_37.geometry} material={materials.material0037} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_38.geometry} material={materials.material0038} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_39.geometry} material={materials.material0039} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_40.geometry} material={materials.material0040} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_41.geometry} material={materials.material0041} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_42.geometry} material={materials.material0042} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_43.geometry} material={materials.material0043} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_44.geometry} material={materials.material0044} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_45.geometry} material={materials.material0045} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_46.geometry} material={materials.material0046} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_47.geometry} material={materials.material0047} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_48.geometry} material={materials.material0048} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_49.geometry} material={materials.material0049} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_50.geometry} material={materials.material0050} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_51.geometry} material={materials.material0051} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_52.geometry} material={materials.material0052} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_53.geometry} material={materials.material0053} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_54.geometry} material={materials.material0054} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_55.geometry} material={materials.material0055} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_56.geometry} material={materials.material0056} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_57.geometry} material={materials.material0057} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_58.geometry} material={materials.material0058} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_59.geometry} material={materials.material0059} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_60.geometry} material={materials.material0060} receiveShadow castShadow={true} />
+        <mesh geometry={nodes.mesh_61.geometry} material={materials.material0061} receiveShadow castShadow={true} />
       </group>
     </group>
   )

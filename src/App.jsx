@@ -19,7 +19,7 @@ const App = () => {
   };
 
   const [scrollY, setScrollY] = useState('0');
-  const maxY = 9000;
+  const maxY = 9400;
   const changeScroll = (n) => {
     setScrollY(n);
     window.scroll({

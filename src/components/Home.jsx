@@ -28,6 +28,7 @@ import { Piano } from '../../public/models/Piano';
 import { Chess } from '../../public/models/Chess';
 import { RubikCube } from '../../public/models/Rubiks_cube';
 import { Book } from '../../public/models/Book';
+import { Duolingo } from '../../public/models/Duolingo';
 import { Box1 } from '../../public/models/Box1';
 import { Box2 } from '../../public/models/Box2';
 import { Send } from '../../public/models/Send';
@@ -44,7 +45,7 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
   // CONFIGURATION
   const GPUTier = useDetectGPU()
   const cameraRef = React.useRef();
-  const [dpr, setDpr] = useState(1);
+  const [dpr, setDpr] = useState(0.75);
   const [targetPos, setTargetPos] = useState(0);
 
   const lightRef = useRef(), lightRef2 = useRef(), lightRef3 = useRef();
@@ -98,8 +99,89 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
   const [colorFeedback, setcolorFeedback] = useState(0x5cae5e);
 
   // INTEREST
-  const chessRef = useRef(), pianoRef = useRef(), rubikRef = useRef(), psychologyRef = useRef();
+  const chessRef = useRef(), pianoRef = useRef(), rubikRef = useRef(), psychologyRef = useRef(), duolingoRef = useRef();
 
+  //piano exp = año actual - 2015
+  const pianoExp = new Date().getFullYear() - 2015;
+  const [chessCount, setChessCount] = useState('');
+  const [duoStreak, setDuoStreak] = useState('');
+
+  async function updateCountFromChess() {
+    try {
+      // 1) Construimos la URL del endpoint de estadísticas
+      const url = `https://api.chess.com/pub/player/qassiel/stats`;
+
+      // 2) Realizamos la solicitud fetch
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Error al obtener los datos: ${response.status}`);
+      }
+
+      // 3) Parseamos la respuesta JSON
+      const data = await response.json();
+
+      // 4) Inicializamos el contador total de partidas
+      let totalGames = 0;
+
+      // 5) Definimos las modalidades de juego que queremos considerar
+      const gameModes = ['chess_bullet', 'chess_blitz', 'chess_rapid', 'chess_daily'];
+
+      // 6) Iteramos sobre cada modalidad y sumamos las partidas jugadas
+      for (const mode of gameModes) {
+        if (data[mode] && data[mode].record) {
+          const { win = 0, loss = 0, draw = 0 } = data[mode].record;
+          totalGames += win + loss + draw;
+        }
+      }
+
+      // 7) Redondeamos hacia abajo a la centena más cercana
+      const roundedCount = Math.floor(totalGames / 10) * 10;
+
+      // 8) Convertimos el número a string y lo asignamos a la variable correspondiente
+      const resultString = roundedCount.toString();
+      setChessCount(resultString);
+
+      console.log('Valor actualizado:', resultString);
+    } catch (err) {
+      console.error('Error al actualizar el conteo de partidas:', err);
+    }
+  }
+
+  async function updateDuolingoStreak() {
+    try {
+      // 1) Montamos la URL del proxy + la URL objetivo
+      const targetUrl = encodeURIComponent('https://duome.eu/Qassiel');
+      const proxyUrl = `https://api.allorigins.win/raw?url=${targetUrl}`;
+
+      // 2) Hacemos el fetch a través del proxy (el proxy añade el header CORS)
+      const response = await fetch(proxyUrl);
+      const html = await response.text();
+
+      // 3) Parseamos el HTML y extraemos el <span class="cc-header-count">
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      // Busca un <span> cuyo aria-label contenga 'days streak'
+      const span = Array.from(doc.querySelectorAll('span')).find(
+        el => el.getAttribute('aria-label') && el.getAttribute('aria-label').includes('days streak')
+      );
+      if (!span) throw new Error('No se encontró un span con aria-label que contenga "days streak"');
+
+      // 4) 
+      let text = span.textContent.trim();
+
+      // 5) Asignas a tu variable
+      setDuoStreak(text);
+      console.log('Valor actualizado:', text);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  useEffect(() => {
+    updateCountFromChess();
+    updateDuolingoStreak();
+    // eslint-disable-next-line
+  }, []);
 
   const changeUserName = (n) => {
     setUserName(n);
@@ -124,6 +206,26 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
   const nombreUsuarioInvalido = (nombre) => {
     const regex = /^[a-zA-Z0-9 ]+$/;
     return !regex.test(nombre);
+  };
+
+  const getDistance2Camera = (v1) => {
+    if (!cameraRef.current) return 0;
+    var position = cameraRef.current.position;
+    return Math.sqrt(
+      Math.pow(v1.x - position.x, 2) +
+      Math.pow(v1.y - position.y, 2) +
+      Math.pow(v1.z - position.z, 2)
+    );
+  };
+
+  const isBeforeCamera = (v1) => {
+    if (!cameraRef.current) return 0;
+    var position = cameraRef.current.position;
+    return position.z + 3 > v1.z;
+  };
+
+  const isVisibleLight = (v1, dist) => {
+    return isBeforeCamera(v1) && getDistance2Camera(v1) < dist;
   };
 
   var sendEmail = () => {
@@ -169,6 +271,35 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
   // Configura el raycaster
   const raycaster = new THREE.Raycaster();
   const mouse = new THREE.Vector2();
+
+  const [mouseSpeed, setMouseSpeed] = useState(0);
+  const lastMousePos = useRef({ x: 0, y: 0, t: Date.now() });
+
+  const updateMouseSpeed = (x, y) => {
+    const now = Date.now();
+    const { x: lastX, y: lastY, t: lastT } = lastMousePos.current;
+    const dt = now - lastT;
+    if (dt > 0) {
+      const dx = x - lastX;
+      const dy = y - lastY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const speed = dist / dt; // px/ms
+      // Normaliza la velocidad a un rango de 0 a 1
+      const normalizedSpeed = Math.min(speed / 800, 1); // Ajusta el divisor para cambiar la sensibilidad
+      setMouseSpeed(normalizedSpeed);
+    }
+    lastMousePos.current = { x, y, t: now };
+  };
+
+  useEffect(() => {
+    const handleMouseMove = (event) => {
+      updateMouseSpeed(event.clientX, event.clientY);
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, []);
 
   const changeTypeForm = (n) => {
     console.log("Type Form: " + n);
@@ -282,7 +413,7 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
 
       intersects = raycaster.intersectObject(unizarRef.current);
       if (intersects.length > 0) {
-        window.open('https://unizar.es/', '_blank');
+        window.open('https://estudios.unizar.es/estudio/asignaturas?anyo_academico=2024&estudio_id=20240148&centro_id=110&plan_id_nk=439&sort=curso', '_blank');
         changeTypeForm(0);
         return;
       }
@@ -328,6 +459,13 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
         changeTypeForm(0);
         return;
       }
+
+      intersects = raycaster.intersectObject(duolingoRef.current);
+      if (intersects.length > 0) {
+        window.open('https://duome.eu/Qassiel', '_blank');
+        changeTypeForm(0);
+        return;
+      }
       changeTypeForm(0);
     } else {
 
@@ -341,25 +479,6 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
       window.removeEventListener('click', onMouseClick, false);
     };
   }, [userName, userEmail, message, scroll, isAnimationDone, window]);
-
-
-
-  const calculateIntersect2 = (x, y) => {
-    const mouse = new THREE.Vector2();
-
-    mouse.x = (x / window.innerWidth) * 2 - 1;
-    mouse.y = -(y / window.innerHeight) * 2 + 1;
-    raycaster.setFromCamera(mouse, cameraRef.current);
-
-    const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
-    const intersectPoint = new THREE.Vector3();
-
-    if (raycaster.ray.intersectPlane(plane, intersectPoint)) {
-      if (handleIntersection) {
-        handleIntersection(intersectPoint);
-      }
-    }
-  };
 
   const calculateIntersect = (x, y) => {
     const mouse = new THREE.Vector2();
@@ -463,10 +582,25 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
     }
   }, [typeForm]);
 
+
+
   return (
     <>
       <section className="w-full h-screen">
         <Canvas dpr={dpr} shadows={enableShadows} className={animationClass}
+          gl={{
+            antialias: true,  // mayor calidad
+            stencil: false,
+            alpha: false,
+            depth: true,
+            logarithmicDepthBuffer: false,
+            preserveDrawingBuffer: false,
+            premultipliedAlpha: false,
+            precision: 'lowp',
+            powerPreference: 'high-performance',
+            failIfMajorPerformanceCaveat: false,
+            physicallyCorrectLights: false
+          }}
           key={animationKey}
           style={{ position: 'fixed', top: 0, left: 0, zIndex: 1 }}
           onPointerMove={handlePointerMove} onTouchMove={handlePointerMove}
@@ -475,29 +609,57 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
             (!(window.screen.orientation.type == "portrait-primary" || window.screen.orientation.type == "portrait-secondary" || window.innerHeight > window.innerWidth) ? (
               <Suspense fallback={null} >
                 <mesh className="CONFIG">
-                  <PerformanceMonitor factor={0.5} onChange={({ factor }) => setDpr(Math.max(0.8, Math.min(factor / 2, 1)), 1)} />
+                  <PerformanceMonitor factor={0.6} ms={200} iterations={3} threshold={0.6} bounds={{ lower: 10, upper: 18 }}
+                    onDecline={() => {
+                      // Reducir la resolución (DPR) hasta un mínimo de 0.5
+                      setDpr(prev => Math.max(0.3, prev - 0.1));
+                    }}
+                    // Se ejecuta cuando el rendimiento mejora por encima de `factor`
+                    onIncline={() => {
+                      // Restaurar la resolución completa
+                      setDpr(prev => Math.min(0.8, prev + 0.1));
+                    }}
+
+                  // onChange={({ factor }) => setDpr(Math.max(0.8, Math.min(factor / 2, 1)), 1)} 
+                  />
                   <CameraController scrollValue={scrollValue} cameraRef={cameraRef} maxY={maxY} />
                   <ambientLight intensity={0.5} />
                 </mesh>
 
                 {/* <mesh className="GRID" position={[0, 0.1, 0]}>
-              <Grid args={[20, 100, 20, 100]} />
-            </mesh> */}
+                  <Grid args={[20, 100, 20, 100]} />
+                </mesh> */}
 
                 <mesh className="POINTER">
-                  <pointLight ref={lightRef} distance={10} castShadow={true} intensity={25} position={[targetPos[0], 0.4, targetPos[2]]}
+                  <pointLight ref={lightRef} distance={2} castShadow={true} intensity={25} position={[targetPos[0], 0.4, targetPos[2]]}
+                    shadow-bias={-0.01}
+                    shadow-camera-near={0.01}
+                    onUpdate={light => {
+                      // Map mouseSpeed (0 = slow, 1+ = fast) to mapSize between 512 and 8
+                      // Clamp mouseSpeed to [0, 1] for mapping
+                      const minSize = 1;
+                      const maxSize = 512;
+                      // const speed = Math.min(Math.max(mouseSpeed, 0), 1);
+                      // Inverse: faster = smaller mapSize
+                      const mapSize = Math.round(maxSize - (maxSize - minSize) * mouseSpeed);
+                      light.shadow.mapSize.width = mapSize;
+                      light.shadow.mapSize.height = mapSize;
+                      light.shadow.needsUpdate = true;
+                    }}
                     color={new THREE.Color(0x223060)} />
                   {/* <pointLight ref={lightRef2} castShadow={true} intensity={25} position={[targetPos[0], 0.7, targetPos[2]]}
               color={new THREE.Color(0x223060)} /> */}
                 </mesh>
 
-                <mesh className="TITLE" position={[0, 0, 22]} visible={whatSection() < 3}>
+                <mesh className="TITLE" position={[0, 0, 22]}>
 
                   <mesh className="LOGO" position={[0, 0, 0.5]}>
-                    <pointLight intensity={200} position={[0, 1, 0.5]}
-                      color={new THREE.Color(0x223060)} visible={whatSection() == 1} />
-                    <pointLight intensity={200} position={[0, 1, 0]}
-                      color={new THREE.Color(0x223060)} visible={whatSection() == 1} />
+                    <pointLight intensity={200} position={[0, 1, 0.5]} distance={isVisibleLight(new THREE.Vector3(0, 5, 22.5), 8) ? 7 : 0.01} shadow-bias={-0.005}
+                      color={new THREE.Color(0x223060)} />
+                    {/* visible={isVisibleLight(new THREE.Vector3(0, 5, 22.5), 8)} /> */}
+                    <pointLight intensity={200} position={[0, 1, 0]} distance={isVisibleLight(new THREE.Vector3(0, 5, 22.5), 8) ? 7 : 0.01} shadow-bias={-0.005}
+                      color={new THREE.Color(0x223060)} />
+                    {/* visible={isVisibleLight(new THREE.Vector3(0, 5, 22.5), 8)} /> */}
                     <mesh position={[0, 0.2, 1]} scale={0.65} rotation={[-Math.PI / 3, 0, 0]}>
                       <Bvh firstHitOnly >
                         <Logo scale={[1, 1., 0.5]} />
@@ -513,14 +675,14 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
                     </mesh>
                   </mesh>
 
-                  <TextAdvance position={[-3.26, 0, 2.4]}
+                  <TextAdvance position={[0, 0, 2.4]}
                     text={"Juan Lorente"}
-                    font={fontTitle} size={0.73} height={0.1} align='left'
+                    font={fontTitle} size={0.73} height={0.1} align='center'
                     colorPri={new THREE.Color(0xdddddd)} colorSec={new THREE.Color(0x333333)}
                   />
-                  <TextAdvance position={[-2.73, 0, 2.8]}
-                    text={"Computer Ghraphics & Videogames developer"}
-                    font={fontText} size={0.16} height={0.03} align='left'
+                  <TextAdvance position={[0, 0, 2.8]}
+                    text={"Computer Vision & Graphics developer"}
+                    font={fontText} size={0.16} height={0.03} align='center'
                     colorPri={"white"} colorSec={new THREE.Color(0x223060)}
                   />
 
@@ -533,7 +695,7 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
                   </mesh>
                 </mesh>
 
-                <mesh className="ABOUT" position={[0, 0, 28]} visible={whatSection() < 4}>
+                <mesh className="ABOUT" position={[0, 0, 28]}>
                   <TextAdvance position={[0, 0, 0]}
                     text={"ABOUT"}
                     font={fontTitle} size={0.3} height={0.1}
@@ -542,10 +704,12 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
                   <Bvh firstHitOnly >
                     <Juan scale={0.6} position={[-3.2, 0.8, 1.8]} rotation={[-Math.PI / 6 + 0.2, Math.PI / 2 + 0.8, -0.08]} />
                   </Bvh>
-                  <pointLight intensity={200} position={[0, 2, 1.5]}
-                    color={new THREE.Color(0x223060)} visible={whatSection() == 2} />
-                  <pointLight intensity={100} position={[-3.5, 3, 1.3]}
-                    color={new THREE.Color(0x223060)} visible={whatSection() == 2} />
+                  <pointLight intensity={200} position={[0, 2, 1.5]} distance={isVisibleLight(new THREE.Vector3(0, 5, 29.5), 8) ? 8 : 0.01}
+                    color={new THREE.Color(0x223060)} />
+                  {/* visible={isVisibleLight(new THREE.Vector3(0, 5, 29.5), 8)} /> */}
+                  <pointLight intensity={100} position={[-3.5, 3, 1.3]} distance={isVisibleLight(new THREE.Vector3(0, 5, 29.3), 8) ? 8 : 0.01}
+                    color={new THREE.Color(0x223060)} />
+                  {/* visible={isVisibleLight(new THREE.Vector3(0, 5, 29.3), 8)} /> */}
                   <TextAdvance position={[0.75, 0, 0.8]}
                     text={"I'm a 21-year-old programmer from Spain, \npassionate about computer graphics and \nvideogame development. \n\nI'm in my final year of Computer \nEngineering and always on the lookout for \nprojects that challenge my creativity and \ntechnical skills."}
                     font={fontText} size={0.16} height={0.05}
@@ -553,21 +717,23 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
                   />
                 </mesh>
 
-                <mesh className="EDUCATION" position={[0, 0, 32.8]} visible={whatSection() < 5 && whatSection() > 1}>
+                <mesh className="EDUCATION" position={[0, 0, 32.8]}>
                   <TextAdvance position={[0, 0, 0]}
                     text={"EDUCATION"}
                     font={fontTitle} size={0.3} height={0.1}
                     colorPri={new THREE.Color(0xdddddd)} colorSec={new THREE.Color(0x333333)}
                   />
-                  <pointLight intensity={150} position={[0.5, 2, 1]}
-                    color={new THREE.Color(0x223060)} visible={whatSection() == 3} />
-                  <pointLight intensity={20} position={[-1.85, 1, 1.07]}
-                    color={new THREE.Color(0x223060)} visible={whatSection() == 3} />
+                  <pointLight intensity={150} position={[0.5, 2, 1]} distance={isVisibleLight(new THREE.Vector3(0, 5, 33.87), 7) ? 5 : 0.01}
+                    color={new THREE.Color(0x223060)} />
+                  {/* visible={isVisibleLight(new THREE.Vector3(0, 5, 33.8), 7)} /> */}
+                  <pointLight intensity={20} position={[-1.85, 1, 1.07]} distance={isVisibleLight(new THREE.Vector3(0, 5, 33.87), 7) ? 2.5 : 0.01}
+                    color={new THREE.Color(0x223060)} />
+                  {/* visible={isVisibleLight(new THREE.Vector3(0, 5, 33.87), 7)} /> */}
                   <Bvh firstHitOnly >
                     <Unizar ref={unizarRef} scale={20} position={[-1.85, -0.09, 1.07]} rotation={[0, 0, 0]} />
                   </Bvh>
                   <TextAdvance position={[-0.8, 0, 0.7]} align="left"
-                    text={"Computer Engineering \nUniversity of Zaragoza"}
+                    text={"Computer Science \nUniversity of Zaragoza"}
                     font={fontText} size={0.16} height={0.05}
                     colorPri={"white"} colorSec={new THREE.Color(0x223060)}
                   />
@@ -578,54 +744,62 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
                   />
                 </mesh>
 
-                <mesh className="PROJECTS" position={[0, 0, 35.9]} visible={whatSection() < 6 && whatSection() > 2}>
+                <mesh className="PROJECTS" position={[0, 0, 35.9]}>
                   <TextAdvance position={[0, 0, 0]}
                     text={"PROJECTS"}
                     font={fontTitle} size={0.3} height={0.1}
                     colorPri={new THREE.Color(0xdddddd)} colorSec={new THREE.Color(0x333333)}
                   />
-                  <pointLight intensity={100} position={[0, 2, 2.8]}
-                    color={new THREE.Color(0x223060)} visible={whatSection() == 4} />
+                  <pointLight intensity={100} position={[0, 2, 2.8]} distance={isVisibleLight(new THREE.Vector3(0, 5, 38.7), 8) ? 10 : 0.01}
+                    color={new THREE.Color(0x223060)} />
+                  {/* visible={isVisibleLight(new THREE.Vector3(0, 5, 38.7), 8)} /> */}
                   <mesh className="RAY TRACER" position={[0, 0, 0]}>
 
                     <mesh className="MODEL" position={[-3, 0.4, 2]} rotation={[-Math.PI / 6, Math.PI / 4, 0]}>
-                      <pointLight castShadow={true} intensity={1} position={[0, 0.4, 0]} power={55}
-                        color={new THREE.Color(0x223060)} visible={whatSection() == 4} />
+                      <pointLight castShadow={true} distance={isVisibleLight(new THREE.Vector3(0, 5, 37.9), 8) ? 1.5 : 0.01} intensity={2} position={[0.1, 0.5, 0.3]} power={55} shadow-camera-near={0.05}
+                        shadow-bias={-0.005}
+                        onUpdate={light => {
+                          light.shadow.mapSize.width = 128
+                          light.shadow.mapSize.height = 128
+                          light.shadow.needsUpdate = true
+                        }}
+                        color={new THREE.Color(0x223060)} />
+                      {/* visible={isVisibleLight(new THREE.Vector3(0, 5, 37.9), 8)} /> */}
                       <Bvh firstHitOnly >
-                        <Plane args={[1, 1, 1, 1]} position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]}
+                        <Plane args={[1, 1, 1, 1]} position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]} castShadow={true}
                           receiveShadow>
-                          <meshPhysicalMaterial color={new THREE.Color(0xffffff)} side={THREE.DoubleSide}
+                          <meshPhysicalMaterial color={new THREE.Color(0xffffff)} side={THREE.DoubleSide} castShadow={true}
                           />
                         </Plane>
-                        <Plane args={[1, 1, 1, 1]} position={[0, 1, 0]} rotation={[Math.PI / 2, 0, 0]}
+                        <Plane args={[1, 1, 1, 1]} position={[0, 1, 0]} rotation={[Math.PI / 2, 0, 0]} castShadow={true}
                           receiveShadow>
-                          <meshPhysicalMaterial color={new THREE.Color(0xffffff)} side={THREE.DoubleSide} />
+                          <meshPhysicalMaterial color={new THREE.Color(0xffffff)} side={THREE.DoubleSide} castShadow={true} />
                         </Plane>
-                        <Plane args={[1, 1, 1, 1]} position={[0, 0.5, -0.5]} rotation={[0, 0, 0]}
+                        <Plane args={[1, 1, 1, 1]} position={[0, 0.5, -0.5]} rotation={[0, 0, 0]} castShadow={true}
                           receiveShadow>
-                          <meshPhysicalMaterial color={new THREE.Color(0xffffff)} side={THREE.DoubleSide}
+                          <meshPhysicalMaterial color={new THREE.Color(0xffffff)} side={THREE.DoubleSide} castShadow={true}
                           />
                         </Plane>
-                        <Plane args={[1, 1, 1, 1]} position={[-0.5, 0.5, 0]} rotation={[0, Math.PI / 2, 0]}
-                          castShadow={false} receiveShadow>
-                          <meshPhysicalMaterial color={new THREE.Color(0xff0000)} side={THREE.DoubleSide}
-                          />
-                        </Plane>
-                        <Plane args={[1, 1, 1, 1]} position={[0.5, 0.5, 0]} rotation={[0, -Math.PI / 2, 0]}
+                        <Plane args={[1, 1, 1, 1]} position={[-0.5, 0.5, 0]} rotation={[0, Math.PI / 2, 0]} castShadow={true}
                           receiveShadow>
-                          <meshPhysicalMaterial color={new THREE.Color(0x00ff00)} side={THREE.DoubleSide}
+                          <meshPhysicalMaterial color={new THREE.Color(0xff0000)} side={THREE.DoubleSide} castShadow={true}
                           />
                         </Plane>
-                        <Sphere args={[0.15]} position={[0.2, 0.15, 0]} rotation={[0, -Math.PI / 2, 0]}
-                          castShadow >
+                        <Plane args={[1, 1, 1, 1]} position={[0.5, 0.5, 0]} rotation={[0, -Math.PI / 2, 0]} castShadow={true}
+                          receiveShadow>
+                          <meshPhysicalMaterial color={new THREE.Color(0x00ff00)} side={THREE.DoubleSide} castShadow={true}
+                          />
+                        </Plane>
+                        <Sphere args={[0.15]} position={[0.2, 0.15, 0]} rotation={[0, -Math.PI / 2, 0]} castShadow={true}
+                          receiveShadow >
                           <meshPhysicalMaterial
                             color={new THREE.Color(0x444444)}
                             roughness={0}
                             metalness={0.1} side={THREE.DoubleSide}
                           />
                         </Sphere>
-                        <Sphere args={[0.15]} position={[-0.2, 0.15, -0.2]} rotation={[0, -Math.PI / 2, 0]}
-                          castShadow >
+                        <Sphere args={[0.15]} position={[-0.2, 0.15, -0.2]} rotation={[0, -Math.PI / 2, 0]} castShadow={true}
+                          receiveShadow >
                           <meshPhysicalMaterial
                             color={new THREE.Color(0x9db4ec)} side={THREE.DoubleSide}
                           />
@@ -656,8 +830,9 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
                     />
 
                     <C scale={20} position={[3, -0.08, 1.6]} rotation={[0, 0, 0]} />
-                    <pointLight intensity={15} position={[3, 1, 1.6]}
-                      color={new THREE.Color(0x223060)} visible={whatSection() == 4} />
+                    <pointLight intensity={15} position={[3, 1, 1.6]} distance={isVisibleLight(new THREE.Vector3(0, 5, 37.5), 6) ? 2 : 0.01}
+                      color={new THREE.Color(0x223060)} />
+                    {/* visible={isVisibleLight(new THREE.Vector3(0, 5, 37.5), 6)} /> */}
 
                     <mesh className="LINKS" position={[0, 0, 2.3]}>
                       <Bvh firstHitOnly >
@@ -671,8 +846,9 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
                   <mesh className="VIDEOGAME" position={[0, 0, 2.7]}>
 
                     <mesh className="MODEL" >
-                      <pointLight intensity={30} position={[-3.3, 1, 1.4]}
-                        color={new THREE.Color(0x223060)} visible={whatSection() == 4} />
+                      <pointLight intensity={30} position={[-3.3, 1, 1.4]} distance={isVisibleLight(new THREE.Vector3(0, 5, 40), 7) ? 4 : 0.01}
+                        color={new THREE.Color(0x223060)} />
+                      {/* visible={isVisibleLight(new THREE.Vector3(0, 5, 40), 7)} /> */}
                       <Bvh firstHitOnly >
                         <Float
                           speed={4} // Animation speed, defaults to 1
@@ -708,12 +884,14 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
                     />
 
                     <Threejs scale={20} position={[3, -0.08, 1.58]} rotation={[0, 0, 0]} />
-                    <pointLight intensity={15} position={[3, 1, 1.58]}
-                      color={new THREE.Color(0x223060)} visible={whatSection() == 4} />
+                    <pointLight intensity={15} position={[3, 1, 1.58]} distance={isVisibleLight(new THREE.Vector3(0, 5, 40.18), 6) ? 2 : 0.01}
+                      color={new THREE.Color(0x223060)} />
+                    {/* visible={isVisibleLight(new THREE.Vector3(0, 5, 40.18), 6)} /> */}
 
                     <Reacts scale={20} position={[4, -0.08, 1.58]} rotation={[0, 0, 0]} />
-                    <pointLight intensity={15} position={[4, 1, 1.58]}
-                      color={new THREE.Color(0x223060)} visible={whatSection() == 4} />
+                    <pointLight intensity={15} position={[4, 1, 1.58]} distance={isVisibleLight(new THREE.Vector3(0, 5, 40.18), 6) ? 2 : 0.01}
+                      color={new THREE.Color(0x223060)} />
+                    {/* visible={isVisibleLight(new THREE.Vector3(0, 5, 40.18), 6)} /> */}
 
                     {/* <mesh className="LINKS" position={[0, 0, 2.3]}>
                       <Bvh firstHitOnly >
@@ -726,7 +904,7 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
 
                 </mesh>
 
-                <mesh className="SKILLS & TOOLS" position={[0, 0, 42.9]} visible={whatSection() < 7 && whatSection() > 3}>
+                <mesh className="SKILLS & TOOLS" position={[0, 0, 42.9]}>
                   <TextAdvance position={[0, 0, 0]}
                     text={"SKILLS & TOOLS"}
                     font={fontTitle} size={0.3} height={0.1}
@@ -734,44 +912,27 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
                   />
                   <Bvh firstHitOnly >
                     <C scale={20} position={[-3.5, -0.08, 1.1]} rotation={[0, 0, 0]} />
-                    <pointLight intensity={15} position={[-3.5, 1, 1.1]}
-                      color={new THREE.Color(0x223060)} visible={whatSection() == 5} />
-
+                    <rectAreaLight intensity={15} position={[0, 1, 1.1]} rotation={[-Math.PI / 2, 0, 0]}
+                      distance={isVisibleLight(new THREE.Vector3(0, 5, 44), 6) ? 10 : 0.01}
+                      width={8} height={1} color={new THREE.Color(0x223060)} />
                     <Blender scale={20} position={[-2.5, -0.08, 1.1]} rotation={[0, 0, 0]} />
-                    <pointLight intensity={15} position={[-2.5, 1, 1.1]}
-                      color={new THREE.Color(0x223060)} visible={whatSection() == 5} />
-
                     <Unreal scale={20} position={[-1.5, -0.08, 1.1]} rotation={[0, 0, 0]} />
-                    <pointLight intensity={15} position={[-1.5, 1, 1.1]}
-                      color={new THREE.Color(0x223060)} visible={whatSection() == 5} />
-
                     <Vscode scale={20} position={[-0.5, -0.08, 1.1]} rotation={[0, 0, 0]} />
-                    <pointLight intensity={15} position={[-0.5, 1, 1.1]}
-                      color={new THREE.Color(0x223060)} visible={whatSection() == 5} />
-
                     <Git scale={20} position={[0.5, -0.08, 1.1]} rotation={[0, 0, 0]} />
-                    <pointLight intensity={15} position={[0.5, 1, 1.1]}
-                      color={new THREE.Color(0x223060)} visible={whatSection() == 5} />
-
                     <Threejs scale={20} position={[1.5, -0.08, 1.1]} rotation={[0, 0, 0]} />
-                    <pointLight intensity={15} position={[1.5, 1, 1.1]}
-                      color={new THREE.Color(0x223060)} visible={whatSection() == 5} />
-
                     <Reacts scale={20} position={[2.5, -0.08, 1.1]} rotation={[0, 0, 0]} />
-                    <pointLight intensity={15} position={[2.5, 1, 1.1]}
-                      color={new THREE.Color(0x223060)} visible={whatSection() == 5} />
-
                     <Tailwind scale={20} position={[3.5, -0.08, 1.1]} rotation={[0, 0, 0]} />
-                    <pointLight intensity={15} position={[3.5, 1, 1.1]}
-                      color={new THREE.Color(0x223060)} visible={whatSection() == 5} />
-
                   </Bvh>
                 </mesh>
 
-                <mesh className="CONTACT ME" position={[0, 0, 45.9]} visible={whatSection() > 4}>
+                <mesh className="CONTACT ME" position={[0, 0, 45.9]}>
 
-                  <pointLight intensity={400} position={[-2.5, 4, 3.5]}
-                    color={new THREE.Color(0x223060)} visible={whatSection() == 6} />
+                  <rectAreaLight intensity={15} position={[0, 2, 3]} rotation={[-Math.PI / 2, 0, 0]}
+                    distance={isVisibleLight(new THREE.Vector3(0, 5, 48.9), 10) ? 15 : 0.01}
+                    width={8} height={5} color={new THREE.Color(0x223060)} />
+                  {/* <pointLight intensity={400} position={[-2.5, 4, 3.5]} distance={isVisibleLight(new THREE.Vector3(0, 5, 49.4), 6) ? 8 : 0.01}
+                    color={new THREE.Color(0x223060)} /> */}
+                  {/* visible={isVisibleLight(new THREE.Vector3(0, 5, 49.4), 6)} /> */}
                   <TextAdvance position={[0, 0, 0]}
                     text={"CONTACT ME"}
                     font={fontTitle} size={0.3} height={0.1}
@@ -824,13 +985,16 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
                     colorPri={new THREE.Color(colorFeedback)} colorSec={new THREE.Color(0x223060)}
                   />
                   <mesh className="Iphone" position={[0, 0, 0]}>
-                    <pointLight intensity={300} position={[2, 4, 3.5]}
-                      color={new THREE.Color(0x223060)} visible={whatSection() == 6} />
-                    <pointLight intensity={110} position={[2, 2, 3.5]}
-                      color={new THREE.Color(0x223060)} visible={whatSection() == 6} />
+                    {/* <pointLight intensity={300} position={[2, 4, 3.5]} distance={isVisibleLight(new THREE.Vector3(0, 5, 49.4), 6) ? 8 : 0.01}
+                      color={new THREE.Color(0x223060)} /> */}
+                    {/* visible={isVisibleLight(new THREE.Vector3(0, 5, 49.4), 6)} /> */}
+                    {/* <pointLight intensity={110} position={[2, 2, 3.5]} distance={isVisibleLight(new THREE.Vector3(0, 5, 49.4), 6) ? 8 : 0.01}
+                      color={new THREE.Color(0x223060)} /> */}
+                    {/* visible={isVisibleLight(new THREE.Vector3(0, 5, 49.4), 6)} /> */}
 
-                    <pointLight intensity={15} position={[-3.5, 1, 1.1]}
-                      color={new THREE.Color(0x223060)} visible={whatSection() == 6} />
+                    {/* <pointLight intensity={15} position={[-3.5, 1, 1.1]} distance={isVisibleLight(new THREE.Vector3(0, 5, 48.3), 6) ? 8 : 0.01}
+                      color={new THREE.Color(0x223060)} /> */}
+                    {/* visible={isVisibleLight(new THREE.Vector3(0, 5, 48.3), 6)} /> */}
                     <Bvh firstHitOnly >
                       <Send ref={sendFormRef} scale={20} position={[0.5, -0.08, 4.6]} rotation={[0, 0, 0]} />
                       <Iphone ref={iphoneRef} position={[2, 0.68, 3]} rotation={[0, 0, scrollValue * Math.PI / 1200 + 4.1]} scale={1.5} />
@@ -839,21 +1003,27 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
                   </mesh>
                 </mesh>
 
-                <mesh className="INTEREST" position={[0, 0, 60.9]} visible={whatSection() > 5}>
+                <mesh className="INTEREST" position={[0, 0, 60.9]}>
                   <TextAdvance position={[0, 0, 0]}
                     text={"INTERESTS"}
                     font={fontTitle} size={0.3} height={0.1}
                     colorPri={new THREE.Color(0xdddddd)} colorSec={new THREE.Color(0x333333)}
                   />
                   <mesh className="LIGHTS">
-                    <pointLight intensity={100} position={[2.5, 2, 2.5]}
-                      color={new THREE.Color(0x223060)} visible={whatSection() == 7} />
-                    <pointLight intensity={100} position={[2.5, 2, 4.8]}
-                      color={new THREE.Color(0x223060)} visible={whatSection() == 7} />
-                    <pointLight intensity={100} position={[-2.5, 2, 2.5]}
-                      color={new THREE.Color(0x223060)} visible={whatSection() == 7} />
-                    <pointLight intensity={100} position={[-2.5, 2, 4.8]}
-                      color={new THREE.Color(0x223060)} visible={whatSection() == 7} />
+                    {/* <pointLight intensity={100} position={[2.5, 2, 2.5]} distance={isVisibleLight(new THREE.Vector3(0, 5, 63.4), 10) ? 12 : 0.01}
+                      color={new THREE.Color(0x223060)} />
+                    <pointLight intensity={100} position={[2.5, 2, 4.8]} distance={isVisibleLight(new THREE.Vector3(0, 5, 65.7), 10) ? 12 : 0.01}
+                      color={new THREE.Color(0x223060)} />
+                    <pointLight intensity={100} position={[-2.5, 2, 2.5]} distance={isVisibleLight(new THREE.Vector3(0, 5, 63.4), 10) ? 12 : 0.01}
+                      color={new THREE.Color(0x223060)} />
+                    <pointLight intensity={100} position={[-2.5, 2, 4.8]} distance={isVisibleLight(new THREE.Vector3(0, 5, 65.7), 10) ? 12 : 0.01}
+                      color={new THREE.Color(0x223060)} />
+                    <pointLight intensity={100} position={[-2.5, 2, 6.8]} distance={isVisibleLight(new THREE.Vector3(0, 5, 65.7), 10) ? 12 : 0.01}
+                      color={new THREE.Color(0x223060)} /> */}
+
+                    <rectAreaLight intensity={15} position={[0, 2, 4.6]} rotation={[-Math.PI / 2, 0, 0]}
+                      distance={isVisibleLight(new THREE.Vector3(0, 5, 65), 10) ? 15 : 0.01}
+                      width={8} height={7} color={new THREE.Color(0x223060)} />
                   </mesh>
                   <mesh className="MODELS">
                     <Bvh firstHitOnly >
@@ -868,6 +1038,8 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
                         <RubikCube ref={rubikRef} scale={0.15} position={[-4.8, 0, 2.3]} rotation={[0, Math.PI / 6, 0]} />
                       </Float>
                       <Book ref={psychologyRef} scale={0.065} position={[4.7, 0, 5]} rotation={[0, -1.7, 0]} />
+
+                      <Duolingo ref={duolingoRef} position={[-4.2, 0, 7]} rotation={[0, 0, 0]} />
                     </Bvh>
                   </mesh>
 
@@ -878,7 +1050,7 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
                       colorPri={"white"} colorSec={new THREE.Color(0x223060)}
                     />
                     <TextAdvance position={[2.5, 0, 2.8]}
-                      text={"10 years EXP"}
+                      text={pianoExp + " years EXP"}
                       font={fontText} size={0.16} height={0.08}
                       colorPri={"white"} colorSec={new THREE.Color(0x223060)}
                     />
@@ -889,13 +1061,25 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
                     />
 
                     <TextAdvance position={[-2.5, 0, 5]}
-                      text={"CHESS +833 games"}
+                      text={"CHESS +" + chessCount + " games"}
                       font={fontText} size={0.16} height={0.08}
                       colorPri={"white"} colorSec={new THREE.Color(0x223060)}
                     />
 
                     <TextAdvance position={[2.5, 0, 5]}
                       text={"PSYCHOLOGY reader"}
+                      font={fontText} size={0.16} height={0.08}
+                      colorPri={"white"} colorSec={new THREE.Color(0x223060)}
+                    />
+
+                    <TextAdvance position={[-2.4, 0, 6.95]}
+                      text={"DUOLINGO"} align='center'
+                      font={fontText} size={0.16} height={0.08}
+                      colorPri={"white"} colorSec={new THREE.Color(0x223060)}
+                    />
+
+                    <TextAdvance position={[-2.4, 0, 7.25]}
+                      text={duoStreak + " days streak"} align='center'
                       font={fontText} size={0.16} height={0.08}
                       colorPri={"white"} colorSec={new THREE.Color(0x223060)}
                     />
