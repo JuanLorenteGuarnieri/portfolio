@@ -20,15 +20,15 @@ type GLTFResult = GLTF & {
 
 type ContextType = Record<string, React.ForwardRefExoticComponent<JSX.IntrinsicElements['mesh']>>
 
-type LogoProps = JSX.IntrinsicElements['group'] & {
-  // Aquí puedes añadir cualquier otra prop personalizada si es necesario
+type Props = JSX.IntrinsicElements['group'] & {
+  link?: string;
 };
 
-export const Chess = forwardRef<Group, LogoProps>((props, ref) => {
+export const Chess = forwardRef<Group, Props>(({ link = 'https://www.chess.com/member/qassiel', ...props }, ref) => {
   const [isHovered, setIsHovered] = useState(false);
   const { nodes, materials } = useGLTF('models/chess.glb') as GLTFResult
   return (
-    <group ref={ref} {...props} dispose={null}>
+    <group ref={ref} {...props} dispose={null} onClick={(e) => { e.stopPropagation(); window.open(link, '_blank'); }}>
       <mesh castShadow receiveShadow geometry={nodes.Cylinder002.geometry} material={materials['Material.001']}
         position={[-0.003, -0.027, -0.01]} scale={isHovered ? [0.0121, 0.0286, 0.0121] : [0.011, 0.026, 0.011]}
         onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}

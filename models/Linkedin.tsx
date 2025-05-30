@@ -8,6 +8,7 @@ import React, { useRef, forwardRef, useState } from 'react'
 import { useGLTF } from '@react-three/drei'
 import { GLTF } from 'three-stdlib'
 import { Group } from 'three';
+import { ThreeEvent } from '@react-three/fiber';
 
 type GLTFResult = GLTF & {
   nodes: {
@@ -22,24 +23,41 @@ type GLTFResult = GLTF & {
 
 type ContextType = Record<string, React.ForwardRefExoticComponent<JSX.IntrinsicElements['mesh']>>
 
-type LogoProps = JSX.IntrinsicElements['group'] & {
-  // Aquí puedes añadir cualquier otra prop personalizada si es necesario
+
+type Props = JSX.IntrinsicElements['group'] & {
+  link?: string;
 };
 
-export const Linkedin = forwardRef<Group, LogoProps>((props, ref) => {
+export const Linkedin = forwardRef<Group, Props>(({ link = 'https://www.linkedin.com/in/juanlorenteguarnieri/en/', ...props }, ref) => {
   const [isHovered, setIsHovered] = useState(false);
   const { nodes, materials } = useGLTF('models/linkedin.glb') as GLTFResult
+  const hoverCount = useRef(0);
+
+
+  const handlePointerEnter = (event: ThreeEvent<PointerEvent>) => {
+    event.stopPropagation();
+    hoverCount.current += 1;
+    setIsHovered(true);
+  };
+
+  const handlePointerLeave = (event: ThreeEvent<PointerEvent>) => {
+    hoverCount.current -= 1;
+    if (hoverCount.current <= 0) {
+      setIsHovered(false);
+      hoverCount.current = 0;
+    }
+  };
   return (
-    <group ref={ref} {...props} dispose={null}>
+    <group ref={ref} {...props} dispose={null} onClick={(e) => { e.stopPropagation(); window.open(link, '_blank'); }}>
       <mesh castShadow receiveShadow geometry={nodes.XMLID_802_.geometry} material={materials.Mat} position={isHovered ? [-0.012, 0, 0.0115] : [-0.012, 0, 0.01]} scale={isHovered ? 0.122 : 0.112}
-        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-        onPointerLeave={() => setIsHovered(false)} />
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave} />
       <mesh castShadow receiveShadow geometry={nodes.XMLID_803_.geometry} material={materials.Mat} position={isHovered ? [-0.012, 0, 0.0115] : [-0.012, 0, 0.01]} scale={isHovered ? 0.122 : 0.112}
-        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-        onPointerLeave={() => setIsHovered(false)} />
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave} />
       <mesh castShadow receiveShadow geometry={nodes.XMLID_804_.geometry} material={materials.Mat} position={isHovered ? [-0.012, 0, 0.0115] : [-0.012, 0, 0.01]} scale={isHovered ? 0.122 : 0.112}
-        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-        onPointerLeave={() => setIsHovered(false)} />
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave} />
     </group>
   )
 });

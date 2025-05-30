@@ -20,17 +20,17 @@ type GLTFResult = GLTF & {
 
 type ContextType = Record<string, React.ForwardRefExoticComponent<JSX.IntrinsicElements['mesh']>>
 
-type LogoProps = JSX.IntrinsicElements['group'] & {
-  // Aquí puedes añadir cualquier otra prop personalizada si es necesario
+type Props = JSX.IntrinsicElements['group'] & {
+  link?: string;
 };
 
-export const Book = forwardRef<Group, LogoProps>((props, ref) => {
+export const Book = forwardRef<Group, Props>(({ link = 'https://www.amazon.com/Laws-Human-Nature-Robert-Greene/dp/0525428143', ...props }, ref) => {
   const [isHovered, setIsHovered] = useState(false);
   const { nodes, materials } = useGLTF('models/book.glb') as GLTFResult
   return (
-    <group ref={ref} {...props} dispose={null}>
+    <group ref={ref} {...props} dispose={null} onClick={(e) => { e.stopPropagation(); window.open(link, '_blank'); }}>
       <mesh geometry={nodes.book_a_0.geometry} material={materials.book_a} position={isHovered ? [11.037, 0, -8.03] : [10.037, 0, -7.03]} scale={isHovered ? 1.1 : 1}
-        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
+        castShadow receiveShadow onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
         onPointerLeave={() => setIsHovered(false)} />
     </group>
   )
