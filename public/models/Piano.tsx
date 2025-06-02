@@ -8,6 +8,7 @@ import React, { useRef, forwardRef, useState } from 'react'
 import { useGLTF } from '@react-three/drei'
 import { GLTF } from 'three-stdlib'
 import { Group } from 'three';
+import { ThreeEvent } from '@react-three/fiber';
 
 type GLTFResult = GLTF & {
   nodes: {
@@ -28,19 +29,36 @@ type GLTFResult = GLTF & {
 
 type ContextType = Record<string, React.ForwardRefExoticComponent<JSX.IntrinsicElements['mesh']>>
 
-type LogoProps = JSX.IntrinsicElements['group'] & {
-  // Aquí puedes añadir cualquier otra prop personalizada si es necesario
+type Props = JSX.IntrinsicElements['group'] & {
+  link?: string;
 };
 
-export const Piano = forwardRef<Group, LogoProps>((props, ref) => {
+export const Piano = forwardRef<Group, Props>(({ link = 'https://recursivearts.com/es/virtual-piano/', ...props }, ref) => {
   const [isHovered, setIsHovered] = useState(false);
   const { nodes, materials } = useGLTF('models/piano.glb') as GLTFResult
+  const hoverCount = useRef(0);
+
+
+  const handlePointerEnter = (event: ThreeEvent<PointerEvent>) => {
+    event.stopPropagation();
+    hoverCount.current += 1;
+    setIsHovered(true);
+  };
+
+  const handlePointerLeave = (event: ThreeEvent<PointerEvent>) => {
+    hoverCount.current -= 1;
+    if (hoverCount.current <= 0) {
+      setIsHovered(false);
+      hoverCount.current = 0;
+    }
+  };
+
   return (
-    <group ref={ref} {...props} dispose={null} scale={isHovered ? 1.35 : 1.3}>
+    <group ref={ref} {...props} dispose={null} scale={isHovered ? 1.35 : 1.3} onClick={(e) => { e.stopPropagation(); window.open(link, '_blank'); }}>
       <group position={[0, -0.001, 0]} scale={0.088}>
         <mesh castShadow receiveShadow geometry={nodes._1.geometry} position={[-0.06, 12.762, -5.007]} scale={571.937}
-          onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-          onPointerLeave={() => setIsHovered(false)} >
+          onPointerEnter={handlePointerEnter}
+          onPointerLeave={handlePointerLeave}>
           <meshPhysicalMaterial
             color={new THREE.Color(0x000000)}
             roughness={0.6}
@@ -48,14 +66,14 @@ export const Piano = forwardRef<Group, LogoProps>((props, ref) => {
           />
         </mesh>
         <mesh castShadow receiveShadow geometry={nodes._2.geometry} material={materials['Wood-10']} position={[0.013, 6.591, -5.639]} scale={571.937}
-          onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-          onPointerLeave={() => setIsHovered(false)} />
+          onPointerEnter={handlePointerEnter}
+          onPointerLeave={handlePointerLeave} />
         <mesh castShadow receiveShadow geometry={nodes._21.geometry} material={materials['Fluegel-02']} position={[0.013, 6.591, -5.639]} scale={571.937}
-          onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-          onPointerLeave={() => setIsHovered(false)} />
+          onPointerEnter={handlePointerEnter}
+          onPointerLeave={handlePointerLeave} />
         <mesh castShadow receiveShadow geometry={nodes._3.geometry} position={[0.013, 9.65, 8.147]} scale={571.937}
-          onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-          onPointerLeave={() => setIsHovered(false)} >
+          onPointerEnter={handlePointerEnter}
+          onPointerLeave={handlePointerLeave}>
           <meshPhysicalMaterial
             color={new THREE.Color(0xaaaaaa)}
             roughness={0.3}
@@ -63,8 +81,8 @@ export const Piano = forwardRef<Group, LogoProps>((props, ref) => {
           />
         </mesh>
         <mesh castShadow receiveShadow geometry={nodes._4.geometry} material={materials['Fluegel-04']} position={[0.013, 9.79, 7.804]} scale={571.937}
-          onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-          onPointerLeave={() => setIsHovered(false)} />
+          onPointerEnter={handlePointerEnter}
+          onPointerLeave={handlePointerLeave} />
       </group>
     </group>
   )

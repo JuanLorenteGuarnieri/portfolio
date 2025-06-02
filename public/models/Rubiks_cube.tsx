@@ -24,15 +24,15 @@ type GLTFResult = GLTF & {
 
 type ContextType = Record<string, React.ForwardRefExoticComponent<JSX.IntrinsicElements['mesh']>>
 
-type LogoProps = JSX.IntrinsicElements['group'] & {
-  // Aquí puedes añadir cualquier otra prop personalizada si es necesario
+type Props = JSX.IntrinsicElements['group'] & {
+  link?: string;
 };
 
-export const RubikCube = forwardRef<Group, LogoProps>((props, ref) => {
+export const RubikCube = forwardRef<Group, Props>(({ link = 'https://rubikscu.be/', ...props }, ref) => {
   const [isHovered, setIsHovered] = useState(false);
   const { nodes, materials } = useGLTF('models/rubiks_cube.glb') as GLTFResult
   return (
-    <group ref={ref} {...props} dispose={null}>
+    <group ref={ref} {...props} dispose={null} onClick={(e) => { e.stopPropagation(); window.open(link, '_blank'); }}>
       <group scale={0.01}>
         <mesh castShadow receiveShadow geometry={nodes.Baked_baked_0.geometry} material={materials.baked}
           rotation={[-Math.PI / 2, 0, 0]} scale={isHovered ? 105 : 100}

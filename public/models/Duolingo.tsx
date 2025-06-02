@@ -8,6 +8,7 @@ import React, { useRef, forwardRef, useState } from 'react'
 import { useGLTF } from '@react-three/drei'
 import { GLTF } from 'three-stdlib'
 import { Group } from 'three';
+import { ThreeEvent } from '@react-three/fiber';
 
 type GLTFResult = GLTF & {
   nodes: {
@@ -72,115 +73,140 @@ type GLTFResult = GLTF & {
 }
 
 type Props = JSX.IntrinsicElements['group'] & {
-  // Aquí puedes añadir cualquier otra prop personalizada si es necesario
+  link?: string;
 };
 
-export const Duolingo = forwardRef<Group, Props>((props, ref) => {
+export const Duolingo = forwardRef<Group, Props>(({ link = 'https://duome.eu/Qassiel', ...props }, ref) => {
   const [isHovered, setIsHovered] = useState(false);
   const { nodes, materials } = useGLTF('models/duolingo.glb') as GLTFResult
+  const hoverCount = useRef(0);
+
+  // set all the materials metalness to 0.5
+  Object.values(materials).forEach((material) => {
+    if (material instanceof THREE.MeshStandardMaterial) {
+      material.metalness = 0.2;
+      material.roughness = 0.1;
+      material.needsUpdate = true;
+    }
+  });
+
+  const handlePointerEnter = (event: ThreeEvent<PointerEvent>) => {
+    event.stopPropagation();
+    hoverCount.current += 1;
+    setIsHovered(true);
+  };
+
+  const handlePointerLeave = (event: ThreeEvent<PointerEvent>) => {
+    hoverCount.current -= 1;
+    if (hoverCount.current <= 0) {
+      setIsHovered(false);
+      hoverCount.current = 0;
+    }
+  };
+
   return (
-    <group ref={ref} {...props} dispose={null} scale={isHovered ? 27 : 24}>
+    <group ref={ref} {...props} dispose={null} scale={isHovered ? 27 : 24} onClick={(e) => { e.stopPropagation(); window.open(link, '_blank'); }}>
       <mesh geometry={nodes.Curve.geometry} material={materials['SVGMat.001']} position={[0, 0, 0.002]} scale={0.264} castShadow receiveShadow
-        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-        onPointerLeave={() => setIsHovered(false)} />
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave} />
       <mesh geometry={nodes.Curve001.geometry} material={materials['SVGMat.002']} position={[0.001, 0, -0.003]} scale={0.264} castShadow receiveShadow
-        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-        onPointerLeave={() => setIsHovered(false)} />
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave} />
       <mesh geometry={nodes.Curve002.geometry} material={materials['SVGMat.003']} position={[0, 0, -0.001]} scale={0.264} castShadow receiveShadow
-        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-        onPointerLeave={() => setIsHovered(false)} />
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave} />
       <mesh geometry={nodes.Curve003.geometry} material={materials['SVGMat.004']} position={[0.001, 0, -0.008]} scale={0.264} castShadow receiveShadow
-        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-        onPointerLeave={() => setIsHovered(false)} />
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave} />
       <mesh geometry={nodes.Curve004.geometry} material={materials['SVGMat.005']} position={[0, 0, 0.005]} scale={0.264} castShadow receiveShadow
-        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-        onPointerLeave={() => setIsHovered(false)} />
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave} />
       <mesh geometry={nodes.Curve005.geometry} material={materials['SVGMat.006']} position={[-0.002, 0, -0.014]} scale={0.264} castShadow receiveShadow
-        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-        onPointerLeave={() => setIsHovered(false)} />
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave} />
       <mesh geometry={nodes.Curve006.geometry} material={materials['SVGMat.007']} position={[0, 0, -0.004]} scale={0.264} castShadow receiveShadow
-        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-        onPointerLeave={() => setIsHovered(false)} />
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave} />
       <mesh geometry={nodes.Curve007.geometry} material={materials['SVGMat.006']} position={[0.011, 0, 0.016]} scale={0.264} castShadow receiveShadow
-        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-        onPointerLeave={() => setIsHovered(false)} />
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave} />
       <mesh geometry={nodes.Curve008.geometry} material={materials['SVGMat.006']} position={[-0.013, 0, 0.014]} scale={0.264} castShadow receiveShadow
-        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-        onPointerLeave={() => setIsHovered(false)} />
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave} />
       <mesh geometry={nodes.Curve009.geometry} material={materials['SVGMat.008']} position={[-0.003, 0, -0.007]} scale={0.264} castShadow receiveShadow
-        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-        onPointerLeave={() => setIsHovered(false)} />
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave} />
       <mesh geometry={nodes.Curve010.geometry} material={materials['SVGMat.009']} position={[0.008, 0, 0.009]} scale={0.264} castShadow receiveShadow
-        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-        onPointerLeave={() => setIsHovered(false)} />
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave} />
       <mesh geometry={nodes.Curve011.geometry} material={materials['SVGMat.009']} position={[-0.008, 0, 0.01]} scale={0.264} castShadow receiveShadow
-        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-        onPointerLeave={() => setIsHovered(false)} />
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave} />
       <mesh geometry={nodes.Curve013.geometry} material={materials['SVGMat.011']} position={[0, 0, -0.004]} scale={0.264} castShadow receiveShadow
-        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-        onPointerLeave={() => setIsHovered(false)} />
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave} />
       <mesh geometry={nodes.Curve014.geometry} material={materials['SVGMat.012']} position={[-0.02, 0, -0.016]} scale={0.264} castShadow receiveShadow
-        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-        onPointerLeave={() => setIsHovered(false)} />
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave} />
       <mesh geometry={nodes.Curve015.geometry} material={materials['SVGMat.012']} position={[0.019, 0, 0.018]} scale={0.264} castShadow receiveShadow
-        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-        onPointerLeave={() => setIsHovered(false)} />
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave} />
       <mesh geometry={nodes.Curve016.geometry} material={materials['SVGMat.013']} position={[-0.004, 0, -0.01]} scale={0.264} castShadow receiveShadow
-        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-        onPointerLeave={() => setIsHovered(false)} />
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave} />
       <mesh geometry={nodes.Curve017.geometry} material={materials['SVGMat.014']} position={[-0.011, 0, 0.023]} scale={0.264} castShadow receiveShadow
-        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-        onPointerLeave={() => setIsHovered(false)} />
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave} />
       <mesh geometry={nodes.Curve018.geometry} material={materials['SVGMat.015']} position={[0.005, 0, -0.01]} scale={0.264} castShadow receiveShadow
-        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-        onPointerLeave={() => setIsHovered(false)} />
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave} />
       <mesh geometry={nodes.Curve019.geometry} material={materials['SVGMat.016']} position={[0.001, 0, -0.005]} scale={0.264} castShadow receiveShadow
-        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-        onPointerLeave={() => setIsHovered(false)} />
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave} />
       <mesh geometry={nodes.Curve020.geometry} material={materials['SVGMat.017']} position={[0.002, 0, 0.002]} scale={0.264} castShadow receiveShadow
-        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-        onPointerLeave={() => setIsHovered(false)} />
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave} />
       <mesh geometry={nodes.Curve021.geometry} material={materials['SVGMat.017']} position={[-0.002, 0, 0.002]} scale={0.264} castShadow receiveShadow
-        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-        onPointerLeave={() => setIsHovered(false)} />
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave} />
       <mesh geometry={nodes.Curve022.geometry} material={materials['SVGMat.015']} position={[0, 0, 0.004]} scale={0.264} castShadow receiveShadow
-        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-        onPointerLeave={() => setIsHovered(false)} />
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave} />
       <mesh geometry={nodes.Curve023.geometry} material={materials['SVGMat.014']} position={[0.015, 0, 0.017]} scale={0.264} castShadow receiveShadow
-        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-        onPointerLeave={() => setIsHovered(false)} />
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave} />
       <mesh geometry={nodes.Curve024.geometry} material={materials['SVGMat.018']} position={[0.025, 0, 0.006]} scale={0.264} castShadow receiveShadow
-        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-        onPointerLeave={() => setIsHovered(false)} />
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave} />
       <mesh geometry={nodes.Curve025.geometry} material={materials['SVGMat.019']} position={[-0.019, 0, 0.012]} scale={0.264} castShadow receiveShadow
-        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-        onPointerLeave={() => setIsHovered(false)} />
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave} />
       <mesh geometry={nodes.Curve026.geometry} material={materials['SVGMat.014']} position={[0.003, 0, -0.019]} scale={0.264} castShadow receiveShadow
-        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-        onPointerLeave={() => setIsHovered(false)} />
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave} />
       <mesh geometry={nodes.Curve027.geometry} material={materials['SVGMat.020']} position={[-0.001, 0, -0.021]} scale={0.264} castShadow receiveShadow
-        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-        onPointerLeave={() => setIsHovered(false)} />
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave} />
       <mesh geometry={nodes.Curve028.geometry} material={materials['SVGMat.020']} position={[0.023, 0, 0.008]} scale={0.264} castShadow receiveShadow
-        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-        onPointerLeave={() => setIsHovered(false)} />
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave} />
       <mesh geometry={nodes.Curve029.geometry} material={materials['SVGMat.021']} position={[-0.006, 0, 0.022]} scale={0.264} castShadow receiveShadow
-        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-        onPointerLeave={() => setIsHovered(false)} />
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave} />
       <mesh geometry={nodes.Curve030.geometry} material={materials['SVGMat.012']} position={[0.014, 0, 0.02]} scale={0.264} castShadow receiveShadow
-        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-        onPointerLeave={() => setIsHovered(false)} />
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave} />
       <mesh geometry={nodes.Curve031.geometry} material={materials['SVGMat.012']} position={[0.015, 0, -0.015]} scale={0.264} castShadow receiveShadow
-        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-        onPointerLeave={() => setIsHovered(false)} />
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave} />
       <mesh geometry={nodes.Curve032.geometry} material={materials['SVGMat.022']} position={[-0.002, 0, -0.009]} scale={0.264} castShadow receiveShadow
-        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-        onPointerLeave={() => setIsHovered(false)} />
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave} />
       <mesh geometry={nodes.Curve033.geometry} material={materials['SVGMat.023']} position={[0.002, 0, -0.009]} scale={0.264} castShadow receiveShadow
-        onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
-        onPointerLeave={() => setIsHovered(false)} />
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave} />
     </group>
   )
 });
 
-useGLTF.preload('/duolingo.glb')
+useGLTF.preload('models/duolingo.glb')
