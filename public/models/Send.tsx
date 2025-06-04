@@ -31,10 +31,10 @@ export const Send = forwardRef<Group, LogoProps>((props, ref) => {
   const { nodes, materials } = useGLTF('models/send.glb') as GLTFResult
   return (
     <group ref={ref} {...props} dispose={null}>
-      <mesh geometry={nodes.Curve.geometry} material={materials.Mat} position={isHovered ? [-0.017, 0, 0.017] : [-0.016, 0, 0.016]} scale={isHovered ? 0.096 : 0.089}
+      <mesh castShadow receiveShadow geometry={nodes.Curve.geometry} material={materials.Mat} position={isHovered ? [-0.017, 0, 0.017] : [-0.016, 0, 0.016]} scale={isHovered ? 0.096 : 0.089}
         onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
         onPointerLeave={() => setIsHovered(false)} />
-      <mesh geometry={nodes.Curve001.geometry} material={materials['Mat.001']} position={isHovered ? [-0.017, 0, 0.017] : [-0.016, 0, 0.016]} scale={isHovered ? 0.096 : 0.089}
+      <mesh castShadow receiveShadow geometry={nodes.Curve001.geometry} material={materials['Mat.001']} position={isHovered ? [-0.017, 0, 0.017] : [-0.016, 0, 0.016]} scale={isHovered ? 0.096 : 0.089}
         onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
         onPointerLeave={() => setIsHovered(false)} />
     </group>

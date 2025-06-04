@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import Navigation from "./components/Navigation";
-import Home from "./components/Home";
+import Home from "./sections/Home";
 import './App.css';
 import CustomCursor from "./components/CustomCursor";
 
@@ -19,7 +19,7 @@ const App = () => {
   };
 
   const [scrollY, setScrollY] = useState('0');
-  const maxY = 9400;
+  const maxY = 14000;
   const changeScroll = (n) => {
     setScrollY(n);
     window.scroll({

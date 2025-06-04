@@ -2,19 +2,20 @@ import React, { useRef, useState, useEffect, Suspense } from 'react';
 import * as THREE from 'three';
 import { Canvas } from '@react-three/fiber';
 import emailjs from '@emailjs/browser';
-import { Plane, Grid, useDetectGPU, PerformanceMonitor } from '@react-three/drei';
+import { Plane, Grid, useDetectGPU, PerformanceMonitor, Bvh, Stats } from '@react-three/drei';
 
-import Loader from './Loader';
-import CameraController from './CameraController';
-import Navigation from './Navigation';
+import Loader from '../components/Loader';
+import CameraController from '../components/CameraController';
+import Navigation from '../components/Navigation';
 import Title from './Title';
 import About from './About';
 import Education from './Education';
 import Projects from './Projects';
 import Skills from './Skills';
 import ContactMe from './ContactMe';
+import MobileCaption from '../components/MobileCaption';
 import Interests from './Interests';
-import MobileCaption from './MobileCaption';
+import Experience from './Experience';
 
 const Home = ({ scrollValue, maxY, changeScroll }) => {
   // CONFIGURATION
@@ -24,6 +25,28 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
   const [targetPos, setTargetPos] = useState(0);
 
   const lightRef = useRef();
+
+  // SECTIONS POSITIONS
+  const titlePos = [0, 0, 22];
+  const aboutPos = [0, 0, 28];
+  const educationPos = [0, 0, 32.8];
+  const experiencePos = [0, 0, 37.9];
+  const projectsPos = [0, 0, 41.5];
+  const skillsPos = [0, 0, 70];
+  const contactPos = [0, 0, 73];
+  const interestPos = [0, 0, 82.5];
+
+
+  const secPos = [
+    { key: 'sectionTitle', value: titlePos[2], label: 'Title' },
+    { key: 'sectionAbout', value: aboutPos[2], label: 'About' },
+    { key: 'sectionEducation', value: educationPos[2], label: 'Education' },
+    { key: 'sectionExperience', value: experiencePos[2], label: 'Experience' },
+    { key: 'sectionProyects', value: projectsPos[2], label: 'Projects' },
+    { key: 'sectionSkills', value: skillsPos[2], label: 'Skills' },
+    { key: 'sectionContact', value: contactPos[2], label: 'Contact' },
+    { key: 'sectionInterest', value: interestPos[2], label: 'Interests' }
+  ];
 
   // CONTACT
   const sendFormRef = useRef();
@@ -374,55 +397,55 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
           {isContentLoaded && isAnimationDone ?
             (!(window.screen.orientation.type == "portrait-primary" || window.screen.orientation.type == "portrait-secondary" || window.innerHeight > window.innerWidth) ? (
               <Suspense fallback={null} >
-                <mesh className="CONFIG">
-                  <PerformanceMonitor factor={0.6} ms={200} iterations={3} threshold={0.6} bounds={() => [20, 30]}
-                    onDecline={() => { setDpr(prev => Math.max(0.3, prev - 0.1)); }}
-                    onIncline={() => { setDpr(prev => Math.min(0.8, prev + 0.1)); }}
-                  />
-                  <CameraController scrollValue={scrollValue} cameraRef={cameraRef} maxY={maxY} />
-                  <ambientLight intensity={0.5} />
-                </mesh>
+                <PerformanceMonitor factor={0.6} ms={200} iterations={3} threshold={0.6} bounds={() => [30, 45]}
+                  onDecline={() => { setDpr(prev => Math.max(0.3, prev - 0.1)); }}
+                  onIncline={() => { setDpr(prev => Math.min(0.8, prev + 0.1)); }}
+                />
+                <CameraController scrollValue={scrollValue} cameraRef={cameraRef} maxY={maxY} />
+                <ambientLight intensity={0.5} />
 
                 {/* <mesh className="GRID" position={[0, 0.1, 0]}>
                   <Grid args={[20, 100, 20, 100]} />
                 </mesh> */}
+                {/* <Stats className="stats" /> */}
 
-                <mesh className="POINTER">
-                  <pointLight ref={lightRef} distance={2} castShadow={true} intensity={25} position={[targetPos[0], 0.4, targetPos[2]]}
-                    shadow-bias={-0.01}
-                    shadow-camera-near={0.01}
-                    onUpdate={light => {
-                      // Map mouseSpeed (0 = slow, 1+ = fast) to mapSize between 512 and 1
-                      const minSize = 1;
-                      const maxSize = 512;
-                      // Inverse: faster = smaller mapSize
-                      const mapSize = Math.round(maxSize - (maxSize - minSize) * mouseSpeed);
-                      light.shadow.mapSize.width = mapSize;
-                      light.shadow.mapSize.height = mapSize;
-                      light.shadow.needsUpdate = true;
-                    }}
-                    color={new THREE.Color(0x223060)} />
-                </mesh>
+                {/* POINTER */}
+                <pointLight ref={lightRef} distance={2} castShadow={true} intensity={25} position={[targetPos[0], 0.4, targetPos[2]]}
+                  shadow-bias={-0.01}
+                  shadow-camera-near={0.01}
+                  onUpdate={light => {
+                    const minSize = 1; // Map mouseSpeed (0 = slow, 1+ = fast) to mapSize between 512 and 1
+                    const maxSize = 400;
+                    const mapSize = Math.round(maxSize - (maxSize - minSize) * mouseSpeed); // Inverse: faster = smaller mapSize
+                    light.shadow.mapSize.width = mapSize;
+                    light.shadow.mapSize.height = mapSize;
+                    light.shadow.needsUpdate = true;
+                  }}
+                  color={new THREE.Color(0x223060)} />
 
-                <Title isVisibleLight={isVisibleLight} pos={[0, 0, 22]} />
-                <About isVisibleLight={isVisibleLight} pos={[0, 0, 28]} />
-                <Education isVisibleLight={isVisibleLight} pos={[0, 0, 32.8]} />
-                <Projects isVisibleLight={isVisibleLight} pos={[0, 0, 37.9]} />
-                <Skills isVisibleLight={isVisibleLight} pos={[0, 0, 44.9]} />
-                <ContactMe isVisibleLight={isVisibleLight} pos={[0, 0, 47.9]}
+                {/* SECTIONS */}
+
+
+                <Title isVisibleLight={isVisibleLight} pos={titlePos} />
+                <About isVisibleLight={isVisibleLight} pos={aboutPos} />
+                <Education isVisibleLight={isVisibleLight} pos={educationPos} />
+                <Experience isVisibleLight={isVisibleLight} pos={experiencePos} />
+                <Projects isVisibleLight={isVisibleLight} pos={projectsPos} />
+                <Skills isVisibleLight={isVisibleLight} pos={skillsPos} />
+                <ContactMe isVisibleLight={isVisibleLight} pos={contactPos}
                   scrollValue={scrollValue} userName={userName} userEmail={userEmail} message={message}
                   feedback={feedback} colorFeedback={colorFeedback} changeUserName={changeUserName} changeUserEmail={changeUserEmail}
                   changeMessage={changeMessage} typeForm={typeForm} changeTypeForm={changeTypeForm} form1Ref={form1Ref} form2Ref={form2Ref} form3Ref={form3Ref}
                   sendFormRef={sendFormRef} changeContentLoaded={changeContentLoaded} changeAnimationDone={changeAnimationDone}
                 />
-                <Interests isVisibleLight={isVisibleLight} pos={[0, 0, 60.9]} />
+                <Interests isVisibleLight={isVisibleLight} pos={interestPos} />
 
-                <mesh className="FLOOR" >
-                  <Plane args={[500, 500]} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 35]}
-                    receiveShadow>
-                    <meshPhysicalMaterial color={new THREE.Color(0x444444)} />
-                  </Plane>
-                </mesh>
+
+                {/* FLOOR */}
+                <Plane args={[500, 500]} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 35]}
+                  receiveShadow>
+                  <meshPhysicalMaterial color={new THREE.Color(0x444444)} />
+                </Plane>
 
               </Suspense>
             ) : (
@@ -477,7 +500,8 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
           }}
           aria-hidden="true" // Ocultar a lectores de pantalla
         />
-        <Navigation cond={isAnimationDone && !((!isMobileDevice() && window.innerHeight > window.innerWidth) || (isMobileDevice() && (window.screen.orientation.type == "portrait-primary" || window.screen.orientation.type == "portrait-secondary")))} action={changeScroll} scrollValue={scrollValue} action2={changeContentLoaded} />
+        <Navigation secPos={secPos} action={changeScroll} scrollValue={scrollValue} action2={changeContentLoaded}
+          cond={isAnimationDone && !((!isMobileDevice() && window.innerHeight > window.innerWidth) || (isMobileDevice() && (window.screen.orientation.type == "portrait-primary" || window.screen.orientation.type == "portrait-secondary")))} />
       </section >
     </>
   );

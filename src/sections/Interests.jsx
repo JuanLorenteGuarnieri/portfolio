@@ -1,6 +1,6 @@
 import { Bvh, Float } from '@react-three/drei';
 import * as THREE from 'three';
-import TextAdvance from './TextAdvance';
+import TextAdvance from '../components/TextAdvance';
 import fontTitle from '../assets/fonts/Encode_Sans_Semi_Expanded/Encode_Sans_Semi_Expanded_Bold.json';
 import fontText from '../assets/fonts/Source_Code_Pro/static/Source_Code_Pro_Regular.json';
 import { Chess } from '../../public/models/Chess';
@@ -56,29 +56,73 @@ function Interests({ isVisibleLight, pos }) {
 
   async function updateDuolingoStreak() {
     try {
+      // 1) Montamos la URL del proxy + el endpoint de actualización de Duome
+      const targetUrl = encodeURIComponent('https://duome.eu/aggiorna.php');
+      const proxyUrl = `https://thingproxy.freeboard.io/fetch/https://duome.eu/aggiorna.php`;
+
+      // 2) Hacemos la petición POST a través del proxy para forzar la actualización de stats
+      const updateResponse = await fetch(proxyUrl, {
+        method: 'POST',
+        headers: {
+          // Duome espera un formulario urlencoded
+          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        },
+        body: new URLSearchParams({
+          who: '258222001', // ID interno de Duome para el usuario "Qassiel"
+        }),
+      });
+      if (!updateResponse.ok) {
+        throw new Error(`Fallo al actualizar stats: ${updateResponse.status}`);
+      }
+
+      // 3) Parseamos la respuesta JSON y extraemos la propiedad "streak"
+      const updateData = await updateResponse.json();
+      if (typeof updateData.streak === 'undefined') {
+        throw new Error('La respuesta JSON no contiene "streak".');
+      }
+      const text = `${updateData.streak}`; // Convertimos a string para setDuoStreak
+
+      // 4) Asignamos la racha al estado correspondiente
+      setDuoStreak(text);
+    } catch (err) {
+      setDuoStreak('N/A');
+      console.error('Error al obtener el streak de Duolingo:', err);
+    }
+  }
+
+  async function updateDuolingoStreak2() {
+    try {
       // 1) Montamos la URL del proxy + la URL objetivo
       const targetUrl = encodeURIComponent('https://duome.eu/Qassiel');
-      const proxyUrl = `https://api.allorigins.win/raw?url=${targetUrl}`;
+      const proxyUrl = `https://thingproxy.freeboard.io/fetch/https://duome.eu/Qassiel`;
 
-      // 2) Hacemos el fetch a través del proxy (el proxy añade el header CORS)
-      const response = await fetch(proxyUrl);
-      const html = await response.text();
-
-      // 3) Parseamos el HTML y extraemos el <span class="cc-header-count">
+      // 2) Hacemos el fetch a través del proxy
+      let response, data, html;
+      response = await fetch(proxyUrl);
+      if (!response.ok) throw new Error('No se pudo obtener la página de Duolingo');
+      html = await response.text();
+      // 3) Parseamos el HTML y extraemos el <span> adecuado
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, 'text/html');
 
-      // Busca un <span> cuyo aria-label contenga 'days streak'
-      const span = Array.from(doc.querySelectorAll('span')).find(
+      // Busca primero por aria-label, luego por clase fallback
+      let span = Array.from(doc.querySelectorAll('span')).find(
         el => el.getAttribute('aria-label') && el.getAttribute('aria-label').includes('days streak')
       );
-      if (!span) throw new Error('No se encontró un span con aria-label que contenga "days streak"');
+      if (!span) {
+        // Fallback: buscar por clase cc-header-count
+        span = doc.querySelector('span.cc-header-count');
+      }
+      else {
+        // 4) Extraemos el texto del span y lo asignamos a la variable correspondiente
+        let text = span.textContent.trim();
+        setDuoStreak(text);
+      }
+      if (!span) throw new Error('No se encontró el span del streak de Duolingo.');
 
-      // 4) Extraemos el texto del span y lo asignamos a la variable correspondiente
-      let text = span.textContent.trim();
-      setDuoStreak(text);
     } catch (err) {
-      console.error(err);
+      setDuoStreak('N/A');
+      console.error('Error al obtener el streak de Duolingo:', err);
     }
   }
 

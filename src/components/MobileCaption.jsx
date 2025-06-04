@@ -2,7 +2,7 @@ import { Html } from '@react-three/drei';
 
 function MobileCaption({ }) {
   return (
-    <Html center key={key}> {/* ROTATE SCREEN */}
+    <Html center> {/* ROTATE SCREEN */}
       <div className="">
         <div className="text-center">
           <svg version="1.0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900.000000 900.000000"

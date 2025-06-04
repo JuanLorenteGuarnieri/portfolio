@@ -1,12 +1,12 @@
 import { Bvh } from '@react-three/drei';
 import * as THREE from 'three';
-import TextAdvance from './TextAdvance';
+import TextAdvance from '../components/TextAdvance';
 import fontTitle from '../assets/fonts/Encode_Sans_Semi_Expanded/Encode_Sans_Semi_Expanded_Bold.json';
 import fontText from '../assets/fonts/Source_Code_Pro/static/Source_Code_Pro_Regular.json';
 import { Unizar } from '../../public/models/Unizar';
 
 function Education({ isVisibleLight, pos }) {
-  const bachelorPos = [0, 0, 0.7];
+  const bachelorPos = [0, 0, 0.9];
   const masterPos = [0, 0, 2.7];
 
   return (
@@ -19,7 +19,7 @@ function Education({ isVisibleLight, pos }) {
 
       <rectAreaLight intensity={15} position={[0, 2, 2.6]} rotation={[-Math.PI / 2, 0, 0]}
         visible={isVisibleLight(new THREE.Vector3(0, 5, pos[2] + 2), 8)}
-        width={5} height={4} color={new THREE.Color(0x223060)} />
+        width={5} height={3} color={new THREE.Color(0x223060)} />
 
       <mesh className="BACHELOR" position={bachelorPos}>
         <Bvh firstHitOnly >

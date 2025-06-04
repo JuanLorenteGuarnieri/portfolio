@@ -1,8 +1,17 @@
 import React, { useRef, useEffect, useMemo, useState } from 'react';
-import { Text3D } from '@react-three/drei';
+import { Bvh, Text3D } from '@react-three/drei';
 import * as THREE from 'three';
 import { useGLTF } from '@react-three/drei'
+import {
+  computeBoundsTree,
+  disposeBoundsTree,
+  acceleratedRaycast,
+} from 'three-mesh-bvh'
 
+
+THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree
+THREE.BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree
+THREE.Mesh.prototype.raycast = acceleratedRaycast
 
 
 const TextAdvance = ({
@@ -19,6 +28,20 @@ const TextAdvance = ({
 
   const { materials } = useGLTF('models/box1.glb')
   materials.Mat.precision = 'lowp';
+
+
+  useEffect(() => {
+    const mesh = textRef.current
+    if (mesh) {
+      // Once the text mesh is mounted, its geometry (TextGeometry) is available.
+      // Call computeBoundsTree() to build the BVH structure on the geometry.
+      mesh.geometry.computeBoundsTree()
+
+      // Optionally, if you ever need to dispose or rebuild:
+      // mesh.geometry.disposeBoundsTree()
+      // mesh.geometry.computeBoundsTree()
+    }
+  }, [])
 
   const textProps = useMemo(
     () => ({
@@ -53,7 +76,9 @@ const TextAdvance = ({
 
   return (
     <mesh>
+      {/* <Bvh firstHitOnly> */}
       <Text3D
+
         ref={textRef}
         castShadow
         receiveShadow
@@ -72,6 +97,7 @@ const TextAdvance = ({
           metalness={0.1}
         />
       </Text3D>
+      {/* </Bvh> */}
     </mesh>
   );
 };
