@@ -28,7 +28,7 @@ export const Box1 = forwardRef<Group, LogoProps>((props, ref) => {
   const { nodes, materials } = useGLTF('models/box1.glb') as GLTFResult
   return (
     <group ref={ref} {...props} dispose={null}>
-      <mesh geometry={nodes.Curve.geometry} material={materials.Mat} position={[0.078, 0, 0]} />
+      <mesh castShadow receiveShadow geometry={nodes.Curve.geometry} material={materials.Mat} position={[0.078, 0, 0]} />
     </group>
   )
 });
