@@ -2,18 +2,18 @@ name: Update Duolingo Streak
 
 on:
   schedule:
-    - cron: '0 6 * * *'  # Todos los días a las 06:00 UTC
-  workflow_dispatch:     # Permite ejecución manual
+    - cron: '0 12 * * *'
+  workflow_dispatch:
 
 jobs:
   update-streak:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout gh-pages branch
+    - name: Checkout main branch (con el script)
       uses: actions/checkout@v3
       with:
-        ref: gh-pages   # Clona la rama gh-pages para actualizar allí
+        ref: main
 
     - name: Setup Node.js
       uses: actions/setup-node@v3
@@ -21,22 +21,26 @@ jobs:
         node-version: '20'
 
     - name: Install dependencies
-      run: |
-        npm install node-fetch@3 cheerio
-        npm ci
-        npm install jsdom node-fetch
+      run: npm install jsdom node-fetch
 
     - name: Run update-streak script
       run: node update-streak.mjs
 
-    - name: Mover streak.json al directorio public/
-      run: mv streak.json public/streak.json
+    - name: Checkout gh-pages branch
+      uses: actions/checkout@v3
+      with:
+        ref: gh-pages
+        path: gh-pages
 
-    - name: Commit and push streak.json
+    - name: Copy streak.json to gh-pages branch
+      run: cp streak.json gh-pages/streak.json
+
+    - name: Commit and push changes on gh-pages
+      working-directory: gh-pages
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
-        git add public/streak.json
+        git add streak.json
         git diff --cached --quiet || git commit -m "Update streak.json"
         git push origin gh-pages
       env:
