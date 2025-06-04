@@ -17,18 +17,15 @@ type GLTFResult = GLTF & {
     Mat: THREE.MeshStandardMaterial
   }
 }
-
-type ContextType = Record<string, React.ForwardRefExoticComponent<JSX.IntrinsicElements['mesh']>>
-
-type LogoProps = JSX.IntrinsicElements['group'] & {
-  // Aquí puedes añadir cualquier otra prop personalizada si es necesario
+type Props = JSX.IntrinsicElements['group'] & {
+  link?: string;
 };
 
-export const Play = forwardRef<Group, LogoProps>((props, ref) => {
+export const Play = forwardRef<Group, Props>(({ link = 'https://github.com/JuanLorenteGuarnieri', ...props }, ref) => {
   const [isHovered, setIsHovered] = useState(false);
   const { nodes, materials } = useGLTF('models/play.glb') as GLTFResult
   return (
-    <group ref={ref} {...props} dispose={null}>
+    <group ref={ref} {...props} dispose={null} onClick={(e) => { e.stopPropagation(); window.open(link, '_blank'); }}>
       <mesh castShadow receiveShadow geometry={nodes.Curve.geometry} material={materials.Mat} position={isHovered ? [-0.011, 0, 0.0118] : [-0.01, 0, 0.011]} scale={isHovered ? 0.7 : 0.651}
         onPointerEnter={(event) => (event.stopPropagation(), setIsHovered(true))}
         onPointerLeave={() => setIsHovered(false)} />
