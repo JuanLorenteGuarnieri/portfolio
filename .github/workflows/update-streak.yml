@@ -25,6 +25,7 @@ jobs:
         run: |
           npm install node-fetch@3 cheerio
           npm ci
+          npm install jsdom node-fetch
 
       - name: Run update-streak script
         run: node update-streak.mjs
