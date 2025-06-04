@@ -1,0 +1,16 @@
+name: Update Duome Stats
+
+on:
+  schedule:
+    - cron: '0 6 * * *' # Todos los días a las 6:00 UTC
+  workflow_dispatch:     # Permite ejecutarlo manualmente también
+
+jobs:
+  post-request:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Curl to aggiorna.php
+        run: |
+          curl -X POST 'https://duome.eu/aggiorna.php' \
+            -H 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8' \
+            --data-urlencode 'who=258222001'

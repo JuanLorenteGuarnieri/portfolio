@@ -1,0 +1,41 @@
+name: Update Duolingo Streak
+
+permissions:
+  contents: write
+  
+on:
+  schedule:
+    - cron: '0 6 * * *'  # Todos los días a las 06:00 UTC
+  workflow_dispatch:     # Permite ejecución manual
+
+jobs:
+  scrape-streak:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          npm install node-fetch@3 cheerio
+          npm ci
+
+      - name: Run update-streak script
+        run: node update-streak.mjs
+
+      - name: Mover streak.json al directorio public/
+        run: mv streak.json public/streak.json
+
+      - name: Commit and push streak.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add public/streak.json
+          git commit -m "Update Duolingo streak" || echo "No changes to commit"
+          git push

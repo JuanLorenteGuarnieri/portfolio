@@ -54,11 +54,29 @@ function Interests({ isVisibleLight, pos }) {
     }
   }
 
-  async function updateDuolingoStreak() {
+  async function updateDuolingoStreak2() {
+    try {
+      const response = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('https://duome.eu/Qassiel'));
+      const data = await response.json();
+
+      // Busca algo como: <span class="streak">123</span>
+      const match = html.match(/Streak:\s*<\/strong>\s*(\d+)/i);
+      if (match && match[1]) {
+        setDuoStreak(match[1]);
+      } else {
+        throw new Error('No se pudo extraer el streak.');
+      }
+    } catch (err) {
+      console.error('Error al obtener el streak:', err);
+      setDuoStreak('N/A');
+    }
+  }
+
+  async function updateDuolingoStreak3() {
     try {
       // 1) Montamos la URL del proxy + el endpoint de actualización de Duome
       const targetUrl = encodeURIComponent('https://duome.eu/aggiorna.php');
-      const proxyUrl = `https://thingproxy.freeboard.io/fetch/https://duome.eu/aggiorna.php`;
+      const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent("https://duome.eu/aggiorna.php")}`;
 
       // 2) Hacemos la petición POST a través del proxy para forzar la actualización de stats
       const updateResponse = await fetch(proxyUrl, {
@@ -76,21 +94,24 @@ function Interests({ isVisibleLight, pos }) {
       }
 
       // 3) Parseamos la respuesta JSON y extraemos la propiedad "streak"
-      const updateData = await updateResponse.json();
-      if (typeof updateData.streak === 'undefined') {
-        throw new Error('La respuesta JSON no contiene "streak".');
-      }
-      const text = `${updateData.streak}`; // Convertimos a string para setDuoStreak
+      const updateText = await updateResponse.text();
+      console.log(updateText); // Mira qué devuelve realmente
 
-      // 4) Asignamos la racha al estado correspondiente
-      setDuoStreak(text);
+      // const updateData = await updateResponse.json();
+      // if (typeof updateData.streak === 'undefined') {
+      //   throw new Error('La respuesta JSON no contiene "streak".');
+      // }
+      // const text = `${updateData.streak}`; // Convertimos a string para setDuoStreak
+
+      // // 4) Asignamos la racha al estado correspondiente
+      // setDuoStreak(text);
     } catch (err) {
       setDuoStreak('N/A');
       console.error('Error al obtener el streak de Duolingo:', err);
     }
   }
 
-  async function updateDuolingoStreak2() {
+  async function updateDuolingoStreak() {
     try {
       // 1) Montamos la URL del proxy + la URL objetivo
       const targetUrl = encodeURIComponent('https://duome.eu/Qassiel');
@@ -127,8 +148,24 @@ function Interests({ isVisibleLight, pos }) {
   }
 
   useEffect(() => {
+    async function fetchStreak() {
+      try {
+        const res = await fetch(`${process.env.PUBLIC_URL}/streak.json`);
+        if (!res.ok) throw new Error('No se pudo cargar streak.json');
+        const data = await res.json();
+        setDuoStreak(data.streak);
+      } catch (err) {
+        console.error('Error al cargar el streak:', err);
+        setDuoStreak('N/A');
+      }
+    }
+
+    fetchStreak();
+  }, []);
+
+  useEffect(() => {
     updateCountFromChess();
-    updateDuolingoStreak();
+    // updateDuolingoStreak();
   }, []);
 
   return (
