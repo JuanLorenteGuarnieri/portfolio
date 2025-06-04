@@ -2,7 +2,7 @@ import fs from 'fs/promises';
 import fetch from 'node-fetch';
 import { JSDOM } from 'jsdom';
 
-const DUOME_URL = 'https://duome.eu/Qassiel';
+const DUOME_URL = 'https://api.allorigins.win/raw?url=https://duome.eu/Qassiel';
 
 async function scrapeStreak() {
   try {
