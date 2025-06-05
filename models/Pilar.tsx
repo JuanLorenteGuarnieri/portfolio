@@ -25,8 +25,9 @@ export const Pilar = forwardRef<Group, Props>(({ ...props }, ref) => {
         const lines = text.split('\n').filter(Boolean)
         const parsed = lines.map(line => {
           let [id, x, y, z, scale] = line.trim().split(/\s+/).map(Number)
-          x = x + 4
-          z = z - 6
+          x = -x + 2
+          y = y - 0.2
+          z = (z - 7) * 1.3
           return { id, x, y, z, scale }
         })
         setPoints(parsed)
@@ -38,7 +39,7 @@ export const Pilar = forwardRef<Group, Props>(({ ...props }, ref) => {
     if (!meshRef.current) return
     points.forEach((point, i) => {
       dummy.current.position.set(point.x, point.z, point.y)
-      dummy.current.scale.set(point.scale / 10, point.scale / 10, point.scale / 10)
+      dummy.current.scale.set(point.scale / 20, point.scale / 20, point.scale / 20)
       dummy.current.updateMatrix()
       meshRef.current!.setMatrixAt(i, dummy.current.matrix)
     })
@@ -47,7 +48,7 @@ export const Pilar = forwardRef<Group, Props>(({ ...props }, ref) => {
 
   return (
     <group ref={ref} {...props}>
-      <Bvh firstHitOnly>
+      <Bvh>
         {points.length > 0 && (
           <instancedMesh castShadow receiveShadow
             ref={meshRef}
