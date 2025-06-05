@@ -164,7 +164,7 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
       const dist = Math.sqrt(dx * dx + dy * dy);
       const speed = dist / dt; // px/ms
       // Normaliza la velocidad a un rango de 0 a 1
-      const normalizedSpeed = Math.min(speed / 800, 1); // Ajusta el divisor para cambiar la sensibilidad
+      const normalizedSpeed = Math.min(speed / 800, 1);
       setMouseSpeed(normalizedSpeed);
     }
     lastMousePos.current = { x, y, t: now };
@@ -181,26 +181,17 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
   }, []);
 
   const changeTypeForm = (n) => {
-    console.log("Type Form: " + n);
     setTypeForm(n);
   };
 
-  const handleIntersection = (point) => {
-    setTargetPos([point.x, point.y, point.z]);
-  };
-
   const handleKeyDown = (event) => { // Prevent default action for 'Space' (scroll)
-    // Comprueba si la tecla presionada es la tecla Espacio
     if (event.keyCode === 32) {
-      event.preventDefault(); // Previene la acción predeterminada (scroll)
+      event.preventDefault();
     }
   };
 
-  useEffect(() => { // Listener for handleKeyDown
-    // Agrega el manejador de eventos al montar el componente
+  useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
-
-    // Elimina el manejador de eventos al desmontar el componente
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
@@ -212,7 +203,6 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
 
   const [isContentLoaded, setIsContentLoaded] = useState(false);
   const [isAnimationDone, setIsAnimationDone] = useState(false);
-
 
   const changeContentLoaded = () => {
     setIsContentLoaded(true);
@@ -229,62 +219,71 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
   }, [isContentLoaded, isAnimationDone]);
 
   const onMouseClick = (event) => {
-    if (isAnimationDone && !(window.screen.orientation.type == "portrait-primary" || window.screen.orientation.type == "portrait-secondary")) {
-      // Calcula la posición del mouse en coordenadas normalizadas (-1 a +1) para ambos ejes
-      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    if (
+      !isAnimationDone ||
+      (window.screen.orientation.type === "portrait-primary" ||
+        window.screen.orientation.type === "portrait-secondary")
+    ) {
+      return;
+    }
 
-      changeTypeForm(0);
+    // Calcula la posición del mouse en coordenadas normalizadas (-1 a +1)
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
-      // Actualiza el rayo con la posición del mouse y la cámara
-      raycaster.setFromCamera(mouse, cameraRef.current);
+    changeTypeForm(0);
 
-      let intersects = raycaster.intersectObject(form1Ref.current);
-      if (intersects.length > 0) {
-        changeTypeForm(1);
-        return;
-      }
+    raycaster.setFromCamera(mouse, cameraRef.current);
 
-      intersects = raycaster.intersectObject(form2Ref.current);
-      if (intersects.length > 0) {
-        changeTypeForm(2);
-        return;
-      }
+    const refs = [
+      { ref: form1Ref, type: 1 },
+      { ref: form2Ref, type: 2 },
+      { ref: form3Ref, type: 3 },
+      { ref: sendFormRef, type: "send" },
+    ];
 
-      intersects = raycaster.intersectObject(form3Ref.current);
-      if (intersects.length > 0) {
-        changeTypeForm(3);
-        return;
-      }
-
-      intersects = raycaster.intersectObject(sendFormRef.current);
-      if (intersects.length > 0) {
-        sendEmail();
-        return;
+    for (const { ref, type } of refs) {
+      if (ref.current) {
+        const intersects = raycaster.intersectObject(ref.current);
+        if (intersects.length > 0) {
+          if (type === "send") {
+            sendEmail();
+          } else {
+            changeTypeForm(type);
+          }
+          return;
+        }
       }
     }
-  }
+  };
 
-  useEffect(() => { // DETECT CLICK
-    window.addEventListener('click', onMouseClick, false);
+  useEffect(() => {
+    window.addEventListener("click", onMouseClick, false);
     return () => {
-      window.removeEventListener('click', onMouseClick, false);
+      window.removeEventListener("click", onMouseClick, false);
     };
-  }, [userName, userEmail, message, scroll, isAnimationDone, window]);
+    // Only depend on variables that affect the click logic
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userName, userEmail, message, isAnimationDone]);
 
   const calculateIntersect = (x, y) => {
-    const mouse = new THREE.Vector2();
+    if (!cameraRef.current) return;
 
+    // Reutiliza mouse y raycaster ya definidos fuera
     mouse.x = (x / window.innerWidth) * 2 - 1;
     mouse.y = -(y / window.innerHeight) * 2 + 1;
 
     raycaster.setFromCamera(mouse, cameraRef.current);
-    raycaster.ray.direction.normalize();
 
-    const intersectPoint = raycaster.ray.origin.sub(raycaster.ray.direction.multiplyScalar(raycaster.ray.origin.y / raycaster.ray.direction.y));
-    setTargetPos([intersectPoint.x, intersectPoint.y, intersectPoint.z]);
+    // Calcula el punto de intersección con el plano y=0 (suelo)
+    const { origin, direction } = raycaster.ray;
+    if (direction.y === 0) return; // Evita división por cero
 
+    const t = -origin.y / direction.y;
+    if (t < 0) return; // Solo intersecciones delante de la cámara
 
+    const intersectPoint = new THREE.Vector3().copy(direction).multiplyScalar(t).add(origin);
+    setTargetPos([intersectPoint.x, 0, intersectPoint.z]);
   };
 
   const handlePointerMove = (event) => { //RECHARGE LIGHT CURSOR WHEN MOVING
@@ -380,7 +379,7 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
           gl={{
             antialias: true,  // mayor calidad
             stencil: false,
-            alpha: false,
+            alpha: true,
             depth: true,
             logarithmicDepthBuffer: false,
             preserveDrawingBuffer: false,

@@ -150,7 +150,7 @@ function Interests({ isVisibleLight, pos }) {
   useEffect(() => {
     async function fetchStreak() {
       try {
-        const res = await fetch(`${process.env.PUBLIC_URL}/streak.json`);
+        const res = await fetch('/portfolio/streak.json');
         if (!res.ok) throw new Error('No se pudo cargar streak.json');
         const data = await res.json();
         setDuoStreak(data.streak);

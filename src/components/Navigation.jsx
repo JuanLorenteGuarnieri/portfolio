@@ -1,38 +1,39 @@
 import { useProgress } from "@react-three/drei";
 import React, { useEffect, useState } from "react";
 
-const Navigation = ({ action, action2, cond, scrollValue, secPos }) => {
+const Navigation = React.memo(({ action, action2, cond, scrollValue, secPos }) => {
   const { progress } = useProgress();
   const [isLoaded, setIsLoaded] = useState(false);
 
-  const pos2scroll = (pos) => {
-    return (pos - 24.5) / 0.00461;
-  };
+  // Memoize pos2scroll to avoid recalculating on every render
+  const pos2scroll = React.useCallback((pos) => (pos - 24.5) / 0.00461, []);
 
-
-  const sections = secPos.map(({ key, value, label }) => ({
-    key,
-    value: pos2scroll(value),
-    label,
-  }))
+  // Memoize sections to avoid unnecessary recalculations
+  const sections = React.useMemo(
+    () =>
+      secPos.map(({ key, value, label }) => ({
+        key,
+        value: pos2scroll(value),
+        label,
+      })),
+    [secPos, pos2scroll]
+  );
 
   useEffect(() => {
-    // Actualiza el estado cuando el progreso es mayor que 95
-    if (progress > 95) {
+    if (progress >= 100 && !isLoaded) {
       setIsLoaded(true);
       action2();
     }
-  }, [progress]); // Dependencia es solo 'progress'
+    // eslint-disable-next-line
+  }, [progress, isLoaded, action2]);
 
-  return (
-    <>
-      {isLoaded && cond && <Navigations action={action} scrollValue={scrollValue} sections={sections} />}
-    </>
-  );
-};
+  // Only render Navigations if loaded and cond is true
+  return isLoaded && cond ? (
+    <Navigations action={action} scrollValue={scrollValue} sections={sections} />
+  ) : null;
+});
 
 const Navigations = ({ action, scrollValue, sections }) => {
-  const [section, setSection] = useState(0); // Inicializa con la animación inicial
 
   function changeScroll(scrollPosition, e) {
     e.preventDefault();

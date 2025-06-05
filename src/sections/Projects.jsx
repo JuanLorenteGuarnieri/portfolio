@@ -10,6 +10,7 @@ import { Threejs } from '../../public/models/Threejs';
 import { Reacts } from '../../public/models/React';
 import { C } from '../../public/models/C';
 import { Python } from '../../public/models/Python';
+import { Robot } from '../../public/models/Robot';
 
 import {
   computeBoundsTree,
@@ -17,6 +18,14 @@ import {
   acceleratedRaycast,
 } from 'three-mesh-bvh'
 import { useEffect, useRef } from 'react';
+import { Lemming } from '../../public/models/Lemming';
+import { Opencv } from '../../public/models/Opencv';
+import { Pytorch } from '../../public/models/Pytorch';
+import { Play } from '../../public/models/Play';
+import { useLoader } from '@react-three/fiber';
+import { TextureLoader } from 'three';
+import { Pilar } from '../../public/models/Pilar';
+import { SurfacePoint } from '../../public/models/SurfacePoint';
 
 
 THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree
@@ -25,6 +34,26 @@ THREE.Mesh.prototype.raycast = acceleratedRaycast
 
 function Projects({ isVisibleLight, pos }) {
   const projectRef = useRef();
+
+
+  const margin = 2.4; // Margin between projects
+
+  // PROJECTS POSITIONS
+  const raytracesPos = [0, 0, margin * 0];
+  const webgamePos = [0, 0, margin * 1];
+  const lemmingsPos = [0, 0, margin * 2];
+  const roboticsPos = [0, 0, margin * 3];
+  const panoramasPos = [0, 0, margin * 4];
+  const bachelorPos = [0, 0, margin * 5];
+  const cvFinalPos = [0, 0, margin * 6];
+  const modelingPos = [0, 0, margin * 7];
+  const ciPos = [0, 0, margin * 8];
+  const aciPos = [0, 0, margin * 9];
+  const slamPos = [0, 0, margin * 10];
+
+
+  const panoramaTexture = useLoader(TextureLoader, 'https://JuanLorenteGuarnieri.github.io/portfolio/panorama.png');
+  const scanpathTexture = useLoader(TextureLoader, 'https://JuanLorenteGuarnieri.github.io/portfolio/scanpath.png');
 
   // useEffect(() => {
   //   const mesh = projectRef.current
@@ -53,10 +82,10 @@ function Projects({ isVisibleLight, pos }) {
         width={3.} height={26} color={new THREE.Color(0x223060)} />
       {/* <pointLight intensity={100} position={[0, 2, 2.8]} distance={isVisibleLight(new THREE.Vector3(0, 5, pos[2] + 2.8), 8) ? 10 : 0.01}
         color={new THREE.Color(0x223060)} /> */}
-      <mesh className="RAY TRACER" position={[0, 0, 0]}>
+      <mesh className="RAY TRACER" position={raytracesPos}>
 
-        <mesh className="MODEL" position={[-3, 0.4, 2]} rotation={[-Math.PI / 6, Math.PI / 4, 0]}>
-          <pointLight castShadow={true} distance={isVisibleLight(new THREE.Vector3(0, 5, pos[2] + 2), 8) ? 1.5 : 0.01} intensity={2} position={[0.1, 0.5, 0.3]} power={55} shadow-camera-near={0.05}
+        <mesh className="MODEL" position={[-3, 0.36, 2]} rotation={[-Math.PI / 6, Math.PI / 4, 0]}>
+          <pointLight castShadow={true} distance={isVisibleLight(new THREE.Vector3(0, 5, raytracesPos[2] + pos[2] + 2), 8) ? 1.5 : 0.01} intensity={5} position={[0.1, 0.5, 0.3]} power={55} shadow-camera-near={0.05}
             shadow-bias={-0.005}
             onUpdate={light => {
               light.shadow.mapSize.width = 128
@@ -105,7 +134,6 @@ function Projects({ isVisibleLight, pos }) {
             </Sphere>
           </Bvh>
         </mesh>
-        {/* <Bvh firstHitOnly > */}
 
         <TextAdvance position={[0, 0, 0.9]}
           text={"RAY TRACER"}
@@ -128,10 +156,9 @@ function Projects({ isVisibleLight, pos }) {
           font={fontText} size={0.16} height={0.08}
           colorPri={"white"} colorSec={new THREE.Color(0x223060)}
         />
-        {/* </Bvh> */}
 
         <C scale={20} position={[3, -0.08, 1.6]} rotation={[0, 0, 0]} />
-        <pointLight intensity={15} position={[3, 1, 1.6]} distance={isVisibleLight(new THREE.Vector3(0, 5, pos[2] + 1.6), 6) ? 2 : 0.01}
+        <pointLight intensity={15} position={[3, 1, 1.6]} distance={isVisibleLight(new THREE.Vector3(0, 5, raytracesPos[2] + pos[2] + 1.6), 6) ? 2 : 0.01}
           color={new THREE.Color(0x223060)} />
 
         <mesh className="LINKS" position={[0, 0, 2.3]}>
@@ -143,10 +170,10 @@ function Projects({ isVisibleLight, pos }) {
 
 
       </mesh>
-      <mesh className="WEBGAME" position={[0, 0, 2.4]}>
+      <mesh className="WEBGAME" position={webgamePos}>
 
         <mesh className="MODEL" >
-          <pointLight intensity={30} position={[-3.3, 1, 1.4]} distance={isVisibleLight(new THREE.Vector3(0, 5, 2.7 + pos[2] + 1.4), 7) ? 4 : 0.01}
+          <pointLight intensity={30} position={[-3.3, 1, 1.4]} distance={isVisibleLight(new THREE.Vector3(0, 5, webgamePos[2] + pos[2] + 1.4), 7) ? 4 : 0.01}
             color={new THREE.Color(0x223060)} />
           <Bvh firstHitOnly >
             <Float
@@ -155,7 +182,7 @@ function Projects({ isVisibleLight, pos }) {
               floatIntensity={0.01} // Up/down float intensity, works like a multiplier with floatingRange,defaults to 1
               floatingRange={[-0.2, 0.1]} // Range of y-axis values the object will float within, defaults to [-0.1,0.1]
             >
-              <RusticSpaceShip position={[-3.5, 0.45, 1.8]} />
+              <RusticSpaceShip position={[-3.5, 0.2, 1.8]} />
             </Float>
           </Bvh>
         </mesh>
@@ -183,15 +210,30 @@ function Projects({ isVisibleLight, pos }) {
         />
 
         <Threejs scale={20} position={[3, -0.08, 1.58]} rotation={[0, 0, 0]} />
-        <pointLight intensity={15} position={[3, 1, 1.58]} distance={isVisibleLight(new THREE.Vector3(0, 5, 2.4 + pos[2] + 1.58), 6) ? 2 : 0.01}
+        <pointLight intensity={15} position={[3, 1, 1.58]} distance={isVisibleLight(new THREE.Vector3(0, 5, webgamePos[2] + pos[2] + 1.58), 6) ? 2 : 0.01}
           color={new THREE.Color(0x223060)} />
 
         <Reacts scale={20} position={[4, -0.08, 1.58]} rotation={[0, 0, 0]} />
-        <pointLight intensity={15} position={[4, 1, 1.58]} distance={isVisibleLight(new THREE.Vector3(0, 5, 2.4 + pos[2] + 1.58), 6) ? 2 : 0.01}
+        <pointLight intensity={15} position={[4, 1, 1.58]} distance={isVisibleLight(new THREE.Vector3(0, 5, webgamePos[2] + pos[2] + 1.58), 6) ? 2 : 0.01}
           color={new THREE.Color(0x223060)} />
 
+        <mesh className="LINKS" position={[0, 0, 2.3]}>
+          <Bvh firstHitOnly >
+            <Play link='https://juanlorenteguarnieri.github.io/Spaceship-Controller/' scale={12} position={[-0.7, -0.08, 0]} rotation={[0, 0, 0]} />
+            <Github link='https://github.com/JuanLorenteGuarnieri/Spaceship-Controller' scale={12} position={[0, -0.08, 0]} rotation={[0, 0, 0]} />
+          </Bvh>
+        </mesh>
       </mesh>
-      <mesh className="LEMMINGS CLONE" position={[0, 0, 4.8]}>
+      <mesh className="LEMMINGS CLONE" position={lemmingsPos}>
+
+
+        <mesh className="MODEL" >
+          <pointLight intensity={30} position={[-3.3, 1, 1.4]} distance={isVisibleLight(new THREE.Vector3(0, 5, lemmingsPos[2] + pos[2] + 1.4), 7) ? 4 : 0.01}
+            color={new THREE.Color(0x223060)} />
+          <Bvh firstHitOnly >
+            <Lemming position={[-3.9, 0.0, 2.2]} scale={0.08} />
+          </Bvh>
+        </mesh>
 
         <TextAdvance position={[0, 0, 0.9]}
           text={"LEMMINGS CLONE"}
@@ -216,11 +258,27 @@ function Projects({ isVisibleLight, pos }) {
         />
 
         <C scale={20} position={[3, -0.08, 1.6]} rotation={[0, 0, 0]} />
-        <pointLight intensity={15} position={[3, 1, 1.6]} distance={isVisibleLight(new THREE.Vector3(0, 5, 4.8 + pos[2] + 1.6), 6) ? 2 : 0.01}
+        <pointLight intensity={15} position={[3, 1, 1.6]} distance={isVisibleLight(new THREE.Vector3(0, 5, lemmingsPos[2] + pos[2] + 1.6), 6) ? 2 : 0.01}
           color={new THREE.Color(0x223060)} />
+
+        <mesh className="LINKS" position={[0, 0, 2.3]}>
+          <Bvh firstHitOnly >
+            {/* <Windows link='https://juanlorenteguarnieri.github.io/Spaceship-Controller/' scale={12} position={[-0.7, -0.08, 0]} rotation={[0, 0, 0]} /> */}
+            <Github link='https://github.com/fernando-lahoz/videojuegos-lemmings' scale={12} position={[0, -0.08, 0]} rotation={[0, 0, 0]} />
+          </Bvh>
+        </mesh>
       </mesh>
 
-      <mesh className="Robotics" position={[0, 0, 7.2]}>
+      <mesh className="Robotics" position={roboticsPos}>
+
+
+        <mesh className="MODEL" >
+          <pointLight intensity={30} position={[-3.3, 1, 1.4]} distance={isVisibleLight(new THREE.Vector3(0, 5, roboticsPos[2] + pos[2] + 1.4), 7) ? 4 : 0.01}
+            color={new THREE.Color(0x223060)} />
+          <Bvh firstHitOnly >
+            <Robot position={[-3.1, -0.05, 1.6]} rotation={[0, Math.PI / 4, 0]} scale={0.005} />
+          </Bvh>
+        </mesh>
 
         <TextAdvance position={[0, 0, 0.9]}
           text={"ROBOTICS"}
@@ -245,11 +303,42 @@ function Projects({ isVisibleLight, pos }) {
         />
 
         <Python scale={18} position={[3, -0.02, 1.6]} rotation={[0, 0, 0]} />
-        <pointLight intensity={15} position={[3, 1, 1.6]} distance={isVisibleLight(new THREE.Vector3(0, 5, 7.2 + pos[2] + 1.6), 6) ? 2 : 0.01}
+        <pointLight intensity={15} position={[3, 1, 1.6]} distance={isVisibleLight(new THREE.Vector3(0, 5, roboticsPos[2] + pos[2] + 1.6), 6) ? 2 : 0.01}
           color={new THREE.Color(0x223060)} />
+
+        <TextAdvance position={[4, 0, 1.6]}
+          text={"BrickPi3"}
+          font={fontText} size={0.11} height={0.09}
+          colorPri={"white"} colorSec={new THREE.Color(0x223060)}
+        />
+        <pointLight intensity={15} position={[4, 1, 1.6]} distance={isVisibleLight(new THREE.Vector3(0, 5, roboticsPos[2] + pos[2] + 1.6), 6) ? 2 : 0.01}
+          color={new THREE.Color(0x223060)} />
+
+        <mesh className="LINKS" position={[0, 0, 2.3]}>
+          <Bvh firstHitOnly >
+            {/* <Doc link='https://juanlorenteguarnieri.github.io/Spaceship-Controller/' scale={12} position={[0.7, -0.08, 0]} rotation={[0, 0, 0]} /> */}
+            <Github link='https://github.com/hsunekichi/Robotica' scale={12} position={[0, -0.08, 0]} rotation={[0, 0, 0]} />
+          </Bvh>
+        </mesh>
       </mesh>
 
-      <mesh className="Panoramas" position={[0, 0, 9.6]}>
+      <mesh className="Panoramas" position={panoramasPos}>
+        <mesh className="MODEL" >
+          <pointLight intensity={30} position={[-3.3, 1, 1.4]} distance={isVisibleLight(new THREE.Vector3(0, 5, panoramasPos[2] + pos[2] + 1.4), 7) ? 4 : 0.01}
+            color={new THREE.Color(0x223060)} />
+
+          <Bvh firstHitOnly >
+            <Plane args={[0.664, 0.412, 1, 1]} position={[-3.0, 0.08, 1.6]} rotation={[-Math.PI / 2, 0, 0]} scale={2.3}
+              receiveShadow={true} castShadow={true}>
+              <meshPhysicalMaterial
+                color={new THREE.Color(0xffffff)}
+                side={THREE.DoubleSide}
+                alphaTest={0.5}
+                map={panoramaTexture}
+              />
+            </Plane>
+          </Bvh>
+        </mesh>
 
         <TextAdvance position={[0, 0, 0.9]}
           text={"PANORAMAS"}
@@ -274,11 +363,38 @@ function Projects({ isVisibleLight, pos }) {
         />
 
         <Python scale={18} position={[3, -0.02, 1.6]} rotation={[0, 0, 0]} />
-        <pointLight intensity={15} position={[3, 1, 1.6]} distance={isVisibleLight(new THREE.Vector3(0, 5, 9.6 + pos[2] + 1.6), 6) ? 2 : 0.01}
+        <pointLight intensity={15} position={[3, 1, 1.6]} distance={isVisibleLight(new THREE.Vector3(0, 5, panoramasPos[2] + pos[2] + 1.6), 6) ? 2 : 0.01}
           color={new THREE.Color(0x223060)} />
+
+        <Opencv scale={20} position={[4, -0.02, 1.58]} rotation={[0, 0, 0]} />
+        <pointLight intensity={15} position={[4, 1, 1.58]} distance={isVisibleLight(new THREE.Vector3(0, 5, panoramasPos[2] + pos[2] + 1.58), 6) ? 2 : 0.01}
+          color={new THREE.Color(0x223060)} />
+
+        <mesh className="LINKS" position={[0, 0, 2.3]}>
+          <Bvh firstHitOnly >
+            {/* <Doc link='https://juanlorenteguarnieri.github.io/Spaceship-Controller/' scale={12} position={[0.7, -0.08, 0]} rotation={[0, 0, 0]} /> */}
+            <Github link='https://github.com/JuanLorenteGuarnieri/practicas-vision-por-computador' scale={12} position={[0, -0.08, 0]} rotation={[0, 0, 0]} />
+          </Bvh>
+        </mesh>
       </mesh>
 
-      <mesh className="Bachelor project" position={[0, 0, 12.0]}>
+      <mesh className="Bachelor project" position={bachelorPos}>
+
+        <mesh className="MODEL" >
+          <pointLight intensity={30} position={[-3.3, 1, 1.4]} distance={isVisibleLight(new THREE.Vector3(0, 5, bachelorPos[2] + pos[2] + 1.4), 7) ? 4 : 0.01}
+            color={new THREE.Color(0x223060)} />
+          <Bvh firstHitOnly >
+            <Sphere position={[-2.8, 0.4, 1.5]} scale={0.4} rotation={[Math.PI / 2, -Math.PI / 1.5, Math.PI]} castShadow={true}>
+              <meshPhysicalMaterial
+                color={new THREE.Color(0xffffff)}
+                side={THREE.DoubleSide}
+                map={scanpathTexture}
+              />
+            </Sphere>
+            <SurfacePoint position={[-2.8, 0.4, 1.5]} distance={0.4} centerLatLon={[60.0, 60.0]}
+              sphereRadius={0.05} sphereColor={'red'} rotation={[-Math.PI / 2, Math.PI / 1.5, Math.PI]} />
+          </Bvh>
+        </mesh>
 
         <TextAdvance position={[0, 0, 0.9]}
           text={"BACHELOR THESIS"}
@@ -303,11 +419,30 @@ function Projects({ isVisibleLight, pos }) {
         />
 
         <Python scale={18} position={[3, -0.02, 1.6]} rotation={[0, 0, 0]} />
-        <pointLight intensity={15} position={[3, 1, 1.6]} distance={isVisibleLight(new THREE.Vector3(0, 5, 12 + pos[2] + 1.6), 6) ? 2 : 0.01}
+        <pointLight intensity={15} position={[3, 1, 1.6]} distance={isVisibleLight(new THREE.Vector3(0, 5, bachelorPos[2] + pos[2] + 1.6), 6) ? 2 : 0.01}
           color={new THREE.Color(0x223060)} />
+
+        <Pytorch scale={20} position={[4, -0.0, 1.58]} rotation={[0, 0, 0]} />
+        <pointLight intensity={15} position={[4, 1, 1.58]} distance={isVisibleLight(new THREE.Vector3(0, 5, bachelorPos[2] + pos[2] + 1.58), 6) ? 2 : 0.01}
+          color={new THREE.Color(0x223060)} />
+
+        <mesh className="LINKS" position={[0, 0, 2.3]}>
+          <Bvh firstHitOnly >
+            {/* <Doc link='https://juanlorenteguarnieri.github.io/Spaceship-Controller/' scale={12} position={[0.7, -0.08, 0]} rotation={[0, 0, 0]} /> */}
+            <Github link='https://github.com/JuanLorenteGuarnieri/scanpaths-for-360-video' scale={12} position={[0, -0.08, 0]} rotation={[0, 0, 0]} />
+          </Bvh>
+        </mesh>
       </mesh>
 
-      <mesh className="CV Final Project" position={[0, 0, 14.4]}>
+      <mesh className="CV Final Project" position={cvFinalPos}>
+
+        <mesh className="MODEL" >
+          <pointLight intensity={30} position={[-3.3, 1, 1.4]} distance={isVisibleLight(new THREE.Vector3(0, 5, cvFinalPos[2] + pos[2] + 1.4), 7) ? 4 : 0.01}
+            color={new THREE.Color(0x223060)} />
+          <Bvh firstHitOnly >
+            <Pilar position={[-3.5, 0.2, 1.8]} scale={0.2} rotation={[2.3 * Math.PI / 4, -0.3 * Math.PI / 4, -0.5 * Math.PI / 4]} />
+          </Bvh>
+        </mesh>
 
         <TextAdvance position={[0, 0, 0.9]}
           text={"STRUCTURE FROM MOTION"}
@@ -332,12 +467,19 @@ function Projects({ isVisibleLight, pos }) {
         />
 
         <Python scale={18} position={[3, -0.02, 1.6]} rotation={[0, 0, 0]} />
-        <pointLight intensity={15} position={[3, 1, 1.6]} distance={isVisibleLight(new THREE.Vector3(0, 5, 14.4 + pos[2] + 1.6), 6) ? 2 : 0.01}
+        <pointLight intensity={15} position={[3, 1, 1.6]} distance={isVisibleLight(new THREE.Vector3(0, 5, cvFinalPos[2] + pos[2] + 1.6), 6) ? 2 : 0.01}
           color={new THREE.Color(0x223060)} />
+
+        <mesh className="LINKS" position={[0, 0, 2.3]}>
+          <Bvh firstHitOnly >
+            {/* <Doc link='https://juanlorenteguarnieri.github.io/Spaceship-Controller/' scale={12} position={[0.7, -0.08, 0]} rotation={[0, 0, 0]} /> */}
+            <Github link='https://github.com/JuanLorenteGuarnieri/CV_Course_assigment' scale={12} position={[0, -0.08, 0]} rotation={[0, 0, 0]} />
+          </Bvh>
+        </mesh>
       </mesh>
 
 
-      <mesh className="Modeling and Simulation of Appearance" position={[0, 0, 16.8]}>
+      <mesh className="Modeling and Simulation of Appearance" position={modelingPos}>
 
         <TextAdvance position={[0, 0, 0.9]}
           text={"RENDERING LEDA THE KNIGHT"}
@@ -362,11 +504,18 @@ function Projects({ isVisibleLight, pos }) {
         />
 
         <C scale={20} position={[3, -0.02, 1.6]} rotation={[0, 0, 0]} />
-        <pointLight intensity={15} position={[3, 1, 1.6]} distance={isVisibleLight(new THREE.Vector3(0, 5, 16.8 + pos[2] + 1.6), 6) ? 2 : 0.01}
+        <pointLight intensity={15} position={[3, 1, 1.6]} distance={isVisibleLight(new THREE.Vector3(0, 5, modelingPos[2] + pos[2] + 1.6), 6) ? 2 : 0.01}
           color={new THREE.Color(0x223060)} />
+
+        <mesh className="LINKS" position={[0, 0, 2.3]}>
+          <Bvh firstHitOnly >
+            {/* <Doc link='https://juanlorenteguarnieri.github.io/Spaceship-Controller/' scale={12} position={[0.7, -0.08, 0]} rotation={[0, 0, 0]} /> */}
+            {/* <Github link='https://github.com/JuanLorenteGuarnieri/CV_Course_assigment' scale={12} position={[0, -0.08, 0]} rotation={[0, 0, 0]} /> */}
+          </Bvh>
+        </mesh>
       </mesh>
 
-      <mesh className="Computational Imaging" position={[0, 0, 19.2]}>
+      <mesh className="Computational Imaging" position={ciPos}>
 
         <TextAdvance position={[0, 0, 0.9]}
           text={"COMPUTATIONAL IMAGING"}
@@ -391,11 +540,18 @@ function Projects({ isVisibleLight, pos }) {
         />
 
         <Python scale={18} position={[3, -0.02, 1.6]} rotation={[0, 0, 0]} />
-        <pointLight intensity={15} position={[3, 1, 1.6]} distance={isVisibleLight(new THREE.Vector3(0, 5, 19.2 + pos[2] + 1.6), 6) ? 2 : 0.01}
+        <pointLight intensity={15} position={[3, 1, 1.6]} distance={isVisibleLight(new THREE.Vector3(0, 5, ciPos[2] + pos[2] + 1.6), 6) ? 2 : 0.01}
           color={new THREE.Color(0x223060)} />
+
+        <mesh className="LINKS" position={[0, 0, 2.3]}>
+          <Bvh firstHitOnly >
+            {/* <Doc link='https://juanlorenteguarnieri.github.io/Spaceship-Controller/' scale={12} position={[0.7, -0.08, 0]} rotation={[0, 0, 0]} /> */}
+            <Github link='https://github.com/JuanLorenteGuarnieri/CI' scale={12} position={[0, -0.08, 0]} rotation={[0, 0, 0]} />
+          </Bvh>
+        </mesh>
       </mesh>
 
-      <mesh className="Advanced Computational Imaging" position={[0, 0, 21.6]}>
+      <mesh className="Advanced Computational Imaging" position={aciPos}>
 
         <TextAdvance position={[0, 0, 0.9]}
           text={"ADVANCED CI"}
@@ -420,11 +576,18 @@ function Projects({ isVisibleLight, pos }) {
         />
 
         <Python scale={18} position={[3, -0.02, 1.6]} rotation={[0, 0, 0]} />
-        <pointLight intensity={15} position={[3, 1, 1.6]} distance={isVisibleLight(new THREE.Vector3(0, 5, 21.6 + pos[2] + 1.6), 6) ? 2 : 0.01}
+        <pointLight intensity={15} position={[3, 1, 1.6]} distance={isVisibleLight(new THREE.Vector3(0, 5, aciPos[2] + pos[2] + 1.6), 6) ? 2 : 0.01}
           color={new THREE.Color(0x223060)} />
+
+        <mesh className="LINKS" position={[0, 0, 2.3]}>
+          <Bvh firstHitOnly >
+            {/* <Doc link='https://juanlorenteguarnieri.github.io/Spaceship-Controller/' scale={12} position={[0.7, -0.08, 0]} rotation={[0, 0, 0]} /> */}
+            <Github link='https://github.com/JuanLorenteGuarnieri/ACI' scale={12} position={[0, -0.08, 0]} rotation={[0, 0, 0]} />
+          </Bvh>
+        </mesh>
       </mesh>
 
-      <mesh className="SLAM" position={[0, 0, 24]}>
+      <mesh className="SLAM" position={slamPos}>
 
         <TextAdvance position={[0, 0, 0.9]}
           text={"SLAM"}
@@ -449,8 +612,15 @@ function Projects({ isVisibleLight, pos }) {
         />
 
         <C scale={20} position={[3, -0.02, 1.6]} rotation={[0, 0, 0]} />
-        <pointLight intensity={15} position={[3, 1, 1.6]} distance={isVisibleLight(new THREE.Vector3(0, 5, 24 + pos[2] + 1.6), 6) ? 2 : 0.01}
+        <pointLight intensity={15} position={[3, 1, 1.6]} distance={isVisibleLight(new THREE.Vector3(0, 5, slamPos[2] + pos[2] + 1.6), 6) ? 2 : 0.01}
           color={new THREE.Color(0x223060)} />
+
+        <mesh className="LINKS" position={[0, 0, 2.3]}>
+          <Bvh firstHitOnly >
+            {/* <Doc link='https://juanlorenteguarnieri.github.io/Spaceship-Controller/' scale={12} position={[0.7, -0.08, 0]} rotation={[0, 0, 0]} /> */}
+            <Github link='https://github.com/hsunekichi/SLAM' scale={12} position={[0, -0.08, 0]} rotation={[0, 0, 0]} />
+          </Bvh>
+        </mesh>
       </mesh>
     </mesh >
   );
