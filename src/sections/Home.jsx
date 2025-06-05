@@ -309,6 +309,16 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
     }
   };
 
+  useEffect(() => {
+    // Usa la última posición conocida del ratón para calcular el punto de intersección cuando cambia scrollValue
+    const { x, y } = lastMousePos.current;
+    // Si no hay movimiento previo, usa el centro de la pantalla como fallback
+    const mouseX = x || window.innerWidth / 2;
+    const mouseY = y || window.innerHeight / 2;
+    calculateIntersect(mouseX, mouseY);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scrollValue]);
+
   const isMobileDevice = () => {
     return /Mobi|Android/i.test(navigator.userAgent);
   };

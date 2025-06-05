@@ -478,7 +478,6 @@ function Projects({ isVisibleLight, pos }) {
         </mesh>
       </mesh>
 
-
       <mesh className="Modeling and Simulation of Appearance" position={modelingPos}>
 
         <TextAdvance position={[0, 0, 0.9]}
