@@ -4,6 +4,7 @@ import { useGLTF } from '@react-three/drei'
 import { GLTF } from 'three-stdlib'
 import { Group } from 'three';
 import { ThreeEvent } from '@react-three/fiber';
+import { useSharedMat } from '../../src/components/sharedMaterial';
 
 type GLTFResult = GLTF & {
   nodes: {
@@ -22,8 +23,9 @@ type Props = JSX.IntrinsicElements['group'] & {
 
 export const Gilab = forwardRef<Group, Props>(({ link = 'https://graphics.unizar.es/', scale = 1, ...props }, ref) => {
   const [isHovered, setIsHovered] = useState(false);
-  const { nodes, materials } = useGLTF('models/gilab.glb') as GLTFResult
+  const { nodes } = useGLTF('models/gilab.glb') as GLTFResult
   const hoverCount = useRef(0);
+  const sharedMaterial = useSharedMat()
 
   const handlePointerEnter = (event: ThreeEvent<PointerEvent>) => {
     event.stopPropagation();
@@ -45,7 +47,7 @@ export const Gilab = forwardRef<Group, Props>(({ link = 'https://graphics.unizar
       castShadow
       receiveShadow
       geometry={nodes.Curve001.geometry}
-      material={materials.Mat}
+      material={sharedMaterial}
       position={[0.001, 0, 0.003]}
       onPointerEnter={handlePointerEnter}
       onPointerLeave={handlePointerLeave}
@@ -55,7 +57,7 @@ export const Gilab = forwardRef<Group, Props>(({ link = 'https://graphics.unizar
       castShadow
       receiveShadow
       geometry={nodes.Curve002.geometry}
-      material={materials.Mat}
+      material={sharedMaterial}
       position={[0.012, 0, -0.015]}
       onPointerEnter={handlePointerEnter}
       onPointerLeave={handlePointerLeave}
@@ -65,13 +67,13 @@ export const Gilab = forwardRef<Group, Props>(({ link = 'https://graphics.unizar
       castShadow
       receiveShadow
       geometry={nodes.Curve003.geometry}
-      material={materials.Mat}
+      material={sharedMaterial}
       position={[0.00, 0, -0.005]}
       onPointerEnter={handlePointerEnter}
       onPointerLeave={handlePointerLeave}
     />
     // Solo se vuelve a crear si nodes o materials cambian
-  ], [nodes, materials, handlePointerEnter, handlePointerLeave]);
+  ], [nodes, handlePointerEnter, handlePointerLeave]);
 
   return (
     <group

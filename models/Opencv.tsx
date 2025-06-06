@@ -3,6 +3,7 @@ import React, { useRef, forwardRef, useMemo } from 'react'
 import { useGLTF } from '@react-three/drei'
 import { GLTF } from 'three-stdlib'
 import { Group } from 'three';
+import { useSharedMat } from '../../src/components/sharedMaterial';
 
 type GLTFResult = GLTF & {
   nodes: {
@@ -16,7 +17,8 @@ type GLTFResult = GLTF & {
 type Props = JSX.IntrinsicElements['group'] & {};
 
 export const Opencv = forwardRef<Group, Props>((props, ref) => {
-  const { nodes, materials } = useGLTF('models/opencv.glb') as GLTFResult
+  const { nodes } = useGLTF('models/opencv.glb') as GLTFResult
+  const sharedMaterial = useSharedMat()
 
   // Memoiza el mesh para evitar recrearlo en cada render
   const curveMesh = useMemo(() => (
@@ -24,10 +26,10 @@ export const Opencv = forwardRef<Group, Props>((props, ref) => {
       castShadow
       receiveShadow
       geometry={nodes.Curve.geometry}
-      material={materials.Mat}
+      material={sharedMaterial}
       scale={0.2}
     />
-  ), [nodes.Curve.geometry, materials.Mat])
+  ), [nodes.Curve.geometry])
 
   return (
     <group ref={ref} {...props} dispose={null}>

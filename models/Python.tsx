@@ -3,6 +3,7 @@ import React, { useRef, forwardRef, useMemo } from 'react'
 import { useGLTF } from '@react-three/drei'
 import { GLTF } from 'three-stdlib'
 import { Group } from 'three';
+import { useSharedMat } from '../../src/components/sharedMaterial';
 
 type GLTFResult = GLTF & {
   nodes: {
@@ -18,7 +19,15 @@ type GLTFResult = GLTF & {
 type Props = JSX.IntrinsicElements['group'] & {};
 
 export const Python = forwardRef<Group, Props>((props, ref) => {
-  const { nodes, materials } = useGLTF('models/python.glb') as GLTFResult
+  const { nodes } = useGLTF('models/python.glb') as GLTFResult
+  const sharedMaterial = useSharedMat()
+
+  // Creamos un material diferente para la segunda mesh
+  const coloredMaterial = useMemo(() => {
+    const mat = sharedMaterial.clone()
+    mat.color = new THREE.Color('#dedeea') // Cambia el color aquí
+    return mat
+  }, [sharedMaterial])
 
   const meshes = useMemo(() => [
     <mesh
@@ -26,7 +35,7 @@ export const Python = forwardRef<Group, Props>((props, ref) => {
       castShadow
       receiveShadow
       geometry={nodes.path1948.geometry}
-      material={materials.Mat2}
+      material={sharedMaterial}
       position={[-0.004, 0, -0.007]}
     />,
     <mesh
@@ -34,10 +43,10 @@ export const Python = forwardRef<Group, Props>((props, ref) => {
       castShadow
       receiveShadow
       geometry={nodes.path1950.geometry}
-      material={materials.Mat}
+      material={coloredMaterial}
       position={[0.005, 0, 0.006]}
     />
-  ], [nodes, materials])
+  ], [nodes, sharedMaterial, coloredMaterial])
 
   return (
     <group ref={ref} {...props} dispose={null}>
