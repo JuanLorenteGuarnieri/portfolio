@@ -17,55 +17,65 @@ const aboutText = [
 ].join('');
 
 function About({ isVisibleLight, pos }) {
-  // Memoize light distances
-  const light1Distance = useMemo(
-    () => isVisibleLight(new THREE.Vector3(0, 5, pos[2] + 1.5), 8) ? 8 : 0.01,
-    [isVisibleLight, pos]
-  );
-  const light2Distance = useMemo(
-    () => isVisibleLight(new THREE.Vector3(0, 5, pos[2] + 1.3), 8) ? 8 : 0.01,
-    [isVisibleLight, pos]
-  );
+
+  // Memoize components
+  const Title = useMemo(() => (
+    <TextAdvance
+      position={[0, 0, 0]}
+      text="ABOUT"
+      font={fontTitle}
+      size={0.3}
+      height={0.1}
+      colorPri={colorPriTitle}
+      colorSec={colorSecTitle}
+    />
+  ), []);
+
+  const JuanModel = useMemo(() => (
+    <Bvh firstHitOnly>
+      <Juan
+        scale={0.6}
+        position={[-3.2, 0.8, 1.8]}
+        rotation={[-Math.PI / 6 + 0.2, Math.PI / 2 + 0.8, -0.08]}
+      />
+    </Bvh>
+  ), []);
+
+  const AboutText = useMemo(() => (
+    <TextAdvance
+      position={[0.75, 0, 0.8]}
+      text={aboutText}
+      font={fontText}
+      size={0.16}
+      height={0.1}
+      colorPri="white"
+      colorSec={colorLight}
+    />
+  ), []);
+
+  const PointLight1 = useMemo(() => (
+    <pointLight
+      intensity={200}
+      position={[0, 2, 1.5]}
+      color={colorLight}
+    />
+  ), []);
+
+  const PointLight2 = useMemo(() => (
+    <pointLight
+      intensity={100}
+      position={[-3.5, 3, 1.3]}
+      color={colorLight}
+    />
+  ), []);
 
   return (
-    <mesh className="ABOUT" position={pos}>
-      <TextAdvance
-        position={[0, 0, 0]}
-        text="ABOUT"
-        font={fontTitle}
-        size={0.3}
-        height={0.1}
-        colorPri={colorPriTitle}
-        colorSec={colorSecTitle}
-      />
-      <Bvh firstHitOnly>
-        <Juan
-          scale={0.6}
-          position={[-3.2, 0.8, 1.8]}
-          rotation={[-Math.PI / 6 + 0.2, Math.PI / 2 + 0.8, -0.08]}
-        />
-      </Bvh>
-      <pointLight
-        intensity={200}
-        position={[0, 2, 1.5]}
-        distance={light1Distance}
-        color={colorLight}
-      />
-      <pointLight
-        intensity={100}
-        position={[-3.5, 3, 1.3]}
-        distance={light2Distance}
-        color={colorLight}
-      />
-      <TextAdvance
-        position={[0.75, 0, 0.8]}
-        text={aboutText}
-        font={fontText}
-        size={0.16}
-        height={0.1}
-        colorPri="white"
-        colorSec={colorLight}
-      />
+    <mesh className="ABOUT" position={pos} visible={isVisibleLight(new THREE.Vector3(0, 5, pos[2]), 9)}>
+      {Title}
+      {JuanModel}
+      {PointLight1}
+      {PointLight2}
+      {AboutText}
     </mesh>
   );
 }

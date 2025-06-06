@@ -8,11 +8,9 @@ import {
   acceleratedRaycast,
 } from 'three-mesh-bvh'
 
-
 THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree
 THREE.BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree
 THREE.Mesh.prototype.raycast = acceleratedRaycast
-
 
 const TextAdvance = ({
   text,
@@ -29,17 +27,10 @@ const TextAdvance = ({
   const { materials } = useGLTF('models/box1.glb')
   materials.Mat.precision = 'lowp';
 
-
   useEffect(() => {
     const mesh = textRef.current
     if (mesh) {
-      // Once the text mesh is mounted, its geometry (TextGeometry) is available.
-      // Call computeBoundsTree() to build the BVH structure on the geometry.
       mesh.geometry.computeBoundsTree()
-
-      // Optionally, if you ever need to dispose or rebuild:
-      // mesh.geometry.disposeBoundsTree()
-      // mesh.geometry.computeBoundsTree()
     }
   }, [])
 
@@ -74,30 +65,37 @@ const TextAdvance = ({
     // eslint-disable-next-line
   }, [align, position, text, font, size, height]);
 
+  // Memoiza el material para evitar recrearlo en cada render
+  const textMaterial = useMemo(() => (
+    <meshStandardMaterial
+      attach="material"
+      color={colorPri}
+      emissive={colorPri}
+      emissiveIntensity={0}
+      roughness={0.0}
+      metalness={0.1}
+    />
+  ), [colorPri]);
+
+  // Memoiza el componente Text3D para evitar recrearlo en cada render
+  const text3DComponent = useMemo(() => (
+    <Text3D
+      ref={textRef}
+      castShadow
+      receiveShadow
+      position={textPosition}
+      rotation={[-Math.PI / 2, 0, 0]}
+      {...textProps}
+      material={materials.Mat}
+    >
+      {text}
+      {textMaterial}
+    </Text3D>
+  ), [text, textPosition, textProps, materials.Mat, textMaterial]);
+
   return (
     <mesh>
-      {/* <Bvh firstHitOnly> */}
-      <Text3D
-
-        ref={textRef}
-        castShadow
-        receiveShadow
-        position={textPosition}
-        rotation={[-Math.PI / 2, 0, 0]}
-        {...textProps}
-        material={materials.Mat}
-      >
-        {text}
-        <meshStandardMaterial
-          attach="material"
-          color={colorPri}
-          emissive={colorPri}
-          emissiveIntensity={0}
-          roughness={0.0}
-          metalness={0.1}
-        />
-      </Text3D>
-      {/* </Bvh> */}
+      {text3DComponent}
     </mesh>
   );
 };

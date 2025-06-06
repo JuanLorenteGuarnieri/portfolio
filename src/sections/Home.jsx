@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, Suspense } from 'react';
+import React, { useRef, useState, useEffect, Suspense, useMemo } from 'react';
 import * as THREE from 'three';
 import { Canvas } from '@react-three/fiber';
 import emailjs from '@emailjs/browser';
@@ -6,7 +6,7 @@ import { Plane, Grid, useDetectGPU, PerformanceMonitor, Bvh, Stats } from '@reac
 
 import Loader from '../components/Loader';
 import CameraController from '../components/CameraController';
-import Navigation from '../components/Navigation';
+import Navigation from '../components/Navigation_original';
 import Title from './Title';
 import About from './About';
 import Education from './Education';
@@ -382,12 +382,111 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
     }
   }, [typeForm]);
 
+  // Memoiza los componentes de las secciones
+  const memoizedSections = useMemo(() => (
+    <>
+      <Title isVisibleLight={isVisibleLight} pos={titlePos} />
+      <About isVisibleLight={isVisibleLight} pos={aboutPos} />
+      <Education isVisibleLight={isVisibleLight} pos={educationPos} />
+      <Experience isVisibleLight={isVisibleLight} pos={experiencePos} />
+      <Projects isVisibleLight={isVisibleLight} pos={projectsPos} />
+      <Skills isVisibleLight={isVisibleLight} pos={skillsPos} />
+      <ContactMe
+        isVisibleLight={isVisibleLight}
+        pos={contactPos}
+        scrollValue={scrollValue}
+        userName={userName}
+        userEmail={userEmail}
+        message={message}
+        feedback={feedback}
+        colorFeedback={colorFeedback}
+        changeUserName={changeUserName}
+        changeUserEmail={changeUserEmail}
+        changeMessage={changeMessage}
+        typeForm={typeForm}
+        changeTypeForm={changeTypeForm}
+        form1Ref={form1Ref}
+        form2Ref={form2Ref}
+        form3Ref={form3Ref}
+        sendFormRef={sendFormRef}
+        changeContentLoaded={changeContentLoaded}
+        changeAnimationDone={changeAnimationDone}
+      />
+      <Interests isVisibleLight={isVisibleLight} pos={interestPos} />
+    </>
+    // Solo vuelve a crear si cambian estas dependencias
+  ), [
+    isVisibleLight, titlePos, aboutPos, educationPos, experiencePos, projectsPos, skillsPos, contactPos, interestPos,
+    scrollValue, userName, userEmail, message, feedback, colorFeedback, changeUserName, changeUserEmail, changeMessage,
+    typeForm, changeTypeForm, form1Ref, form2Ref, form3Ref, sendFormRef, changeContentLoaded, changeAnimationDone
+  ]);
+
+  // Memoiza el floor
+  const memoizedFloor = useMemo(() => (
+    <Plane args={[500, 500]} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 35]} receiveShadow>
+      <meshPhysicalMaterial color={new THREE.Color(0x444444)} />
+    </Plane>
+  ), []);
+
+  // Memoiza el ambientLight
+  const memoizedAmbientLight = useMemo(() => (
+    <ambientLight intensity={0.5} />
+  ), []);
+
+  // Memoiza el pointLight
+  const memoizedPointLight = useMemo(() => (
+    <pointLight
+      ref={lightRef}
+      distance={2}
+      castShadow={true}
+      intensity={25}
+      position={[targetPos[0], 0.4, targetPos[2]]}
+      shadow-bias={-0.01}
+      shadow-camera-near={0.01}
+      onUpdate={light => {
+        const minSize = 1;
+        const maxSize = 400;
+        const mapSize = Math.round(maxSize - (maxSize - minSize) * mouseSpeed);
+        light.shadow.mapSize.width = mapSize;
+        light.shadow.mapSize.height = mapSize;
+        light.shadow.needsUpdate = true;
+      }}
+      color={new THREE.Color(0x223060)}
+    />
+  ), [targetPos, mouseSpeed]);
+
+  // Memoiza el PerformanceMonitor
+  const memoizedPerformanceMonitor = useMemo(() => (
+    <PerformanceMonitor
+      factor={0.6}
+      ms={200}
+      iterations={3}
+      threshold={0.6}
+      bounds={() => [30, 45]}
+      onDecline={() => { setDpr(prev => Math.max(0.3, prev - 0.1)); }}
+      onIncline={() => { setDpr(prev => Math.min(0.8, prev + 0.1)); }}
+    />
+  ), []);
+
+  // Memoiza el CameraController
+  const memoizedCameraController = useMemo(() => (
+    <CameraController scrollValue={scrollValue} cameraRef={cameraRef} maxY={maxY} />
+  ), [scrollValue, maxY]);
+
+  // Memoiza el Stats
+  const memoizedStats = useMemo(() => (
+    <Stats className="stats" />
+  ), []);
+
   return (
     <>
       <section className="w-full h-screen">
-        <Canvas dpr={dpr} shadows={enableShadows} className={animationClass}
+        <Canvas
+          dpr={dpr}
+          shadows={enableShadows}
+          className={animationClass}
           gl={{
-            antialias: true,  // mayor calidad
+            antialias: true,
             stencil: false,
             alpha: true,
             depth: true,
@@ -401,68 +500,29 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
           }}
           key={animationKey}
           style={{ position: 'fixed', top: 0, left: 0, zIndex: 1 }}
-          onPointerMove={handlePointerMove} onTouchMove={handlePointerMove}
-          camera={({ isPerspectiveCamera: true, near: 0.1, far: 9, setFocalLength: 555, zoom: (window.innerWidth / window.innerHeight) / 1.6 })}>
-          {isContentLoaded && isAnimationDone ?
-            (!(window.screen.orientation.type == "portrait-primary" || window.screen.orientation.type == "portrait-secondary" || window.innerHeight > window.innerWidth) ? (
-              <Suspense fallback={null} >
-                <PerformanceMonitor factor={0.6} ms={200} iterations={3} threshold={0.6} bounds={() => [30, 45]}
-                  onDecline={() => { setDpr(prev => Math.max(0.3, prev - 0.1)); }}
-                  onIncline={() => { setDpr(prev => Math.min(0.8, prev + 0.1)); }}
-                />
-                <CameraController scrollValue={scrollValue} cameraRef={cameraRef} maxY={maxY} />
-                <ambientLight intensity={0.5} />
-
-                {/* <mesh className="GRID" position={[0, 0.1, 0]}>
-                  <Grid args={[20, 100, 20, 100]} />
-                </mesh> */}
-                {/* <Stats className="stats" /> */}
-
-                {/* POINTER */}
-                <pointLight ref={lightRef} distance={2} castShadow={true} intensity={25} position={[targetPos[0], 0.4, targetPos[2]]}
-                  shadow-bias={-0.01}
-                  shadow-camera-near={0.01}
-                  onUpdate={light => {
-                    const minSize = 1; // Map mouseSpeed (0 = slow, 1+ = fast) to mapSize between 512 and 1
-                    const maxSize = 400;
-                    const mapSize = Math.round(maxSize - (maxSize - minSize) * mouseSpeed); // Inverse: faster = smaller mapSize
-                    light.shadow.mapSize.width = mapSize;
-                    light.shadow.mapSize.height = mapSize;
-                    light.shadow.needsUpdate = true;
-                  }}
-                  color={new THREE.Color(0x223060)} />
-
-                {/* SECTIONS */}
-
-
-                <Title isVisibleLight={isVisibleLight} pos={titlePos} />
-                <About isVisibleLight={isVisibleLight} pos={aboutPos} />
-                <Education isVisibleLight={isVisibleLight} pos={educationPos} />
-                <Experience isVisibleLight={isVisibleLight} pos={experiencePos} />
-                <Projects isVisibleLight={isVisibleLight} pos={projectsPos} />
-                <Skills isVisibleLight={isVisibleLight} pos={skillsPos} />
-                <ContactMe isVisibleLight={isVisibleLight} pos={contactPos}
-                  scrollValue={scrollValue} userName={userName} userEmail={userEmail} message={message}
-                  feedback={feedback} colorFeedback={colorFeedback} changeUserName={changeUserName} changeUserEmail={changeUserEmail}
-                  changeMessage={changeMessage} typeForm={typeForm} changeTypeForm={changeTypeForm} form1Ref={form1Ref} form2Ref={form2Ref} form3Ref={form3Ref}
-                  sendFormRef={sendFormRef} changeContentLoaded={changeContentLoaded} changeAnimationDone={changeAnimationDone}
-                />
-                <Interests isVisibleLight={isVisibleLight} pos={interestPos} />
-
-
-                {/* FLOOR */}
-                <Plane args={[500, 500]} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 35]}
-                  receiveShadow>
-                  <meshPhysicalMaterial color={new THREE.Color(0x444444)} />
-                </Plane>
-
+          onPointerMove={handlePointerMove}
+          onTouchMove={handlePointerMove}
+          camera={({ isPerspectiveCamera: true, near: 0.1, far: 9, setFocalLength: 555, zoom: (window.innerWidth / window.innerHeight) / 1.6 })}
+        >
+          {isContentLoaded && isAnimationDone ? (
+            !(window.screen.orientation.type == "portrait-primary" ||
+              window.screen.orientation.type == "portrait-secondary" ||
+              window.innerHeight > window.innerWidth) ? (
+              <Suspense fallback={null}>
+                {memoizedPerformanceMonitor}
+                {memoizedCameraController}
+                {memoizedAmbientLight}
+                {memoizedStats}
+                {memoizedPointLight}
+                {memoizedSections}
+                {memoizedFloor}
               </Suspense>
             ) : (
               <MobileCaption />
             )
-            ) : (
-              <Loader action={changeAnimationDone} />
-            )}
+          ) : (
+            <Loader action={changeAnimationDone} />
+          )}
         </Canvas>
         <input ref={hiddenInputRef1}
           type="text"

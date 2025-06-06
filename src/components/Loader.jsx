@@ -18,7 +18,7 @@ const Loader = ({ action }) => {
       <div className="container" style={{ height: '100vh', width: '100vw' }}>
         <video ref={videoRef} width="100%" height="100%" muted autoPlay loop={false}>
           <source src={video} type="video/mp4" />
-          Tu navegador no soporta videos.
+          Your browser doesn't support videos.
         </video>
       </div>
     </Html>

@@ -5,10 +5,8 @@ const Navigation = React.memo(({ action, action2, cond, scrollValue, secPos }) =
   const { progress } = useProgress();
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Memoize pos2scroll to avoid recalculating on every render
   const pos2scroll = React.useCallback((pos) => (pos - 24.5) / 0.00461, []);
 
-  // Memoize sections to avoid unnecessary recalculations
   const sections = React.useMemo(
     () =>
       secPos.map(({ key, value, label }) => ({
@@ -27,35 +25,18 @@ const Navigation = React.memo(({ action, action2, cond, scrollValue, secPos }) =
     // eslint-disable-next-line
   }, [progress, isLoaded, action2]);
 
-  // Only render Navigations if loaded and cond is true
   return isLoaded && cond ? (
     <Navigations action={action} scrollValue={scrollValue} sections={sections} />
   ) : null;
 });
 
-const Navigations = ({ action, scrollValue, sections }) => {
-
-  function changeScroll(scrollPosition, e) {
-    e.preventDefault();
-    e.stopPropagation();
-    action(scrollPosition);
-  };
-
-  useEffect(() => {
-
-  }, [scrollValue]);
-
-  return (
-
-    <nav id="menuBar" className="fadeIn fixed top-0 left-0 z-10 h-55 md:h-45 lg:h-35 xl:h-25 fadeIn">
-      <ul className="list-none justify-between items-center">
-        <li onClick={(e) => changeScroll(sections[0].value, e)}>
-          <a >
-            <svg version="1.0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900.000000 900.000000"
-              preserveAspectRatio="xMidYMid meet" fill={scrollValue >= sections[0].value && scrollValue < sections[1].value ? ("#ffffff") : ("currentColor")} className="w-4 h-4 md:w-5 md:h-5" >
-              <g transform="translate(-100,900) scale(0.12,-0.12)"
-                stroke="none">
-                <path d="M3514 7251 c-28 -16 -64 -46 -80 -66 -16 -20 -34 -42 -39 -48 -15
+const menuIcons = [
+  // SVGs como componentes o funciones
+  (fill) => (
+    <svg version="1.0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900.000000 900.000000"
+      preserveAspectRatio="xMidYMid meet" fill={fill} className="w-4 h-4 md:w-5 md:h-5">
+      <g transform="translate(-100,900) scale(0.12,-0.12)" stroke="none">
+        <path d="M3514 7251 c-28 -16 -64 -46 -80 -66 -16 -20 -34 -42 -39 -48 -15
                           -17 -75 -116 -75 -123 0 -3 -6 -20 -14 -37 -8 -18 -31 -81 -51 -142 -20 -60
                           -40 -119 -45 -130 -5 -11 -21 -49 -36 -85 -28 -69 -77 -172 -97 -205 -69 -113
                           -221 -276 -309 -331 -51 -32 -190 -104 -233 -120 -101 -37 -237 -80 -285 -89
@@ -113,7 +94,7 @@ const Navigations = ({ action, scrollValue, sections }) => {
                           91 -19 100 -4 9 -11 41 -14 71 -4 29 -10 58 -16 65 -5 6 -12 30 -16 53 -4 24
                           -11 45 -16 49 -5 3 -9 12 -9 20 0 14 -29 87 -49 124 -4 8 -25 47 -46 85 -104
                           195 -221 313 -363 368 -62 25 -109 21 -168 -12z"/>
-                <path d="M4452 4628 c-14 -28 -35 -61 -42 -68 -3 -3 -30 -36 -60 -75 -30 -38
+        <path d="M4452 4628 c-14 -28 -35 -61 -42 -68 -3 -3 -30 -36 -60 -75 -30 -38
                           -61 -76 -68 -84 -7 -7 -41 -50 -74 -95 -34 -44 -68 -87 -75 -94 -18 -18 -16
                           -57 2 -72 8 -7 15 -18 15 -25 0 -7 7 -18 15 -25 8 -7 15 -21 15 -32 0 -10 7
                           -21 15 -24 8 -4 15 -14 15 -24 0 -11 5 -22 11 -25 5 -4 14 -17 20 -28 9 -22
@@ -124,79 +105,102 @@ const Navigations = ({ action, scrollValue, sections }) => {
                           13 25 18 37 6 11 15 24 20 28 20 12 11 60 -17 90 -15 17 -50 59 -77 95 -27 36
                           -56 72 -65 81 -9 9 -39 47 -65 83 -27 36 -52 66 -57 66 -4 0 -8 4 -8 9 0 5
                           -10 25 -22 45 -28 43 -68 49 -86 14z"/>
-              </g>
-            </svg >
-            <span>Title</span>
-          </a >
-        </li >
-        <li onClick={(e) => changeScroll(sections[1].value + 700, e)}>
-          <a >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={scrollValue >= sections[1].value && scrollValue < sections[2].value ? ("#ffffff") : ("currentColor")} className="w-4 h-4 md:w-5 md:h-5">
-              <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clipRule="evenodd" />
-            </svg>
-            <span>About</span>
-          </a>
-        </li>
-        <li onClick={(e) => changeScroll(sections[2].value + 700, e)}>
-          <a >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={scrollValue >= sections[2].value && scrollValue < sections[3].value ? ("#ffffff") : ("currentColor")} className="w-4 h-4 md:w-5 md:h-5">
-              <path d="M11.7 2.805a.75.75 0 0 1 .6 0A60.65 60.65 0 0 1 22.83 8.72a.75.75 0 0 1-.231 1.337 49.948 49.948 0 0 0-9.902 3.912l-.003.002c-.114.06-.227.119-.34.18a.75.75 0 0 1-.707 0A50.88 50.88 0 0 0 7.5 12.173v-.224c0-.131.067-.248.172-.311a54.615 54.615 0 0 1 4.653-2.52.75.75 0 0 0-.65-1.352 56.123 56.123 0 0 0-4.78 2.589 1.858 1.858 0 0 0-.859 1.228 49.803 49.803 0 0 0-4.634-1.527.75.75 0 0 1-.231-1.337A60.653 60.653 0 0 1 11.7 2.805Z" />
-              <path d="M13.06 15.473a48.45 48.45 0 0 1 7.666-3.282c.134 1.414.22 2.843.255 4.284a.75.75 0 0 1-.46.711 47.87 47.87 0 0 0-8.105 4.342.75.75 0 0 1-.832 0 47.87 47.87 0 0 0-8.104-4.342.75.75 0 0 1-.461-.71c.035-1.442.121-2.87.255-4.286.921.304 1.83.634 2.726.99v1.27a1.5 1.5 0 0 0-.14 2.508c-.09.38-.222.753-.397 1.11.452.213.901.434 1.346.66a6.727 6.727 0 0 0 .551-1.607 1.5 1.5 0 0 0 .14-2.67v-.645a48.549 48.549 0 0 1 3.44 1.667 2.25 2.25 0 0 0 2.12 0Z" />
-              <path d="M4.462 19.462c.42-.419.753-.89 1-1.395.453.214.902.435 1.347.662a6.742 6.742 0 0 1-1.286 1.794.75.75 0 0 1-1.06-1.06Z" />
-            </svg>
-            <span>Education</span>
-          </a>
-        </li>
-        <li onClick={(e) => changeScroll(sections[3].value + 700, e)}>
-          <a >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={scrollValue >= sections[3].value && scrollValue < sections[4].value ? ("#ffffff") : ("currentColor")} className="w-4 h-4 md:w-5 md:h-5">
-              <path fillRule="evenodd" d="M7.5 5.25a3 3 0 0 1 3-3h3a3 3 0 0 1 3 3v.205c.933.085 1.857.197 2.774.334 1.454.218 2.476 1.483 2.476 2.917v3.033c0 1.211-.734 2.352-1.936 2.752A24.726 24.726 0 0 1 12 15.75c-2.73 0-5.357-.442-7.814-1.259-1.202-.4-1.936-1.541-1.936-2.752V8.706c0-1.434 1.022-2.7 2.476-2.917A48.814 48.814 0 0 1 7.5 5.455V5.25Zm7.5 0v.09a49.488 49.488 0 0 0-6 0v-.09a1.5 1.5 0 0 1 1.5-1.5h3a1.5 1.5 0 0 1 1.5 1.5Zm-3 8.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clipRule="evenodd" />
-              <path d="M3 18.4v-2.796a4.3 4.3 0 0 0 .713.31A26.226 26.226 0 0 0 12 17.25c2.892 0 5.68-.468 8.287-1.335.252-.084.49-.189.713-.311V18.4c0 1.452-1.047 2.728-2.523 2.923-2.12.282-4.282.427-6.477.427a49.19 49.19 0 0 1-6.477-.427C4.047 21.128 3 19.852 3 18.4Z" />
-            </svg>
+      </g>
+    </svg>
+  ),
+  (fill) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={fill} className="w-4 h-4 md:w-5 md:h-5">
+      <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clipRule="evenodd" />
+    </svg>
+  ),
+  (fill) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={fill} className="w-4 h-4 md:w-5 md:h-5">
+      <path d="M11.7 2.805a.75.75 0 0 1 .6 0A60.65 60.65 0 0 1 22.83 8.72a.75.75 0 0 1-.231 1.337 49.948 49.948 0 0 0-9.902 3.912l-.003.002c-.114.06-.227.119-.34.18a.75.75 0 0 1-.707 0A50.88 50.88 0 0 0 7.5 12.173v-.224c0-.131.067-.248.172-.311a54.615 54.615 0 0 1 4.653-2.52.75.75 0 0 0-.65-1.352 56.123 56.123 0 0 0-4.78 2.589 1.858 1.858 0 0 0-.859 1.228 49.803 49.803 0 0 0-4.634-1.527.75.75 0 0 1-.231-1.337A60.653 60.653 0 0 1 11.7 2.805Z" />
+      <path d="M13.06 15.473a48.45 48.45 0 0 1 7.666-3.282c.134 1.414.22 2.843.255 4.284a.75.75 0 0 1-.46.711 47.87 47.87 0 0 0-8.105 4.342.75.75 0 0 1-.832 0 47.87 47.87 0 0 0-8.104-4.342.75.75 0 0 1-.461-.71c.035-1.442.121-2.87.255-4.286.921.304 1.83.634 2.726.99v1.27a1.5 1.5 0 0 0-.14 2.508c-.09.38-.222.753-.397 1.11.452.213.901.434 1.346.66a6.727 6.727 0 0 0 .551-1.607 1.5 1.5 0 0 0 .14-2.67v-.645a48.549 48.549 0 0 1 3.44 1.667 2.25 2.25 0 0 0 2.12 0Z" />
+      <path d="M4.462 19.462c.42-.419.753-.89 1-1.395.453.214.902.435 1.347.662a6.742 6.742 0 0 1-1.286 1.794.75.75 0 0 1-1.06-1.06Z" />
+    </svg>
+  ),
+  (fill) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={fill} className="w-4 h-4 md:w-5 md:h-5">
+      <path fillRule="evenodd" d="M7.5 5.25a3 3 0 0 1 3-3h3a3 3 0 0 1 3 3v.205c.933.085 1.857.197 2.774.334 1.454.218 2.476 1.483 2.476 2.917v3.033c0 1.211-.734 2.352-1.936 2.752A24.726 24.726 0 0 1 12 15.75c-2.73 0-5.357-.442-7.814-1.259-1.202-.4-1.936-1.541-1.936-2.752V8.706c0-1.434 1.022-2.7 2.476-2.917A48.814 48.814 0 0 1 7.5 5.455V5.25Zm7.5 0v.09a49.488 49.488 0 0 0-6 0v-.09a1.5 1.5 0 0 1 1.5-1.5h3a1.5 1.5 0 0 1 1.5 1.5Zm-3 8.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clipRule="evenodd" />
+      <path d="M3 18.4v-2.796a4.3 4.3 0 0 0 .713.31A26.226 26.226 0 0 0 12 17.25c2.892 0 5.68-.468 8.287-1.335.252-.084.49-.189.713-.311V18.4c0 1.452-1.047 2.728-2.523 2.923-2.12.282-4.282.427-6.477.427a49.19 49.19 0 0 1-6.477-.427C4.047 21.128 3 19.852 3 18.4Z" />
+    </svg>
+  ),
+  (fill) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={fill} className="w-4 h-4 md:w-5 md:h-5">
+      <path d="M19.906 9c.382 0 .749.057 1.094.162V9a3 3 0 0 0-3-3h-3.879a.75.75 0 0 1-.53-.22L11.47 3.66A2.25 2.25 0 0 0 9.879 3H6a3 3 0 0 0-3 3v3.162A3.756 3.756 0 0 1 4.094 9h15.812ZM4.094 10.5a2.25 2.25 0 0 0-2.227 2.568l.857 6A2.25 2.25 0 0 0 4.951 21H19.05a2.25 2.25 0 0 0 2.227-1.932l.857-6a2.25 2.25 0 0 0-2.227-2.568H4.094Z" />
+    </svg>
+  ),
+  (fill) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={fill} className="w-4 h-4 md:w-5 md:h-5">
+      <path fillRule="evenodd" d="M12 6.75a5.25 5.25 0 0 1 6.775-5.025.75.75 0 0 1 .313 1.248l-3.32 3.319c.063.475.276.934.641 1.299.365.365.824.578 1.3.64l3.318-3.319a.75.75 0 0 1 1.248.313 5.25 5.25 0 0 1-5.472 6.756c-1.018-.086-1.87.1-2.309.634L7.344 21.3A3.298 3.298 0 1 1 2.7 16.657l8.684-7.151c.533-.44.72-1.291.634-2.309A5.342 5.342 0 0 1 12 6.75ZM4.117 19.125a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Z" clipRule="evenodd" />
+      <path d="m10.076 8.64-2.201-2.2V4.874a.75.75 0 0 0-.364-.643l-3.75-2.25a.75.75 0 0 0-.916.113l-.75.75a.75.75 0 0 0-.113.916l2.25 3.75a.75.75 0 0 0 .643.364h1.564l2.062 2.062 1.575-1.297Z" />
+      <path fillRule="evenodd" d="m12.556 17.329 4.183 4.182a3.375 3.375 0 0 0 4.773-4.773l-3.306-3.305a6.803 6.803 0 0 1-1.53.043c-.394-.034-.682-.006-.867.042a.589.589 0 0 0-.167.063l-3.086 3.748Zm3.414-1.36a.75.75 0 0 1 1.06 0l1.875 1.876a.75.75 0 1 1-1.06 1.06L15.97 17.03a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
+    </svg>
+  ),
+  (fill) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={fill} className="w-4 h-4 md:w-5 md:h-5">
+      <path d="M1.5 8.67v8.58a3 3 0 0 0 3 3h15a3 3 0 0 0 3-3V8.67l-8.928 5.493a3 3 0 0 1-3.144 0L1.5 8.67Z" />
+      <path d="M22.5 6.908V6.75a3 3 0 0 0-3-3h-15a3 3 0 0 0-3 3v.158l9.714 5.978a1.5 1.5 0 0 0 1.572 0L22.5 6.908Z" />
+    </svg>
+  ),
+  (fill) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={fill} className="w-4 h-4 md:w-5 md:h-5">
+      <path fillRule="evenodd" d="M19.952 1.651a.75.75 0 0 1 .298.599V16.303a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.403-4.909l2.311-.66a1.5 1.5 0 0 0 1.088-1.442V6.994l-9 2.572v9.737a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.402-4.909l2.31-.66a1.5 1.5 0 0 0 1.088-1.442V5.25a.75.75 0 0 1 .544-.721l10.5-3a.75.75 0 0 1 .658.122Z" clipRule="evenodd" />
+    </svg>
+  )
+];
 
-            <span>Experience</span>
-          </a>
-        </li>
-        <li onClick={(e) => changeScroll(sections[4].value + 700, e)}>
-          <a >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={scrollValue >= sections[4].value && scrollValue < sections[5].value ? ("#ffffff") : ("currentColor")} className="w-4 h-4 md:w-5 md:h-5">
-              <path d="M19.906 9c.382 0 .749.057 1.094.162V9a3 3 0 0 0-3-3h-3.879a.75.75 0 0 1-.53-.22L11.47 3.66A2.25 2.25 0 0 0 9.879 3H6a3 3 0 0 0-3 3v3.162A3.756 3.756 0 0 1 4.094 9h15.812ZM4.094 10.5a2.25 2.25 0 0 0-2.227 2.568l.857 6A2.25 2.25 0 0 0 4.951 21H19.05a2.25 2.25 0 0 0 2.227-1.932l.857-6a2.25 2.25 0 0 0-2.227-2.568H4.094Z" />
-            </svg>
+const menuLabels = [
+  "Title",
+  "About",
+  "Education",
+  "Experience",
+  "Projects",
+  "Skills",
+  "Contact",
+  "Interests",
+];
 
-            <span>Projects</span>
-          </a>
-        </li>
-        <li onClick={(e) => changeScroll(sections[5].value + 700, e)}>
-          <a >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={scrollValue >= sections[5].value && scrollValue < sections[6].value ? ("#ffffff") : ("currentColor")} className="w-4 h-4 md:w-5 md:h-5">
-              <path fillRule="evenodd" d="M12 6.75a5.25 5.25 0 0 1 6.775-5.025.75.75 0 0 1 .313 1.248l-3.32 3.319c.063.475.276.934.641 1.299.365.365.824.578 1.3.64l3.318-3.319a.75.75 0 0 1 1.248.313 5.25 5.25 0 0 1-5.472 6.756c-1.018-.086-1.87.1-2.309.634L7.344 21.3A3.298 3.298 0 1 1 2.7 16.657l8.684-7.151c.533-.44.72-1.291.634-2.309A5.342 5.342 0 0 1 12 6.75ZM4.117 19.125a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Z" clipRule="evenodd" />
-              <path d="m10.076 8.64-2.201-2.2V4.874a.75.75 0 0 0-.364-.643l-3.75-2.25a.75.75 0 0 0-.916.113l-.75.75a.75.75 0 0 0-.113.916l2.25 3.75a.75.75 0 0 0 .643.364h1.564l2.062 2.062 1.575-1.297Z" />
-              <path fillRule="evenodd" d="m12.556 17.329 4.183 4.182a3.375 3.375 0 0 0 4.773-4.773l-3.306-3.305a6.803 6.803 0 0 1-1.53.043c-.394-.034-.682-.006-.867.042a.589.589 0 0 0-.167.063l-3.086 3.748Zm3.414-1.36a.75.75 0 0 1 1.06 0l1.875 1.876a.75.75 0 1 1-1.06 1.06L15.97 17.03a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
-            </svg>
-            <span>Skills</span>
-          </a>
-        </li>
-        <li onClick={(e) => changeScroll(sections[6].value + 700, e)}>
-          <a >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={scrollValue >= sections[6].value && scrollValue < sections[7].value ? ("#ffffff") : ("currentColor")} className="w-4 h-4 md:w-5 md:h-5">
-              <path d="M1.5 8.67v8.58a3 3 0 0 0 3 3h15a3 3 0 0 0 3-3V8.67l-8.928 5.493a3 3 0 0 1-3.144 0L1.5 8.67Z" />
-              <path d="M22.5 6.908V6.75a3 3 0 0 0-3-3h-15a3 3 0 0 0-3 3v.158l9.714 5.978a1.5 1.5 0 0 0 1.572 0L22.5 6.908Z" />
-            </svg>
-            <span>Contact</span>
-          </a>
-        </li>
-        <li onClick={(e) => changeScroll(sections[7].value + 700, e)}>
-          <a >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={scrollValue >= sections[7].value ? ("#ffffff") : ("currentColor")} className="w-4 h-4 md:w-5 md:h-5">
-              <path fillRule="evenodd" d="M19.952 1.651a.75.75 0 0 1 .298.599V16.303a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.403-4.909l2.311-.66a1.5 1.5 0 0 0 1.088-1.442V6.994l-9 2.572v9.737a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.402-4.909l2.31-.66a1.5 1.5 0 0 0 1.088-1.442V5.25a.75.75 0 0 1 .544-.721l10.5-3a.75.75 0 0 1 .658.122Z" clipRule="evenodd" />
-            </svg>
-            <span>Interests</span>
-          </a>
-        </li>
-      </ul >
-    </nav >
+const Navigations = ({ action, scrollValue, sections }) => {
+  // Memoiza los items del menú
+  const menuItems = React.useMemo(() => {
+    return sections.map((section, idx) => ({
+      ...section,
+      icon: menuIcons[idx],
+      label: menuLabels[idx],
+      idx,
+    }));
+  }, [sections]);
+
+  function changeScroll(scrollPosition, e) {
+    e.preventDefault();
+    e.stopPropagation();
+    action(scrollPosition);
+  }
+
+  return (
+    <nav id="menuBar" className="fadeIn fixed top-0 left-0 z-10 h-55 md:h-45 lg:h-35 xl:h-25 fadeIn">
+      <ul className="list-none justify-between items-center">
+        {menuItems.map((item, idx) => (
+          <li key={item.key} onClick={(e) => changeScroll(item.value + (idx === 0 ? 0 : idx === 5 ? 600 : 700), e)}>
+            <a>
+              {item.icon(
+                scrollValue >= item.value &&
+                  (idx === menuItems.length - 1
+                    ? true
+                    : scrollValue < menuItems[idx + 1].value)
+                  ? "#ffffff"
+                  : "currentColor"
+              )}
+              <span>{item.label}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
   );
 };
 
-export default Navigation
-export { Navigations }
+export default Navigation;
+export { Navigations };

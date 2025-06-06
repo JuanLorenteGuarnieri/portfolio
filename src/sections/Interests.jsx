@@ -8,7 +8,7 @@ import { Piano } from '../../public/models/Piano';
 import { Book } from '../../public/models/Book';
 import { RubikCube } from '../../public/models/Rubiks_cube';
 import { Duolingo } from '../../public/models/Duolingo';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 
 function Interests({ isVisibleLight, pos }) {
   const pianoExp = new Date().getFullYear() - 2015;
@@ -168,77 +168,104 @@ function Interests({ isVisibleLight, pos }) {
     // updateDuolingoStreak();
   }, []);
 
-  return (
-    <mesh className="INTERESTS" position={pos}>
-      <TextAdvance position={[0, 0, 0]}
-        text={"INTERESTS"}
-        font={fontTitle} size={0.3} height={0.1}
-        colorPri={new THREE.Color(0xdddddd)} colorSec={new THREE.Color(0x333333)}
+  // Memoiza los modelos 3D
+  const models = useMemo(() => (
+    <Bvh firstHitOnly>
+      <Piano position={[4.8, -0.19, 2.1]} rotation={[0, -Math.PI / 3, 0]} />
+      <Chess scale={2.4} position={[-4.5, 0, 5]} rotation={[0, 0, 0]} />
+      <Float speed={4} rotationIntensity={0.3} floatIntensity={0.4} floatingRange={[0, 1]}>
+        <RubikCube scale={0.15} position={[-4.8, 0, 2.3]} rotation={[0, Math.PI / 6, 0]} />
+      </Float>
+      <Book scale={0.065} position={[4.7, 0, 5]} rotation={[0, -1.7, 0]} />
+      <Duolingo position={[-4.2, 0, 7]} rotation={[0, 0, 0]} />
+    </Bvh>
+  ), []);
+
+  // Memoiza los textos que no dependen de estado
+  const staticTexts = useMemo(() => (
+    <>
+      <TextAdvance position={[2.5, 0, 2.5]}
+        text={"PIANO"}
+        font={fontText} size={0.17} height={0.08}
+        colorPri={"white"} colorSec={new THREE.Color(0x223060)}
       />
-      <mesh className="LIGHTS">
-        <rectAreaLight intensity={15} position={[0, 2, 4.6]} rotation={[-Math.PI / 2, 0, 0]}
-          visible={isVisibleLight(new THREE.Vector3(0, 5, pos[2] + 2.1), 10)}
-          width={8} height={7} color={new THREE.Color(0x223060)} />
-      </mesh>
-      <mesh className="MODELS">
-        <Bvh firstHitOnly >
-          <Piano position={[4.8, -0.19, 2.1]} rotation={[0, -Math.PI / 3, 0]} />
-          <Chess scale={2.4} position={[-4.5, 0, 5]} rotation={[0, 0, 0]} />
-          <Float
-            speed={4} // Animation speed, defaults to 1
-            rotationIntensity={0.3} // XYZ rotation intensity, defaults to 1
-            floatIntensity={0.4} // Up/down float intensity, works like a multiplier with floatingRange,defaults to 1
-            floatingRange={[0, 1]} // Range of y-axis values the object will float within, defaults to [-0.1,0.1]
-          >
-            <RubikCube scale={0.15} position={[-4.8, 0, 2.3]} rotation={[0, Math.PI / 6, 0]} />
-          </Float>
-          <Book scale={0.065} position={[4.7, 0, 5]} rotation={[0, -1.7, 0]} />
+      <TextAdvance position={[-2.5, 0, 2.66]}
+        text={"RUBIK's solver"}
+        font={fontText} size={0.16} height={0.08}
+        colorPri={"white"} colorSec={new THREE.Color(0x223060)}
+      />
+      <TextAdvance position={[2.5, 0, 5]}
+        text={"PSYCHOLOGY reader"}
+        font={fontText} size={0.16} height={0.08}
+        colorPri={"white"} colorSec={new THREE.Color(0x223060)}
+      />
+      <TextAdvance position={[-2.4, 0, 6.95]}
+        text={"DUOLINGO"} align='center'
+        font={fontText} size={0.16} height={0.08}
+        colorPri={"white"} colorSec={new THREE.Color(0x223060)}
+      />
+    </>
+  ), []);
 
-          <Duolingo position={[-4.2, 0, 7]} rotation={[0, 0, 0]} />
-        </Bvh>
-      </mesh>
+  // Memoiza los textos que dependen de estado
+  const dynamicTexts = useMemo(() => (
+    <>
+      <TextAdvance position={[2.5, 0, 2.8]}
+        text={pianoExp + " years EXP"}
+        font={fontText} size={0.16} height={0.08}
+        colorPri={"white"} colorSec={new THREE.Color(0x223060)}
+      />
+      <TextAdvance position={[-2.5, 0, 5]}
+        text={"CHESS +" + chessCount + " games"}
+        font={fontText} size={0.16} height={0.08}
+        colorPri={"white"} colorSec={new THREE.Color(0x223060)}
+      />
+      <TextAdvance position={[-2.4, 0, 7.25]}
+        text={duoStreak + " days streak"} align='center'
+        font={fontText} size={0.16} height={0.08}
+        colorPri={"white"} colorSec={new THREE.Color(0x223060)}
+      />
+    </>
+  ), [pianoExp, chessCount, duoStreak]);
 
-      <mesh className="TEXT">
-        <TextAdvance position={[2.5, 0, 2.5]}
-          text={"PIANO"}
-          font={fontText} size={0.17} height={0.08}
-          colorPri={"white"} colorSec={new THREE.Color(0x223060)}
-        />
-        <TextAdvance position={[2.5, 0, 2.8]}
-          text={pianoExp + " years EXP"}
-          font={fontText} size={0.16} height={0.08}
-          colorPri={"white"} colorSec={new THREE.Color(0x223060)}
-        />
-        <TextAdvance position={[-2.5, 0, 2.66]}
-          text={"RUBIK's solver"}
-          font={fontText} size={0.16} height={0.08}
-          colorPri={"white"} colorSec={new THREE.Color(0x223060)}
-        />
+  // Memoiza el título
+  const title = useMemo(() => (
+    <TextAdvance position={[0, 0, 0]}
+      text={"INTERESTS"}
+      font={fontTitle} size={0.3} height={0.1}
+      colorPri={new THREE.Color(0xdddddd)} colorSec={new THREE.Color(0x333333)}
+    />
+  ), []);
 
-        <TextAdvance position={[-2.5, 0, 5]}
-          text={"CHESS +" + chessCount + " games"}
-          font={fontText} size={0.16} height={0.08}
-          colorPri={"white"} colorSec={new THREE.Color(0x223060)}
-        />
+  // Memoiza la luz
+  const lights = useMemo(() => (
+    <mesh className="LIGHTS">
+      <rectAreaLight intensity={15} position={[0, 2, 4.6]} rotation={[-Math.PI / 2, 0, 0]}
+        width={8} height={7} color={new THREE.Color(0x223060)} />
+    </mesh>
+  ), []);
 
-        <TextAdvance position={[2.5, 0, 5]}
-          text={"PSYCHOLOGY reader"}
-          font={fontText} size={0.16} height={0.08}
-          colorPri={"white"} colorSec={new THREE.Color(0x223060)}
-        />
+  // Memoiza el mesh de textos
+  const textMesh = useMemo(() => (
+    <mesh className="TEXT">
+      {staticTexts}
+      {dynamicTexts}
+    </mesh>
+  ), [staticTexts, dynamicTexts]);
 
-        <TextAdvance position={[-2.4, 0, 6.95]}
-          text={"DUOLINGO"} align='center'
-          font={fontText} size={0.16} height={0.08}
-          colorPri={"white"} colorSec={new THREE.Color(0x223060)}
-        />
+  // Memoiza el mesh de modelos
+  const modelsMesh = useMemo(() => (
+    <mesh className="MODELS">
+      {models}
+    </mesh>
+  ), [models]);
 
-        <TextAdvance position={[-2.4, 0, 7.25]}
-          text={duoStreak + " days streak"} align='center'
-          font={fontText} size={0.16} height={0.08}
-          colorPri={"white"} colorSec={new THREE.Color(0x223060)}
-        />
-      </mesh>
+  return (
+    <mesh className="INTERESTS" position={pos} visible={isVisibleLight(new THREE.Vector3(0, 5, pos[2]), 10)}>
+      {title}
+      {lights}
+      {modelsMesh}
+      {textMesh}
     </mesh>
   );
 }

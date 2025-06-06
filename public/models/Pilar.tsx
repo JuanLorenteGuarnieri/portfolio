@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { forwardRef, useEffect, useRef, useState } from 'react'
+import { forwardRef, useEffect, useRef, useState, useMemo } from 'react'
 import { Group, InstancedMesh, Object3D } from 'three'
 import { Bvh } from '@react-three/drei'
 
@@ -46,6 +46,16 @@ export const Pilar = forwardRef<Group, Props>(({ ...props }, ref) => {
     meshRef.current.instanceMatrix.needsUpdate = true
   }, [points])
 
+  // Memoized geometry and material
+  const sphereGeometry = useMemo(
+    () => <sphereGeometry args={[1, 16, 16]} />,
+    []
+  )
+  const meshMaterial = useMemo(
+    () => <meshStandardMaterial color="red" />,
+    []
+  )
+
   return (
     <group ref={ref} {...props}>
       <Bvh>
@@ -54,8 +64,8 @@ export const Pilar = forwardRef<Group, Props>(({ ...props }, ref) => {
             ref={meshRef}
             args={[undefined, undefined, points.length]}
           >
-            <sphereGeometry args={[1, 16, 16]} />
-            <meshStandardMaterial color="red" />
+            {sphereGeometry}
+            {meshMaterial}
           </instancedMesh>
         )}
       </Bvh>
