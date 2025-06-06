@@ -4,7 +4,7 @@ Command: npx gltfjsx@6.2.16 robot.glb -t -r .
 */
 
 import * as THREE from 'three'
-import React, { useRef, forwardRef, useImperativeHandle, useEffect } from 'react'
+import React, { useRef, forwardRef, useImperativeHandle, useEffect, useMemo } from 'react'
 import { useGLTF } from '@react-three/drei'
 import { GLTF } from 'three-stdlib'
 import { Group } from 'three';
@@ -197,7 +197,6 @@ type RobotProps = JSX.IntrinsicElements['group'] & {
   // Aquí puedes añadir cualquier otra prop personalizada si es necesario
 };
 
-
 export const Robot = forwardRef<Group, RobotProps>((props, ref) => {
   const groupRef = useRef<Group>(null);
   const rightWheelRef = useRef<Group>(null);
@@ -219,73 +218,91 @@ export const Robot = forwardRef<Group, RobotProps>((props, ref) => {
     }
   }, [basketRef.current]);
 
-  return (
-    <group ref={groupRef} {...props} dispose={null}>
-      <group ref={basketRef} position={[-0.094, 36.046, 42.275]} scale={8.478}>
-        <mesh castShadow receiveShadow geometry={nodes.servo_motor001.geometry} material={materials.Orange} rotation={[-2.463, 0, 0]} scale={0.118} />
-        <mesh castShadow receiveShadow geometry={nodes.axel_4.geometry} material={materials.Grey} position={[-4.612, -0.033, -11.354]} rotation={[0, 0, -Math.PI]} scale={0.118} />
-        <mesh castShadow receiveShadow geometry={nodes.axel_5.geometry} material={materials.Grey} position={[0.011, -0.033, -11.354]} rotation={[0, 0, -Math.PI]} scale={0.118} />
-        <mesh castShadow receiveShadow geometry={nodes.axel_6.geometry} material={materials.Grey} position={[4.634, -0.033, -11.354]} rotation={[0, 0, -Math.PI]} scale={0.118} />
-        <mesh castShadow receiveShadow geometry={nodes.axel_conector_angled.geometry} material={materials.Black} position={[1.852, -0.033, -11.354]} rotation={[-Math.PI / 2, 0, -Math.PI / 2]} scale={0.118} />
-        <mesh castShadow receiveShadow geometry={nodes.axel_conector_angled001.geometry} material={materials.Black} position={[-1.83, -0.033, -11.354]} rotation={[-Math.PI / 2, 0, -Math.PI / 2]} scale={0.118} />
-        <mesh castShadow receiveShadow geometry={nodes.brick_2.geometry} material={materials.Dark_grey} position={[-6.141, 0.008, -0.015]} rotation={[Math.PI, Math.PI / 2, 0]} scale={0.118} />
-        <mesh castShadow receiveShadow geometry={nodes.brick_2001.geometry} material={materials.Dark_grey} position={[6.212, 0.008, -11.354]} rotation={[Math.PI, Math.PI / 2, 0]} scale={0.118} />
-        <mesh castShadow receiveShadow geometry={nodes.brick_2002.geometry} material={materials.Dark_grey} position={[-6.141, 0.008, -11.354]} rotation={[Math.PI, Math.PI / 2, 0]} scale={0.118} />
-        <mesh castShadow receiveShadow geometry={nodes.brick_2003.geometry} material={materials.Dark_grey} position={[6.212, 0.008, -0.015]} rotation={[Math.PI, Math.PI / 2, 0]} scale={0.118} />
-        <mesh castShadow receiveShadow geometry={nodes.brick_5.geometry} material={materials.Grey} position={[-6.141, 1.146, -1.89]} rotation={[-Math.PI / 2, 0, -Math.PI / 2]} scale={0.118} />
-        <mesh castShadow receiveShadow geometry={nodes.brick_5001.geometry} material={materials.Grey} position={[6.212, 1.146, -1.89]} rotation={[-Math.PI / 2, 0, -Math.PI / 2]} scale={0.118} />
-        <mesh castShadow receiveShadow geometry={nodes.brick_7.geometry} material={materials.Grey} position={[-6.141, 0.005, -4.74]} rotation={[-Math.PI / 2, 0, -Math.PI / 2]} scale={0.118} />
-        <mesh castShadow receiveShadow geometry={nodes.brick_7001.geometry} material={materials.Grey} position={[6.212, 0.005, -4.74]} rotation={[-Math.PI / 2, 0, -Math.PI / 2]} scale={0.118} />
-        <mesh castShadow receiveShadow geometry={nodes.brick_7002.geometry} material={materials.Grey} position={[-6.141, 1.137, -8.52]} rotation={[-Math.PI / 2, 0, -Math.PI / 2]} scale={0.118} />
-        <mesh castShadow receiveShadow geometry={nodes.brick_7003.geometry} material={materials.Grey} position={[6.212, 1.137, -8.52]} rotation={[-Math.PI / 2, 0, -Math.PI / 2]} scale={0.118} />
-        <mesh castShadow receiveShadow geometry={nodes.pin_sphere.geometry} material={materials.Black} position={[-1.83, 0.564, -11.354]} rotation={[2.361, -0.099, 0.099]} scale={-0.118} />
-        <mesh castShadow receiveShadow geometry={nodes.pin_sphere001.geometry} material={materials.Black} position={[1.852, 0.564, -11.354]} rotation={[2.361, -0.099, 0.099]} scale={-0.118} />
-        <mesh castShadow receiveShadow geometry={nodes.axel.geometry} material={materials.Black} position={[0.035, -0.007, 0.001]} rotation={[Math.PI, 0, 0]} scale={0.118} />
-        <mesh castShadow receiveShadow geometry={nodes.axel_2.geometry} material={materials.Grey} position={[6.179, -0.006, 0.001]} rotation={[Math.PI, 0, 0]} scale={0.118} />
-        <mesh castShadow receiveShadow geometry={nodes.axel_3.geometry} material={materials.Grey} position={[-6.124, -0.006, 0.001]} rotation={[Math.PI, 0, 0]} scale={0.118} />
-        <mesh castShadow receiveShadow geometry={nodes.axel_connector.geometry} material={materials.Black} position={[-4.71, -0.019, 0.007]} rotation={[-Math.PI / 2, 0, -Math.PI / 2]} scale={0.118} />
-        <mesh castShadow receiveShadow geometry={nodes.axel_connector001.geometry} material={materials.Black} position={[4.78, -0.019, 0.007]} rotation={[-Math.PI / 2, 0, -Math.PI / 2]} scale={0.118} />
-      </group>
-      <group ref={leftWheelRef} position={[31.917, 27.979, -0.006]} rotation={[0, 0, 0]} scale={8.478}>
-        <mesh castShadow receiveShadow geometry={nodes['32269_Black_Technic_Gear_20_Tooth_Double_Bevel001'].geometry} material={materials.Grey} position={[4.372, -0.039, -0.03]} rotation={[0, 0, -Math.PI]} scale={0.118} />
-        <mesh castShadow receiveShadow geometry={nodes['3650_Black_Technic_Gear_24_Tooth_Crown_Type_III_(x_pattern)001'].geometry} material={materials.Grey} position={[1.663, -0.02, -0.02]} rotation={[Math.PI, Math.PI / 2, 0]} scale={0.118} />
-        <mesh castShadow receiveShadow geometry={nodes.axel001.geometry} material={materials.Grey} position={[1.432, -0.005, -0.029]} rotation={[0, 0, -Math.PI]} scale={0.118} />
-        <mesh castShadow receiveShadow geometry={nodes.motor001.geometry} material={materials.Red} rotation={[-1.571, 0, 0]} scale={0.118} />
-        <mesh castShadow receiveShadow geometry={nodes.wheel004.geometry} material={materials.Neumatic} position={[3.301, -0.009, -0.023]} scale={0.118} />
-        <mesh castShadow receiveShadow geometry={nodes.wheel005.geometry} material={materials.Grey} position={[3.325, -0.005, 0.032]} scale={0.118} />
-      </group>
-      <group ref={rightWheelRef} position={[-32.084, 27.979, -0.006]} rotation={[0, 0, 0]} scale={8.478}>
-        <mesh castShadow receiveShadow geometry={nodes['32269_Black_Technic_Gear_20_Tooth_Double_Bevel'].geometry} material={materials.Grey} position={[-4.39, -0.039, 0.002]} rotation={[Math.PI, 0, 0]} scale={0.118} />
-        <mesh castShadow receiveShadow geometry={nodes['3650_Black_Technic_Gear_24_Tooth_Crown_Type_III_(x_pattern)'].geometry} material={materials.Grey} position={[-1.681, -0.02, -0.008]} rotation={[Math.PI, -Math.PI / 2, 0]} scale={0.118} />
-        <mesh castShadow receiveShadow geometry={nodes.axel002.geometry} material={materials.Grey} position={[-1.45, -0.005, 0.001]} rotation={[Math.PI, 0, 0]} scale={0.118} />
-        <mesh castShadow receiveShadow geometry={nodes.motor002.geometry} material={materials.Red} rotation={[-1.571, 0, 0]} scale={0.118} />
-        <mesh castShadow receiveShadow geometry={nodes.wheel.geometry} material={materials.Grey} position={[-3.32, -0.01, 0.005]} rotation={[Math.PI, 0, Math.PI]} scale={0.118} />
-        <mesh castShadow receiveShadow geometry={nodes.wheel001.geometry} material={materials.Neumatic} position={[-3.32, -0.01, 0.005]} rotation={[Math.PI, 0, Math.PI]} scale={0.118} />
-      </group>
-      <group position={[-13.428, 90.108, 6.724]} rotation={[0.333, -0.001, 3.119]} scale={8.478}>
-        <group position={[0.001, -0.041, 0.118]}>
-          <group rotation={[Math.PI / 2, 0, 0]}>
-            <group position={[0.611, 4.734, -0.009]} scale={[0.633, 0.284, 0.284]}>
-              <mesh castShadow receiveShadow geometry={nodes.Object_18.geometry} material={materials.Black} />
-              <mesh castShadow receiveShadow geometry={nodes.Object_19.geometry} material={materials.Black} />
-              <mesh castShadow receiveShadow geometry={nodes.Object_20.geometry} material={materials.Black} />
-            </group>
-            <group position={[0.943, 0.586, -0.396]} rotation={[-0.498, 0, 0]} scale={[0.633, 0.284, 0.284]}>
-              <mesh castShadow receiveShadow geometry={nodes.Object_24.geometry} material={materials.Black} />
-              <mesh castShadow receiveShadow geometry={nodes.Object_25.geometry} material={materials.Black} />
-            </group>
-            <mesh castShadow receiveShadow geometry={nodes.Object_8.geometry} material={materials.Black} position={[0, 5.342, 0]} />
-            <mesh castShadow receiveShadow geometry={nodes.Object_10.geometry} material={materials.Dark_grey} position={[-1.223, 6.152, -0.024]} scale={[0.527, 0.527, 0.549]} />
-            <mesh castShadow receiveShadow geometry={nodes.Object_12.geometry} material={materials.Black} position={[-1.223, 6.152, -0.024]} scale={[0.527, 0.527, 0.549]} />
-            <mesh castShadow receiveShadow geometry={nodes.Object_14.geometry} material={materials.Grey} position={[-3.263, 7.03, -0.024]} scale={[0.527, 0.527, 0.549]} />
-            <mesh castShadow receiveShadow geometry={nodes.Object_27.geometry} material={materials.Grey} position={[2.081, 5.098, 0.15]} scale={[0.992, 0.287, 0.992]} />
-            <mesh castShadow receiveShadow geometry={nodes.Object_6.geometry} material={materials.Black} position={[0, 5.107, 0]} />
-            <mesh castShadow receiveShadow geometry={nodes.Object_4.geometry} material={materials.White} position={[2.893, 6.973, -0.116]} rotation={[0, 0, -0.009]} scale={3.028} />
-            <mesh castShadow receiveShadow geometry={nodes.Object_22.geometry} material={materials.Black} position={[-0.965, 4.732, -0.003]} rotation={[Math.PI, 0, -Math.PI / 2]} scale={[0.218, 1.576, 0.218]} />
-            <mesh castShadow receiveShadow geometry={nodes.Object_16.geometry} material={materials.White} position={[-0.97, 7.033, -0.03]} scale={0.256} />
+  // Definir los componentes de grupo fuera del return usando useMemo
+  const basketGroup = useMemo(() => (
+    <group ref={basketRef} position={[-0.094, 36.046, 42.275]} scale={8.478}>
+      <mesh castShadow receiveShadow geometry={nodes.servo_motor001.geometry} material={materials.Orange} rotation={[-2.463, 0, 0]} scale={0.118} />
+      <mesh castShadow receiveShadow geometry={nodes.axel_4.geometry} material={materials.Grey} position={[-4.612, -0.033, -11.354]} rotation={[0, 0, -Math.PI]} scale={0.118} />
+      <mesh castShadow receiveShadow geometry={nodes.axel_5.geometry} material={materials.Grey} position={[0.011, -0.033, -11.354]} rotation={[0, 0, -Math.PI]} scale={0.118} />
+      <mesh castShadow receiveShadow geometry={nodes.axel_6.geometry} material={materials.Grey} position={[4.634, -0.033, -11.354]} rotation={[0, 0, -Math.PI]} scale={0.118} />
+      <mesh castShadow receiveShadow geometry={nodes.axel_conector_angled.geometry} material={materials.Black} position={[1.852, -0.033, -11.354]} rotation={[-Math.PI / 2, 0, -Math.PI / 2]} scale={0.118} />
+      <mesh castShadow receiveShadow geometry={nodes.axel_conector_angled001.geometry} material={materials.Black} position={[-1.83, -0.033, -11.354]} rotation={[-Math.PI / 2, 0, -Math.PI / 2]} scale={0.118} />
+      <mesh castShadow receiveShadow geometry={nodes.brick_2.geometry} material={materials.Dark_grey} position={[-6.141, 0.008, -0.015]} rotation={[Math.PI, Math.PI / 2, 0]} scale={0.118} />
+      <mesh castShadow receiveShadow geometry={nodes.brick_2001.geometry} material={materials.Dark_grey} position={[6.212, 0.008, -11.354]} rotation={[Math.PI, Math.PI / 2, 0]} scale={0.118} />
+      <mesh castShadow receiveShadow geometry={nodes.brick_2002.geometry} material={materials.Dark_grey} position={[-6.141, 0.008, -11.354]} rotation={[Math.PI, Math.PI / 2, 0]} scale={0.118} />
+      <mesh castShadow receiveShadow geometry={nodes.brick_2003.geometry} material={materials.Dark_grey} position={[6.212, 0.008, -0.015]} rotation={[Math.PI, Math.PI / 2, 0]} scale={0.118} />
+      <mesh castShadow receiveShadow geometry={nodes.brick_5.geometry} material={materials.Grey} position={[-6.141, 1.146, -1.89]} rotation={[-Math.PI / 2, 0, -Math.PI / 2]} scale={0.118} />
+      <mesh castShadow receiveShadow geometry={nodes.brick_5001.geometry} material={materials.Grey} position={[6.212, 1.146, -1.89]} rotation={[-Math.PI / 2, 0, -Math.PI / 2]} scale={0.118} />
+      <mesh castShadow receiveShadow geometry={nodes.brick_7.geometry} material={materials.Grey} position={[-6.141, 0.005, -4.74]} rotation={[-Math.PI / 2, 0, -Math.PI / 2]} scale={0.118} />
+      <mesh castShadow receiveShadow geometry={nodes.brick_7001.geometry} material={materials.Grey} position={[6.212, 0.005, -4.74]} rotation={[-Math.PI / 2, 0, -Math.PI / 2]} scale={0.118} />
+      <mesh castShadow receiveShadow geometry={nodes.brick_7002.geometry} material={materials.Grey} position={[-6.141, 1.137, -8.52]} rotation={[-Math.PI / 2, 0, -Math.PI / 2]} scale={0.118} />
+      <mesh castShadow receiveShadow geometry={nodes.brick_7003.geometry} material={materials.Grey} position={[6.212, 1.137, -8.52]} rotation={[-Math.PI / 2, 0, -Math.PI / 2]} scale={0.118} />
+      <mesh castShadow receiveShadow geometry={nodes.pin_sphere.geometry} material={materials.Black} position={[-1.83, 0.564, -11.354]} rotation={[2.361, -0.099, 0.099]} scale={-0.118} />
+      <mesh castShadow receiveShadow geometry={nodes.pin_sphere001.geometry} material={materials.Black} position={[1.852, 0.564, -11.354]} rotation={[2.361, -0.099, 0.099]} scale={-0.118} />
+      <mesh castShadow receiveShadow geometry={nodes.axel.geometry} material={materials.Black} position={[0.035, -0.007, 0.001]} rotation={[Math.PI, 0, 0]} scale={0.118} />
+      <mesh castShadow receiveShadow geometry={nodes.axel_2.geometry} material={materials.Grey} position={[6.179, -0.006, 0.001]} rotation={[Math.PI, 0, 0]} scale={0.118} />
+      <mesh castShadow receiveShadow geometry={nodes.axel_3.geometry} material={materials.Grey} position={[-6.124, -0.006, 0.001]} rotation={[Math.PI, 0, 0]} scale={0.118} />
+      <mesh castShadow receiveShadow geometry={nodes.axel_connector.geometry} material={materials.Black} position={[-4.71, -0.019, 0.007]} rotation={[-Math.PI / 2, 0, -Math.PI / 2]} scale={0.118} />
+      <mesh castShadow receiveShadow geometry={nodes.axel_connector001.geometry} material={materials.Black} position={[4.78, -0.019, 0.007]} rotation={[-Math.PI / 2, 0, -Math.PI / 2]} scale={0.118} />
+    </group>
+  ), [nodes, materials]);
+
+  const leftWheelGroup = useMemo(() => (
+    <group ref={leftWheelRef} position={[31.917, 27.979, -0.006]} rotation={[0, 0, 0]} scale={8.478}>
+      <mesh castShadow receiveShadow geometry={nodes['32269_Black_Technic_Gear_20_Tooth_Double_Bevel001'].geometry} material={materials.Grey} position={[4.372, -0.039, -0.03]} rotation={[0, 0, -Math.PI]} scale={0.118} />
+      <mesh castShadow receiveShadow geometry={nodes['3650_Black_Technic_Gear_24_Tooth_Crown_Type_III_(x_pattern)001'].geometry} material={materials.Grey} position={[1.663, -0.02, -0.02]} rotation={[Math.PI, Math.PI / 2, 0]} scale={0.118} />
+      <mesh castShadow receiveShadow geometry={nodes.axel001.geometry} material={materials.Grey} position={[1.432, -0.005, -0.029]} rotation={[0, 0, -Math.PI]} scale={0.118} />
+      <mesh castShadow receiveShadow geometry={nodes.motor001.geometry} material={materials.Red} rotation={[-1.571, 0, 0]} scale={0.118} />
+      <mesh castShadow receiveShadow geometry={nodes.wheel004.geometry} material={materials.Neumatic} position={[3.301, -0.009, -0.023]} scale={0.118} />
+      <mesh castShadow receiveShadow geometry={nodes.wheel005.geometry} material={materials.Grey} position={[3.325, -0.005, 0.032]} scale={0.118} />
+    </group>
+  ), [nodes, materials]);
+
+  const rightWheelGroup = useMemo(() => (
+    <group ref={rightWheelRef} position={[-32.084, 27.979, -0.006]} rotation={[0, 0, 0]} scale={8.478}>
+      <mesh castShadow receiveShadow geometry={nodes['32269_Black_Technic_Gear_20_Tooth_Double_Bevel'].geometry} material={materials.Grey} position={[-4.39, -0.039, 0.002]} rotation={[Math.PI, 0, 0]} scale={0.118} />
+      <mesh castShadow receiveShadow geometry={nodes['3650_Black_Technic_Gear_24_Tooth_Crown_Type_III_(x_pattern)'].geometry} material={materials.Grey} position={[-1.681, -0.02, -0.008]} rotation={[Math.PI, -Math.PI / 2, 0]} scale={0.118} />
+      <mesh castShadow receiveShadow geometry={nodes.axel002.geometry} material={materials.Grey} position={[-1.45, -0.005, 0.001]} rotation={[Math.PI, 0, 0]} scale={0.118} />
+      <mesh castShadow receiveShadow geometry={nodes.motor002.geometry} material={materials.Red} rotation={[-1.571, 0, 0]} scale={0.118} />
+      <mesh castShadow receiveShadow geometry={nodes.wheel.geometry} material={materials.Grey} position={[-3.32, -0.01, 0.005]} rotation={[Math.PI, 0, Math.PI]} scale={0.118} />
+      <mesh castShadow receiveShadow geometry={nodes.wheel001.geometry} material={materials.Neumatic} position={[-3.32, -0.01, 0.005]} rotation={[Math.PI, 0, Math.PI]} scale={0.118} />
+    </group>
+  ), [nodes, materials]);
+
+  const headGroup = useMemo(() => (
+    <group position={[-13.428, 90.108, 6.724]} rotation={[0.333, -0.001, 3.119]} scale={8.478}>
+      <group position={[0.001, -0.041, 0.118]}>
+        <group rotation={[Math.PI / 2, 0, 0]}>
+          <group position={[0.611, 4.734, -0.009]} scale={[0.633, 0.284, 0.284]}>
+            <mesh castShadow receiveShadow geometry={nodes.Object_18.geometry} material={materials.Black} />
+            <mesh castShadow receiveShadow geometry={nodes.Object_19.geometry} material={materials.Black} />
+            <mesh castShadow receiveShadow geometry={nodes.Object_20.geometry} material={materials.Black} />
           </group>
+          <group position={[0.943, 0.586, -0.396]} rotation={[-0.498, 0, 0]} scale={[0.633, 0.284, 0.284]}>
+            <mesh castShadow receiveShadow geometry={nodes.Object_24.geometry} material={materials.Black} />
+            <mesh castShadow receiveShadow geometry={nodes.Object_25.geometry} material={materials.Black} />
+          </group>
+          <mesh castShadow receiveShadow geometry={nodes.Object_8.geometry} material={materials.Black} position={[0, 5.342, 0]} />
+          <mesh castShadow receiveShadow geometry={nodes.Object_10.geometry} material={materials.Dark_grey} position={[-1.223, 6.152, -0.024]} scale={[0.527, 0.527, 0.549]} />
+          <mesh castShadow receiveShadow geometry={nodes.Object_12.geometry} material={materials.Black} position={[-1.223, 6.152, -0.024]} scale={[0.527, 0.527, 0.549]} />
+          <mesh castShadow receiveShadow geometry={nodes.Object_14.geometry} material={materials.Grey} position={[-3.263, 7.03, -0.024]} scale={[0.527, 0.527, 0.549]} />
+          <mesh castShadow receiveShadow geometry={nodes.Object_27.geometry} material={materials.Grey} position={[2.081, 5.098, 0.15]} scale={[0.992, 0.287, 0.992]} />
+          <mesh castShadow receiveShadow geometry={nodes.Object_6.geometry} material={materials.Black} position={[0, 5.107, 0]} />
+          <mesh castShadow receiveShadow geometry={nodes.Object_4.geometry} material={materials.White} position={[2.893, 6.973, -0.116]} rotation={[0, 0, -0.009]} scale={3.028} />
+          <mesh castShadow receiveShadow geometry={nodes.Object_22.geometry} material={materials.Black} position={[-0.965, 4.732, -0.003]} rotation={[Math.PI, 0, -Math.PI / 2]} scale={[0.218, 1.576, 0.218]} />
+          <mesh castShadow receiveShadow geometry={nodes.Object_16.geometry} material={materials.White} position={[-0.97, 7.033, -0.03]} scale={0.256} />
         </group>
       </group>
+    </group>
+  ), [nodes, materials]);
+
+  return (
+    <group ref={groupRef} {...props} dispose={null}>
+      {basketGroup}
+      {leftWheelGroup}
+      {rightWheelGroup}
+      {headGroup}
+      {/* El resto de la estructura permanece igual */}
       <mesh castShadow receiveShadow geometry={nodes.pin_2_one_side003.geometry} material={materials.Grey} position={[16.103, 102.398, 17.842]} rotation={[2.349, -0.093, 0.099]} />
       <mesh castShadow receiveShadow geometry={nodes.BrickPi3.geometry} material={materials.Grey} position={[0, 111.451, -57.635]} scale={[34.5, 31.75, 47.6]} />
       <mesh castShadow receiveShadow geometry={nodes.servo_motor.geometry} material={materials.White} position={[0, 45.411, -11.628]} rotation={[Math.PI / 2, 0, 0]} />
@@ -360,7 +377,7 @@ export const Robot = forwardRef<Group, RobotProps>((props, ref) => {
       <mesh castShadow receiveShadow geometry={nodes.beam_13.geometry} material={materials.Dark_grey} position={[0, 67.621, -85.518]} rotation={[0, Math.PI / 2, 0]} />
       <mesh castShadow receiveShadow geometry={nodes.beam_15.geometry} material={materials.Dark_grey} position={[0, 131.858, -109.742]} rotation={[Math.PI / 2, 0, -Math.PI / 2]} />
       <mesh castShadow receiveShadow geometry={nodes.beam_lift_4.geometry} material={materials.Dark_grey} position={[-21.682, 34.881, -93.874]} rotation={[-Math.PI / 2, -Math.PI / 2, 0]} />
-      <mesh castShadow receiveShadow geometry={nodes.beam_lift_4001.geometry} material={materials.Dark_grey} position={[21.682, 34.881, -93.874]} rotation={[Math.PI / 2, Math.PI / 2, 0]} />
+      <mesh castShadow receiveShadow geometry={nodes.beam_lift_4001.geometry} material={materials.Dark_grey} position={[21.682, 34.881, -93.874]} rotation={[Math.PI, 0, Math.PI / 2]} />
       <mesh castShadow receiveShadow geometry={nodes.lift_arm_5.geometry} material={materials.Dark_grey} position={[11.342, 75.756, -96.663]} rotation={[0, 0, Math.PI]} />
       <mesh castShadow receiveShadow geometry={nodes.lift_arm_5001.geometry} material={materials.Dark_grey} position={[-11.342, 75.756, -96.663]} />
       <mesh castShadow receiveShadow geometry={nodes.lift_arm_big.geometry} material={materials.Dark_grey} position={[-47.815, 27.958, -61.441]} rotation={[Math.PI, 0, Math.PI / 2]} />
@@ -406,6 +423,5 @@ export const Robot = forwardRef<Group, RobotProps>((props, ref) => {
     </group>
   )
 });
-
 
 useGLTF.preload('models/robot.glb')
