@@ -35,7 +35,7 @@ export const Python = forwardRef<Group, Props>((props, ref) => {
       castShadow
       receiveShadow
       geometry={nodes.path1948.geometry}
-      material={sharedMaterial}
+      material={coloredMaterial}
       position={[-0.004, 0, -0.007]}
     />,
     <mesh
@@ -43,7 +43,7 @@ export const Python = forwardRef<Group, Props>((props, ref) => {
       castShadow
       receiveShadow
       geometry={nodes.path1950.geometry}
-      material={coloredMaterial}
+      material={sharedMaterial}
       position={[0.005, 0, 0.006]}
     />
   ], [nodes, sharedMaterial, coloredMaterial])
