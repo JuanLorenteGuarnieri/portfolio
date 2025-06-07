@@ -206,6 +206,12 @@ export const Robot = forwardRef<Group, RobotProps>(({ parentPos, ...props }, ref
   const { nodes, materials } = useGLTF('models/robot.glb') as GLTFResult;
   materials.Red.emissive = materials.Red.color;
 
+  useEffect(() => {
+    if ('Red' in materials) {
+      const red = materials.Red as THREE.MeshStandardMaterial;
+      red.emissive = red.color.clone(); // importante usar clone()
+    }
+  }, [materials]);
 
   const cursorRef = useRef<THREE.Object3D | null>(null);
   const { scene } = useThree();
