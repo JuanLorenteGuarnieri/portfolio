@@ -6,17 +6,17 @@ import { Bvh } from '@react-three/drei'
 type Props = JSX.IntrinsicElements['group'] & {}
 
 type PointData = {
-  id: number
   x: number
   y: number
   z: number
   scale: number
 }
 
-export const Pilar = forwardRef<Group, Props>(({ ...props }, ref) => {
+export const Slammap = forwardRef<Group, Props>(({ ...props }, ref) => {
   const [points, setPoints] = useState<PointData[]>([])
   const meshRef = useRef<InstancedMesh>(null)
   const dummy = useRef(new Object3D())
+  // let count = -1
 
   useEffect(() => {
     fetch('https://JuanLorenteGuarnieri.github.io/portfolio/euroc.txt')
@@ -24,13 +24,16 @@ export const Pilar = forwardRef<Group, Props>(({ ...props }, ref) => {
       .then(text => {
         const lines = text.split('\n').filter(Boolean)
         const parsed = lines.map(line => {
-          let [id, x, y, z, scale] = line.trim().split(/\s+/).map(Number)
-          x = -x + 2
-          y = y - 0.2
-          z = (z - 7) * 1.3
-          return { id, x, y, z, scale }
+          let [x, y, z, scale] = line.trim().split(/\s+/).map(Number)
+          // x = x
+          // y = y
+          // z = z
+          // count++
+          return { x, y, z, scale }
         })
-        setPoints(parsed)
+        const reduced = parsed.filter((_, index) => index % 3 === 0)
+
+        setPoints(reduced)
       })
       .catch(() => setPoints([]))
   }, [])
@@ -38,8 +41,8 @@ export const Pilar = forwardRef<Group, Props>(({ ...props }, ref) => {
   useEffect(() => {
     if (!meshRef.current) return
     points.forEach((point, i) => {
-      dummy.current.position.set(point.x, point.z, point.y)
-      dummy.current.scale.set(point.scale / 20, point.scale / 20, point.scale / 20)
+      dummy.current.position.set(point.x, point.y, point.z)
+      dummy.current.scale.set(point.scale / 1, point.scale / 1, point.scale / 1)
       dummy.current.updateMatrix()
       meshRef.current!.setMatrixAt(i, dummy.current.matrix)
     })
@@ -48,7 +51,7 @@ export const Pilar = forwardRef<Group, Props>(({ ...props }, ref) => {
 
   // Memoized geometry and material
   const sphereGeometry = useMemo(
-    () => <sphereGeometry args={[1, 16, 16]} />,
+    () => <sphereGeometry args={[0.01, 0.1, 0.1]} />,
     []
   )
   const meshMaterial = useMemo(

@@ -48,7 +48,7 @@ export const Pilar = forwardRef<Group, Props>(({ ...props }, ref) => {
 
   // Memoized geometry and material
   const sphereGeometry = useMemo(
-    () => <sphereGeometry args={[1, 16, 16]} />,
+    () => <sphereGeometry args={[1, 1, 1]} />,
     []
   )
   const meshMaterial = useMemo(
