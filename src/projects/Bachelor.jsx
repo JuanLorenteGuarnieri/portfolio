@@ -9,6 +9,9 @@ import { Python } from '../../public/models/Python';
 import { SurfacePoint } from '../../public/models/SurfacePoint';
 import { useLoader } from '@react-three/fiber';
 import { useMemo } from 'react';
+import { Doc } from '../../public/models/Doc';
+import { Docs } from '../../public/models/Docs';
+import { Slides } from '../../public/models/Slides';
 
 function Bachelor({ isVisibleLight, pos, parentPos }) {
   const scanpathTexture = useLoader(TextureLoader, 'https://JuanLorenteGuarnieri.github.io/portfolio/scanpath.png');
@@ -49,10 +52,6 @@ function Bachelor({ isVisibleLight, pos, parentPos }) {
     <Pytorch scale={20} position={[4, -0.0, 1.58]} rotation={[0, 0, 0]} />
   ), []);
 
-  const githubLink = useMemo(() => (
-    <Github link='https://github.com/JuanLorenteGuarnieri/scanpaths-for-360-video' scale={12} position={[0, -0.08, 0]} rotation={[0, 0, 0]} />
-  ), []);
-
   const pythonLight = useMemo(() => (
     <pointLight intensity={15} position={[3, 1, 1.6]} color={new THREE.Color(0x223060)} />
   ), []);
@@ -74,7 +73,7 @@ function Bachelor({ isVisibleLight, pos, parentPos }) {
           emissive={new THREE.Color(0xffffff)}
           map={scanpathTexture}
           emissiveMap={scanpathTexture}
-          emissiveIntensity={0.6}
+          emissiveIntensity={0.3}
         />
       </Sphere>
       <SurfacePoint position={[-2.8, 0.4, 1.5]} distance={0.4} centerLatLon={[60.0, 60.0]}
@@ -85,23 +84,25 @@ function Bachelor({ isVisibleLight, pos, parentPos }) {
   const linksMesh = useMemo(() => (
     <mesh className="LINKS" position={[0, 0, 2.3]}>
       <Bvh firstHitOnly>
-        {githubLink}
+        <Docs link='https://JuanLorenteGuarnieri.github.io/portfolio/bachelor_thesis.pdf' scale={15} position={[0.7, -0.09, 0]} rotation={[0, 0, 0]} />
+        <Github link='https://github.com/JuanLorenteGuarnieri/scanpaths-for-360-video' scale={12} position={[0, -0.07, 0]} rotation={[0, 0, 0]} />
+        <Slides link='https://docs.google.com/presentation/d/1gXCbYENrblfP3ud_XEzPqUJJUwImf6FU6f15xGOxrHY/edit?usp=sharing' scale={15} position={[-0.7, -0.09, 0]} rotation={[0, 0, 0]} />
       </Bvh>
     </mesh>
-  ), [githubLink]);
+  ), []);
 
   return (
     <mesh className="Bachelor project" position={pos} visible={isVisibleLight(new THREE.Vector3(0, 5, pos[2] + parentPos[2]), 8)}>
       <mesh className="MODEL">
-        {leftLight}
-        {/* {sphereModel} */}
+        {/* {leftLight} */}
+        {sphereModel}
       </mesh>
       {titleTexts}
       {subtitleText}
       {pythonIcon}
-      {pythonLight}
+      {/* {pythonLight} */}
       {pytorchIcon}
-      {pytorchLight}
+      {/* {pytorchLight} */}
       {linksMesh}
     </mesh>
   );

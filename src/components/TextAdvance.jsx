@@ -1,12 +1,12 @@
 import React, { useRef, useEffect, useMemo, useState } from 'react';
 import { Bvh, Text3D } from '@react-three/drei';
 import * as THREE from 'three';
-import { useGLTF } from '@react-three/drei'
 import {
   computeBoundsTree,
   disposeBoundsTree,
   acceleratedRaycast,
 } from 'three-mesh-bvh'
+import { useSharedMat } from './sharedMaterial';
 
 THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree
 THREE.BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree
@@ -24,8 +24,7 @@ const TextAdvance = ({
   const textRef = useRef();
   const [textPosition, setTextPosition] = useState(position);
 
-  const { materials } = useGLTF('models/box1.glb')
-  materials.Mat.precision = 'lowp';
+  const sharedMaterial = useSharedMat()
 
   useEffect(() => {
     const mesh = textRef.current
@@ -65,6 +64,7 @@ const TextAdvance = ({
     // eslint-disable-next-line
   }, [align, position, text, font, size, height]);
 
+
   // Memoiza el material para evitar recrearlo en cada render
   const textMaterial = useMemo(() => (
     <meshStandardMaterial
@@ -86,12 +86,14 @@ const TextAdvance = ({
       position={textPosition}
       rotation={[-Math.PI / 2, 0, 0]}
       {...textProps}
-      material={materials.Mat}
+      material={sharedMaterial}
+      color={colorPri}
     >
       {text}
-      {textMaterial}
+      {/* {textMaterial} */}
+      {colorPri != 'white' ? textMaterial : null}
     </Text3D>
-  ), [text, textPosition, textProps, materials.Mat, textMaterial]);
+  ), [text, textPosition, textProps]);//, textMaterial]);
 
   return (
     <mesh>

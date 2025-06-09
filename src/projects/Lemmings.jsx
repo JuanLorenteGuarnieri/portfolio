@@ -4,8 +4,11 @@ import TextAdvance from '../components/TextAdvance';
 import fontText from '../assets/fonts/Source_Code_Pro/static/Source_Code_Pro_Regular.json';
 import { Bvh } from '@react-three/drei';
 import { Github } from '../../public/models/Github';
+import { Windows } from '../../public/models/Windows';
 import { C } from '../../public/models/C';
 import { Lemming } from '../../public/models/Lemming';
+import { Docs } from '../../public/models/Docs';
+import { Sdl } from '../../public/models/Sdl';
 
 function Lemmings({ isVisibleLight, pos, parentPos }) {
   // Memoriza los textos repetidos
@@ -59,13 +62,18 @@ function Lemmings({ isVisibleLight, pos, parentPos }) {
 
   // Memoriza el componente C
   const CModel = useMemo(() => (
-    <C scale={20} position={[3, -0.08, 1.6]} rotation={[0, 0, 0]} />
+    <>
+      <C scale={20} position={[3, -0.08, 1.6]} rotation={[0, 0, 0]} />
+      <Sdl scale={20} position={[4, -0.08, 1.58]} rotation={[0, 0, 0]} />
+    </>
   ), []);
 
   // Memoriza el Github link
   const GithubLink = useMemo(() => (
     <Bvh firstHitOnly>
-      <Github link='https://github.com/fernando-lahoz/videojuegos-lemmings' scale={12} position={[0, -0.08, 0]} rotation={[0, 0, 0]} />
+      <Windows link='https://drive.google.com/file/d/1Q5Ernxro459w8ib38GBHCS0tqSxGjtLu/view?usp=sharing' scale={12} position={[-0.7, -0.05, 0]} rotation={[0, 0, 0]} />
+      <Github link='https://github.com/fernando-lahoz/videojuegos-lemmings' scale={12} position={[0, -0.07, 0]} rotation={[0, 0, 0]} />
+      <Docs link='https://JuanLorenteGuarnieri.github.io/portfolio/Lemmings-Report.pdf' scale={15} position={[0.7, -0.09, 0]} rotation={[0, 0, 0]} />
     </Bvh>
   ), []);
 
@@ -104,7 +112,7 @@ function Lemmings({ isVisibleLight, pos, parentPos }) {
   // Memoriza el mesh del Lemming y su luz
   const LemmingMesh = useMemo(() => (
     <mesh className="MODEL">
-      {LemmingLight}
+      {/* {LemmingLight} */}
       {LemmingModel}
     </mesh>
   ), [LemmingLight, LemmingModel]);
@@ -115,13 +123,13 @@ function Lemmings({ isVisibleLight, pos, parentPos }) {
       position={pos}
       visible={isVisibleLight(new THREE.Vector3(0, 5, pos[2] + parentPos[2]), 8)}
     >
-      {/* {LemmingMesh} */}
+      {LemmingMesh}
       {TitleText}
       {Underline1}
       {Underline2}
       {DescriptionText}
       {CModel}
-      {CLight}
+      {/* {CLight} */}
       {LinksMesh}
     </mesh>
   );

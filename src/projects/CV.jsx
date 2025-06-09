@@ -6,6 +6,9 @@ import { Bvh } from '@react-three/drei';
 import { Github } from '../../public/models/Github';
 import { Python } from '../../public/models/Python';
 import { Pilar } from '../../public/models/Pilar';
+import { Doc } from '../../public/models/Doc';
+import { Docs } from '../../public/models/Docs';
+import { Slides } from '../../public/models/Slides';
 
 function CV({ isVisibleLight, pos, parentPos }) {
   // Memoized components
@@ -49,12 +52,6 @@ function CV({ isVisibleLight, pos, parentPos }) {
     <Python scale={18} position={[3, -0.02, 1.6]} rotation={[0, 0, 0]} />
   ), []);
 
-  const githubLink = useMemo(() => (
-    <Bvh firstHitOnly>
-      <Github link='https://github.com/JuanLorenteGuarnieri/CV_Course_assigment' scale={12} position={[0, -0.08, 0]} rotation={[0, 0, 0]} />
-    </Bvh>
-  ), []);
-
   const pilarModel = useMemo(() => (
     <Bvh firstHitOnly>
       <Pilar position={[-3.5, 0.2, 1.5]} scale={0.2} rotation={[2.3 * Math.PI / 4, -0.3 * Math.PI / 4, -0.5 * Math.PI / 4]} />
@@ -73,14 +70,18 @@ function CV({ isVisibleLight, pos, parentPos }) {
   // Memoized mesh for LINKS
   const linksMesh = useMemo(() => (
     <mesh className="LINKS" position={[0, 0, 2.3]}>
-      {githubLink}
+      <Bvh firstHitOnly>
+        <Slides link='https://docs.google.com/presentation/d/1V4Otg7DNuBv4fv6qX-vHvVVhF-vU46wMAwNEN0qA7Pk/edit?usp=sharing' scale={15} position={[-0.7, -0.09, 0]} rotation={[0, 0, 0]} />
+        <Github link='https://github.com/JuanLorenteGuarnieri/CV_Course_assigment' scale={12} position={[0, -0.07, 0]} rotation={[0, 0, 0]} />
+        <Docs link='https://drive.google.com/drive/folders/1kahkhTmxwPGJO9HCXRsiSIEK-ENtv5FE?usp=sharing' scale={15} position={[0.7, -0.09, 0]} rotation={[0, 0, 0]} />
+      </Bvh>
     </mesh>
-  ), [githubLink]);
+  ), []);
 
   // Memoized MODEL mesh
   const modelMesh = useMemo(() => (
     <mesh className="MODEL">
-      {pilarLight}
+      {/* {pilarLight} */}
       {pilarModel}
     </mesh>
   ), [pilarLight, pilarModel]);
@@ -91,13 +92,13 @@ function CV({ isVisibleLight, pos, parentPos }) {
       position={pos}
       visible={isVisibleLight(new THREE.Vector3(0, 5, pos[2] + parentPos[2]), 8)}
     >
-      {/* {modelMesh} */}
+      {modelMesh}
       {titleText}
       {line1}
       {line2}
       {subtitleText}
       {pythonModel}
-      {pythonLight}
+      {/* {pythonLight} */}
       {linksMesh}
     </mesh>
   );

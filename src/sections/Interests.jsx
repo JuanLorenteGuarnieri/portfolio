@@ -147,20 +147,38 @@ function Interests({ isVisibleLight, pos }) {
     }
   }
 
-  useEffect(() => {
-    async function fetchStreak() {
-      try {
-        const res = await fetch('/portfolio/streak.json');
-        if (!res.ok) throw new Error('No se pudo cargar streak.json');
-        const data = await res.json();
-        setDuoStreak(data.streak);
-      } catch (err) {
-        console.error('Error al cargar el streak:', err);
-        setDuoStreak('N/A');
-      }
-    }
+  // useEffect(() => {
+  //   async function fetchStreak() {
+  //     try {
+  //       const res = await fetch('/portfolio/streak.json');
+  //       if (!res.ok) throw new Error('No se pudo cargar streak.json');
+  //       const data = await res.json();
+  //       setDuoStreak(data.streak);
+  //     } catch (err) {
+  //       console.error('Error al cargar el streak:', err);
+  //       setDuoStreak('N/A');
+  //     }
+  //   }
+  //   fetchStreak();
+  // }, []);
 
-    fetchStreak();
+  useEffect(() => {
+    // Fecha de hoy
+    const today = new Date();
+
+    // Racha conocida para una fecha conocida
+    const knownStreak = 667;
+    const knownDate = new Date('2025-06-06');
+
+    // Fecha en que empezó la racha
+    const streakStart = new Date(knownDate);
+    streakStart.setDate(streakStart.getDate() - (knownStreak - 1));
+
+    // Diferencia de días entre hoy y la fecha de inicio
+    const msPerDay = 1000 * 60 * 60 * 24;
+    const diffDays = Math.ceil((today - streakStart) / msPerDay);
+
+    setDuoStreak(diffDays);
   }, []);
 
   useEffect(() => {
@@ -171,35 +189,35 @@ function Interests({ isVisibleLight, pos }) {
   // Memoiza los modelos 3D
   const models = useMemo(() => (
     <Bvh firstHitOnly>
-      <Piano position={[4.8, -0.19, 2.1]} rotation={[0, -Math.PI / 3, 0]} />
-      <Chess scale={2.4} position={[-4.5, 0, 5]} rotation={[0, 0, 0]} />
+      <Piano position={[4.8, -0.19, 1.6]} rotation={[0, -Math.PI / 3, 0]} />
+      <Chess scale={2.4} position={[-4.5, 0, 4.5]} rotation={[0, 0, 0]} />
       <Float speed={4} rotationIntensity={0.3} floatIntensity={0.4} floatingRange={[0, 1]}>
-        <RubikCube scale={0.15} position={[-4.8, 0, 2.3]} rotation={[0, Math.PI / 6, 0]} />
+        <RubikCube scale={0.15} position={[-4.8, 0, 1.8]} rotation={[0, Math.PI / 6, 0]} />
       </Float>
-      <Book scale={0.065} position={[4.7, 0, 5]} rotation={[0, -1.7, 0]} />
-      <Duolingo position={[-4.2, 0, 7]} rotation={[0, 0, 0]} />
+      <Book scale={0.065} position={[4.7, 0, 4.5]} rotation={[0, -1.7, 0]} />
+      <Duolingo position={[-4.2, 0, 6.5]} rotation={[0, 0, 0]} />
     </Bvh>
   ), []);
 
   // Memoiza los textos que no dependen de estado
   const staticTexts = useMemo(() => (
     <>
-      <TextAdvance position={[2.5, 0, 2.5]}
+      <TextAdvance position={[2.5, 0, 2.0]}
         text={"PIANO"}
         font={fontText} size={0.17} height={0.08}
         colorPri={"white"} colorSec={new THREE.Color(0x223060)}
       />
-      <TextAdvance position={[-2.5, 0, 2.66]}
+      <TextAdvance position={[-2.5, 0, 2.16]}
         text={"RUBIK's solver"}
         font={fontText} size={0.16} height={0.08}
         colorPri={"white"} colorSec={new THREE.Color(0x223060)}
       />
-      <TextAdvance position={[2.5, 0, 5]}
+      <TextAdvance position={[2.5, 0, 4.5]}
         text={"PSYCHOLOGY reader"}
         font={fontText} size={0.16} height={0.08}
         colorPri={"white"} colorSec={new THREE.Color(0x223060)}
       />
-      <TextAdvance position={[-2.4, 0, 6.95]}
+      <TextAdvance position={[-2.4, 0, 6.45]}
         text={"DUOLINGO"} align='center'
         font={fontText} size={0.16} height={0.08}
         colorPri={"white"} colorSec={new THREE.Color(0x223060)}
@@ -210,17 +228,17 @@ function Interests({ isVisibleLight, pos }) {
   // Memoiza los textos que dependen de estado
   const dynamicTexts = useMemo(() => (
     <>
-      <TextAdvance position={[2.5, 0, 2.8]}
+      <TextAdvance position={[2.5, 0, 2.3]}
         text={pianoExp + " years EXP"}
         font={fontText} size={0.16} height={0.08}
         colorPri={"white"} colorSec={new THREE.Color(0x223060)}
       />
-      <TextAdvance position={[-2.5, 0, 5]}
+      <TextAdvance position={[-2.5, 0, 4.5]}
         text={"CHESS +" + chessCount + " games"}
         font={fontText} size={0.16} height={0.08}
         colorPri={"white"} colorSec={new THREE.Color(0x223060)}
       />
-      <TextAdvance position={[-2.4, 0, 7.25]}
+      <TextAdvance position={[-2.4, 0, 6.75]}
         text={duoStreak + " days streak"} align='center'
         font={fontText} size={0.16} height={0.08}
         colorPri={"white"} colorSec={new THREE.Color(0x223060)}
@@ -233,7 +251,7 @@ function Interests({ isVisibleLight, pos }) {
     <TextAdvance position={[0, 0, 0]}
       text={"INTERESTS"}
       font={fontTitle} size={0.3} height={0.1}
-      colorPri={new THREE.Color(0xdddddd)} colorSec={new THREE.Color(0x333333)}
+      colorPri={"white"} colorSec={new THREE.Color(0x333333)}
     />
   ), []);
 
@@ -263,7 +281,7 @@ function Interests({ isVisibleLight, pos }) {
   return (
     <mesh className="INTERESTS" position={pos} visible={isVisibleLight(new THREE.Vector3(0, 5, pos[2]), 10)}>
       {title}
-      {lights}
+      {/* {lights} */}
       {modelsMesh}
       {textMesh}
     </mesh>

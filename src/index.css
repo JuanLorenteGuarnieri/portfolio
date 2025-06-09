@@ -9,6 +9,31 @@
   --green-rgb: 125 161 35;
 }
 
+/* Contenedor desplazable sin mostrar scroll */
+.container {
+  overflow-y: auto;
+  /* o scroll para siempre mostrar scroll funcional */
+  -ms-overflow-style: none;
+  /* Oculta scroll en IE/Edge antiguos */
+  scrollbar-width: none;
+  /* Oculta scroll en Firefox */
+}
+
+/* Ocultar scroll en toda la página */
+html,
+body {
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE/Edge legacy */
+}
+
+body::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari, Opera */
+}
+
+
 body {
   font-family: "Work Sans", sans-serif;
   cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="5" height="5" viewport="0 0 24 24" style="fill:black;"><circle cx="12" cy="12" r="10" fill="white"/></svg>') 12 12, auto;

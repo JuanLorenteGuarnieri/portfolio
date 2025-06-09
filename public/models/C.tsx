@@ -3,6 +3,7 @@ import React, { useRef, forwardRef, useMemo } from 'react'
 import { useGLTF } from '@react-three/drei'
 import { GLTF } from 'three-stdlib'
 import { Group } from 'three';
+import { useSharedMat } from '../../src/components/sharedMaterial';
 
 type GLTFResult = GLTF & {
   nodes: {
@@ -22,6 +23,7 @@ type LogoProps = JSX.IntrinsicElements['group'];
 
 export const C = forwardRef<Group, LogoProps>((props, ref) => {
   const { nodes, materials } = useGLTF('models/c.glb') as GLTFResult
+  const sharedMaterial = useSharedMat()
 
   const meshes = useMemo(() => [
     <mesh
@@ -47,7 +49,7 @@ export const C = forwardRef<Group, LogoProps>((props, ref) => {
       castShadow
       receiveShadow
       geometry={nodes.Curve013.geometry}
-      material={materials.Mat}
+      material={sharedMaterial}
       position={[-0.013, 0, 0.013]}
       scale={0.767}
     />,
@@ -56,7 +58,7 @@ export const C = forwardRef<Group, LogoProps>((props, ref) => {
       castShadow
       receiveShadow
       geometry={nodes.Curve014.geometry}
-      material={materials.Mat}
+      material={sharedMaterial}
       position={[-0.013, 0, 0.013]}
       scale={0.767}
     />,

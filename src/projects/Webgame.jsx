@@ -49,16 +49,16 @@ function Webgame({ isVisibleLight, pos, parentPos }) {
   const links = useMemo(() => (
     <mesh className="LINKS" position={[0, 0, 2.3]}>
       <Bvh firstHitOnly >
-        <Play link='https://juanlorenteguarnieri.github.io/Spaceship-Controller/' scale={12} position={[-0.7, -0.08, 0]} rotation={[0, 0, 0]} />
-        <Github link='https://github.com/JuanLorenteGuarnieri/Spaceship-Controller' scale={12} position={[0, -0.08, 0]} rotation={[0, 0, 0]} />
+        <Play link='https://juanlorenteguarnieri.github.io/Spaceship-Controller/' scale={11} position={[-0.7, -0.06, 0]} rotation={[0, 0, 0]} />
+        <Github link='https://github.com/JuanLorenteGuarnieri/Spaceship-Controller' scale={12} position={[0, -0.07, 0]} rotation={[0, 0, 0]} />
       </Bvh>
     </mesh>
   ), []);
 
   const model = useMemo(() => (
     <mesh className="MODEL" >
-      <pointLight intensity={30} position={[-3.3, 1, 1.4]}
-        color={new THREE.Color(0x223060)} />
+      {/* <pointLight intensity={30} position={[-3.3, 1, 1.4]}
+        color={new THREE.Color(0x223060)} /> */}
       <Bvh firstHitOnly >
         <Float
           speed={4}
@@ -82,11 +82,11 @@ function Webgame({ isVisibleLight, pos, parentPos }) {
   // Memoiza el contenido del componente principal
   const content = useMemo(() => (
     <>
-      {/* {model} */}
+      {model}
       {titleTexts}
       {descriptionText}
       {techIcons}
-      {pointLights}
+      {/* {pointLights} */}
       {links}
     </>
   ), [titleTexts, descriptionText, techIcons, pointLights, links]);

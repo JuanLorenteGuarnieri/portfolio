@@ -3,6 +3,7 @@ import React, { useRef, forwardRef, useMemo } from 'react'
 import { useGLTF } from '@react-three/drei'
 import { GLTF } from 'three-stdlib'
 import { Group } from 'three';
+import { useSharedMat } from '../../src/components/sharedMaterial';
 
 type GLTFResult = GLTF & {
   nodes: {
@@ -18,7 +19,8 @@ type GLTFResult = GLTF & {
 type LogoProps = JSX.IntrinsicElements['group'];
 
 export const Vscode = forwardRef<Group, LogoProps>((props, ref) => {
-  const { nodes, materials } = useGLTF('models/vscode.glb') as GLTFResult
+  const { nodes } = useGLTF('models/vscode.glb') as GLTFResult
+  const sharedMaterial = useSharedMat()
 
   const meshes = useMemo(() => [
     <mesh
@@ -26,7 +28,7 @@ export const Vscode = forwardRef<Group, LogoProps>((props, ref) => {
       castShadow
       receiveShadow
       geometry={nodes.Curve003.geometry}
-      material={materials.Mat}
+      material={sharedMaterial}
       position={[-0.015, 0.004, 0.013]}
       scale={0.732}
     />,
@@ -35,7 +37,7 @@ export const Vscode = forwardRef<Group, LogoProps>((props, ref) => {
       castShadow
       receiveShadow
       geometry={nodes.Curve006.geometry}
-      material={materials.Mat}
+      material={sharedMaterial}
       position={[-0.015, 0.006, 0.013]}
       scale={0.732}
     />,
@@ -44,12 +46,12 @@ export const Vscode = forwardRef<Group, LogoProps>((props, ref) => {
       castShadow
       receiveShadow
       geometry={nodes.Curve007.geometry}
-      material={materials.Mat}
+      material={sharedMaterial}
       position={[-0.015, 0.001, -0.014]}
       rotation={[0, 0, -Math.PI]}
       scale={-0.732}
     />
-  ], [nodes, materials]);
+  ], [nodes]);
 
   return (
     <group ref={ref} {...props} dispose={null}>

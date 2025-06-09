@@ -90,7 +90,7 @@ function Education({ isVisibleLight, pos }) {
       font={fontTitle}
       size={0.3}
       height={0.1}
-      colorPri={new THREE.Color(0xdddddd)}
+      colorPri={"white"}
       colorSec={new THREE.Color(0x333333)}
     />
   ), []);
@@ -123,7 +123,7 @@ function Education({ isVisibleLight, pos }) {
   return (
     <mesh className="EDUCATION" position={pos} visible={isVisibleLight(new THREE.Vector3(0, 5, pos[2]), 10)}>
       {TitleText}
-      {RectAreaLight}
+      {/* {RectAreaLight} */}
       {BachelorMesh}
       {MasterMesh}
     </mesh>

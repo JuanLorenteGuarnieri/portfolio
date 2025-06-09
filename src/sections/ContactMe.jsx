@@ -44,7 +44,7 @@ function ContactMe({
     <TextAdvance position={[0, 0, 0]}
       text={"CONTACT ME"}
       font={fontTitle} size={0.3} height={0.1}
-      colorPri={new THREE.Color(0xdddddd)} colorSec={new THREE.Color(0x333333)}
+      colorPri={"white"} colorSec={new THREE.Color(0x333333)}
     />
   ), []);
 
@@ -95,7 +95,8 @@ function ContactMe({
       text={feedback}
       font={fontText} size={0.16} height={0.05}
       colorPri={new THREE.Color(colorFeedback)} colorSec={new THREE.Color(0x223060)}
-    />
+    >
+    </TextAdvance>
   ), [feedback, colorFeedback]);
 
   const iphoneMesh = useMemo(() => (
@@ -109,7 +110,7 @@ function ContactMe({
 
   return (
     <mesh className="CONTACT ME" position={pos} visible={isVisibleLight(new THREE.Vector3(0, 5, pos[2]), 11)}>
-      {rectLight}
+      {/* {rectLight} */}
       {contactTitle}
       {nameMesh}
       {emailMesh}

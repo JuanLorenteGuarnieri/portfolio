@@ -5,16 +5,20 @@ import { Bvh } from '@react-three/drei';
 import { C } from '../../public/models/C';
 import { Helmet } from '../../public/models/Helmet';
 import { useMemo } from 'react';
+import { Doc } from '../../public/models/Doc';
+import { Github } from '../../public/models/Github';
+import { Image } from '../../public/models/Image';
+import { Docs } from '../../public/models/Docs';
 
 function MSOA({ isVisibleLight, pos, parentPos }) {
   const helmetMesh = useMemo(() => (
     <mesh className="MODEL" >
-      <pointLight
+      {/* <pointLight
         intensity={30}
         position={[-3.3, 1, 1.4]}
         distance={isVisibleLight(new THREE.Vector3(0, 5, pos[2] + parentPos[2] + 1.4), 7) ? 4 : 0.01}
         color={new THREE.Color(0x223060)}
-      />
+      /> */}
       <Bvh firstHitOnly>
         <Helmet position={[-3.2, 0.0, 1.5]} rotation={[0, Math.PI / 3, -Math.PI / 4.4]} />
       </Bvh>
@@ -79,18 +83,19 @@ function MSOA({ isVisibleLight, pos, parentPos }) {
   const links = useMemo(() => (
     <mesh className="LINKS" position={[0, 0, 2.3]}>
       <Bvh firstHitOnly>
-        {/* <Doc link='https://juanlorenteguarnieri.github.io/Spaceship-Controller/' scale={12} position={[0.7, -0.08, 0]} rotation={[0, 0, 0]} /> */}
-        {/* <Github link='https://github.com/JuanLorenteGuarnieri/CV_Course_assigment' scale={12} position={[0, -0.08, 0]} rotation={[0, 0, 0]} /> */}
+        <Image link='https://drive.google.com/drive/folders/1TSSObTZ0PYL8OEWN4-ffV9e57B1nJurX?usp=sharing' scale={7} position={[-0.7, -0.06, 0]} rotation={[0, 0, 0]} />
+        <Github link='https://github.com/hsunekichi/infGraf2' scale={12} position={[0, -0.07, 0]} rotation={[0, 0, 0]} />
+        <Docs link='https://JuanLorenteGuarnieri.github.io/portfolio/msoa_report.pdf' scale={15} position={[0.7, -0.09, 0]} rotation={[0, 0, 0]} />
       </Bvh>
     </mesh>
   ), []);
 
   return (
     <mesh className="Modeling and Simulation of Appearance" position={pos} visible={isVisibleLight(new THREE.Vector3(0, 5, pos[2] + parentPos[2]), 8)}>
-      {/* {helmetMesh} */}
+      {helmetMesh}
       {textLines}
       {cModel}
-      {cLight}
+      {/* {cLight} */}
       {links}
     </mesh>
   );

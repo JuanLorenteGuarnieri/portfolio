@@ -6,6 +6,9 @@ import { Github } from '../../public/models/Github';
 import { Python } from '../../public/models/Python';
 import { Nlos } from '../../public/models/Nlos';
 import { useMemo } from 'react';
+import { Doc } from '../../public/models/Doc';
+import { Docs } from '../../public/models/Docs';
+import { Matlab } from '../../public/models/Matlab';
 
 function CI({ isVisibleLight, pos, parentPos }) {
   // Memoized models
@@ -16,12 +19,16 @@ function CI({ isVisibleLight, pos, parentPos }) {
   ), []);
 
   const pythonModel = useMemo(() => (
-    <Python scale={18} position={[3, -0.02, 1.6]} rotation={[0, 0, 0]} />
+    <>
+      <Python scale={18} position={[3, -0.02, 1.6]} rotation={[0, 0, 0]} />
+      <Matlab scale={20} position={[4, -0.08, 1.58]} rotation={[0, 0, 0]} />
+    </>
   ), []);
 
   const githubLink = useMemo(() => (
     <Bvh firstHitOnly>
-      <Github link='https://github.com/JuanLorenteGuarnieri/CI' scale={12} position={[0, -0.08, 0]} rotation={[0, 0, 0]} />
+      <Github link='https://github.com/JuanLorenteGuarnieri/CI' scale={12} position={[0, -0.07, 0]} rotation={[0, 0, 0]} />
+      <Docs link='https://drive.google.com/drive/folders/1QhiTT7H6CbZmZbyhMNpNuPmOxMm6MEdE?usp=sharing' scale={15} position={[0.7, -0.09, 0]} rotation={[0, 0, 0]} />
     </Bvh>
   ), []);
 
@@ -70,8 +77,8 @@ function CI({ isVisibleLight, pos, parentPos }) {
   return (
     <mesh className="Computational Imaging" position={pos} visible={isVisibleLight(new THREE.Vector3(0, 5, pos[2] + parentPos[2]), 8)}>
       <mesh className="MODEL" >
-        {modelLight}
-        {/* {nlosModel} */}
+        {/* {modelLight} */}
+        {nlosModel}
       </mesh>
 
       {titleText}
@@ -80,7 +87,7 @@ function CI({ isVisibleLight, pos, parentPos }) {
       {descriptionText}
 
       {pythonModel}
-      {pythonLight}
+      {/* {pythonLight} */}
 
       <mesh className="LINKS" position={[0, 0, 2.3]}>
         {githubLink}

@@ -8,6 +8,9 @@ import { Opencv } from '../../public/models/Opencv';
 import { Python } from '../../public/models/Python';
 import { useLoader } from '@react-three/fiber';
 import { useMemo } from 'react';
+import { Doc } from '../../public/models/Doc';
+import { Docs } from '../../public/models/Docs';
+import { Slides } from '../../public/models/Slides';
 
 function Panorama({ isVisibleLight, pos, parentPos }) {
   const panoramaTexture = useLoader(TextureLoader, 'https://JuanLorenteGuarnieri.github.io/portfolio/panorama.png');
@@ -49,9 +52,11 @@ function Panorama({ isVisibleLight, pos, parentPos }) {
     <Opencv scale={20} position={[4, -0.02, 1.58]} rotation={[0, 0, 0]} />
   ), []);
 
-  const githubLink = useMemo(() => (
+  const Links = useMemo(() => (
     <Bvh firstHitOnly>
-      <Github link='https://github.com/JuanLorenteGuarnieri/practicas-vision-por-computador' scale={12} position={[0, -0.08, 0]} rotation={[0, 0, 0]} />
+      <Slides link='https://docs.google.com/presentation/d/1pAjQLrd5b9q-ryxu_RyFkuZBJdBS67Qy/edit?usp=sharing' scale={15} position={[-0.7, -0.09, 0]} rotation={[0, 0, 0]} />
+      <Github link='https://github.com/JuanLorenteGuarnieri/practicas-vision-por-computador' scale={12} position={[0, -0.07, 0]} rotation={[0, 0, 0]} />
+      <Docs link='https://drive.google.com/drive/folders/1NHQAsPHTBvrzUNYlLSwe9PhrYTbAy_fB?usp=sharing' scale={15} position={[0.7, -0.09, 0]} rotation={[0, 0, 0]} />
     </Bvh>
   ), []);
 
@@ -87,21 +92,21 @@ function Panorama({ isVisibleLight, pos, parentPos }) {
   return (
     <mesh className="Panoramas" position={pos} visible={isVisibleLight(new THREE.Vector3(0, 5, pos[2] + parentPos[2]), 8)}>
       <mesh className="MODEL" >
-        {mainLight}
-        {/* {planeComponent} */}
+        {/* {mainLight} */}
+        {planeComponent}
       </mesh>
 
       {titleTexts}
       {descriptionText}
 
       {pythonIcon}
-      {pythonLight}
+      {/* {pythonLight} */}
 
       {opencvIcon}
-      {opencvLight}
+      {/* {opencvLight} */}
 
       <mesh className="LINKS" position={[0, 0, 2.3]}>
-        {githubLink}
+        {Links}
       </mesh>
     </mesh>
   );

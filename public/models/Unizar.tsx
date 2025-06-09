@@ -4,6 +4,7 @@ import { useGLTF } from '@react-three/drei'
 import { GLTF } from 'three-stdlib'
 import { Group } from 'three';
 import { ThreeEvent } from '@react-three/fiber';
+import { useSharedMat } from '../../src/components/sharedMaterial';
 
 type GLTFResult = GLTF & {
   nodes: {
@@ -24,8 +25,9 @@ type Props = JSX.IntrinsicElements['group'] & {
 
 export const Unizar = forwardRef<Group, Props>(({ link = 'https://www.unizar.es/', ...props }, ref) => {
   const [isHovered, setIsHovered] = useState(false);
-  const { nodes, materials } = useGLTF('models/unizar.glb') as GLTFResult
+  const { nodes } = useGLTF('models/unizar.glb') as GLTFResult
   const hoverCount = useRef(0);
+  const sharedMaterial = useSharedMat()
 
   const handlePointerEnter = (event: ThreeEvent<PointerEvent>) => {
     event.stopPropagation();
@@ -44,12 +46,14 @@ export const Unizar = forwardRef<Group, Props>(({ link = 'https://www.unizar.es/
   const meshProps = useMemo(() => ({
     castShadow: true,
     receiveShadow: true,
-    material: materials['SVGMat.022'],
+    material: sharedMaterial,
+    // material: materials['SVGMat.022'],
     position: isHovered ? ([-0.027, 0, 0.036] as [number, number, number]) : ([-0.025, 0, 0.033] as [number, number, number]),
     scale: isHovered ? (1.1 as number) : (1 as number),
     onPointerEnter: handlePointerEnter,
     onPointerLeave: handlePointerLeave,
-  }), [isHovered, materials]);
+  }), [isHovered]);
+  // }), [isHovered, materials]);
 
   const meshes = useMemo(() => [
     <mesh key="path102" geometry={nodes.path102.geometry} {...meshProps} />,

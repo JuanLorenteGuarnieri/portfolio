@@ -3,6 +3,7 @@ import React, { useRef, forwardRef, useState, useMemo } from 'react'
 import { useGLTF } from '@react-three/drei'
 import { GLTF } from 'three-stdlib'
 import { Group } from 'three';
+import { useSharedMat } from '../../src/components/sharedMaterial';
 
 type GLTFResult = GLTF & {
   nodes: {
@@ -44,17 +45,18 @@ const GithubMesh = React.memo(function GithubMesh({
 
 export const Github = forwardRef<Group, Props>(({ link = 'https://github.com/JuanLorenteGuarnieri', ...props }, ref) => {
   const [isHovered, setIsHovered] = useState(false);
-  const { nodes, materials } = useGLTF('models/github.glb') as GLTFResult
+  const { nodes } = useGLTF('models/github.glb') as GLTFResult
+  const sharedMaterial = useSharedMat()
 
   // Memoriza el componente mesh para evitar recreaciones innecesarias
   const meshComponent = useMemo(() => (
     <GithubMesh
       geometry={nodes.Curve002.geometry}
-      material={materials.Mat}
+      material={sharedMaterial}
       isHovered={isHovered}
       setIsHovered={setIsHovered}
     />
-  ), [nodes.Curve002.geometry, materials.Mat, isHovered, setIsHovered]);
+  ), [nodes.Curve002.geometry, isHovered, setIsHovered]);
 
   return (
     <group

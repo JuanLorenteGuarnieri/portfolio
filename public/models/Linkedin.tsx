@@ -4,6 +4,7 @@ import { useGLTF } from '@react-three/drei'
 import { GLTF } from 'three-stdlib'
 import { Group } from 'three';
 import { ThreeEvent } from '@react-three/fiber';
+import { useSharedMat } from '../../src/components/sharedMaterial';
 
 type GLTFResult = GLTF & {
   nodes: {
@@ -22,8 +23,9 @@ type Props = JSX.IntrinsicElements['group'] & {
 
 export const Linkedin = forwardRef<Group, Props>(({ link = 'https://www.linkedin.com/in/juanlorenteguarnieri/en/', ...props }, ref) => {
   const [isHovered, setIsHovered] = useState(false);
-  const { nodes, materials } = useGLTF('models/linkedin.glb') as GLTFResult
+  const { nodes } = useGLTF('models/linkedin.glb') as GLTFResult
   const hoverCount = useRef(0);
+  const sharedMaterial = useSharedMat()
 
   const handlePointerEnter = (event: ThreeEvent<PointerEvent>) => {
     event.stopPropagation();
@@ -43,7 +45,7 @@ export const Linkedin = forwardRef<Group, Props>(({ link = 'https://www.linkedin
     const meshProps = {
       castShadow: true,
       receiveShadow: true,
-      material: materials.Mat,
+      material: sharedMaterial,
       position: isHovered ? [-0.012, 0, 0.0115] as [number, number, number] : [-0.012, 0, 0.01] as [number, number, number],
       scale: isHovered ? [0.122, 0.122, 0.122] as [number, number, number] : [0.112, 0.112, 0.112] as [number, number, number],
       onPointerEnter: handlePointerEnter,
@@ -56,7 +58,7 @@ export const Linkedin = forwardRef<Group, Props>(({ link = 'https://www.linkedin
       <mesh key="mesh3" geometry={nodes.XMLID_804_.geometry} {...meshProps} />,
     ];
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isHovered, nodes, materials]);
+  }, [isHovered, nodes]);
 
   return (
     <group

@@ -8,6 +8,7 @@ import React, { useRef, forwardRef, useImperativeHandle, useEffect, useMemo } fr
 import { useGLTF } from '@react-three/drei'
 import { GLTF } from 'three-stdlib'
 import { Group } from 'three';
+import { useFrame, useThree } from '@react-three/fiber';
 
 type GLTFResult = GLTF & {
   nodes: {
@@ -194,29 +195,71 @@ type GLTFResult = GLTF & {
 type ContextType = Record<string, React.ForwardRefExoticComponent<JSX.IntrinsicElements['mesh']>>
 
 type RobotProps = JSX.IntrinsicElements['group'] & {
-  // Aquí puedes añadir cualquier otra prop personalizada si es necesario
+  parentPos: [number, number, number]
 };
 
-export const Robot = forwardRef<Group, RobotProps>((props, ref) => {
+export const Robot = forwardRef<Group, RobotProps>(({ parentPos, ...props }, ref) => {
   const groupRef = useRef<Group>(null);
   const rightWheelRef = useRef<Group>(null);
   const leftWheelRef = useRef<Group>(null);
   const basketRef = useRef<Group>(null);
   const { nodes, materials } = useGLTF('models/robot.glb') as GLTFResult;
-
-  // // Exponer las referencias internas al ref externo
-  // useImperativeHandle(ref, () => ({
-  //   robot: groupRef.current,
-  //   rightWheel: rightWheelRef.current,
-  //   leftWheel: leftWheelRef.current,
-  //   basket: basketRef.current
-  // }), []);
+  materials.Red.emissive = materials.Red.color;
 
   useEffect(() => {
-    if (basketRef.current) {
-      basketRef.current.rotation.x = Math.PI;
+    if ('Red' in materials) {
+      const red = materials.Red as THREE.MeshStandardMaterial;
+      red.emissive = red.color.clone(); // importante usar clone()
     }
-  }, [basketRef.current]);
+  }, [materials]);
+
+  const cursorRef = useRef<THREE.Object3D | null>(null);
+  const { scene } = useThree();
+
+  // Buscar la luz una sola vez y guardarla en cursorRef
+  useEffect(() => {
+    const found = scene.getObjectByName("cursor");
+    if (found) {
+      cursorRef.current = found;
+    } else {
+      console.warn('Luz "cursor" no encontrada en la escena.');
+    }
+  }, [scene]);
+
+  // Animación por frame
+  useFrame(() => {
+    if (!basketRef.current || !groupRef.current || !cursorRef.current) return;
+
+    const basketPos = basketRef.current.position;
+    const basketScale = basketRef.current.scale;
+    const cursorPos = cursorRef.current.position;
+    const groupPos = groupRef.current.position;
+    const groupScale = groupRef.current.scale;
+
+    const distanceZ = Math.abs(parentPos[2] + groupPos.z + (basketPos.z * groupScale.z / basketScale.z) - cursorPos.z);
+    const distanceX = Math.abs(groupPos.x + (basketPos.x * groupScale.x / basketScale.x) - cursorPos.x + 0.3);
+
+    const isClose = distanceZ < 0.5 && distanceX < 0.5;
+    const targetRotationX = isClose ? Math.PI : Math.PI / 2;
+
+    basketRef.current.rotation.x = THREE.MathUtils.lerp(
+      basketRef.current.rotation.x,
+      targetRotationX,
+      0.1 // velocidad de interpolación
+    );
+
+    // Normalizar rotación entre Math.PI/2 (0) y Math.PI (1)
+    const rot = basketRef.current.rotation.x;
+    const intensity = THREE.MathUtils.clamp(
+      (rot - Math.PI / 2) / (Math.PI - Math.PI / 2),
+      0,
+      1
+    );
+
+    // Aplicar intensidad
+    materials.Red.emissiveIntensity = intensity;
+  });
+
 
   // Definir los componentes de grupo fuera del return usando useMemo
   const basketGroup = useMemo(() => (
@@ -237,8 +280,8 @@ export const Robot = forwardRef<Group, RobotProps>((props, ref) => {
       <mesh castShadow receiveShadow geometry={nodes.brick_7001.geometry} material={materials.Grey} position={[6.212, 0.005, -4.74]} rotation={[-Math.PI / 2, 0, -Math.PI / 2]} scale={0.118} />
       <mesh castShadow receiveShadow geometry={nodes.brick_7002.geometry} material={materials.Grey} position={[-6.141, 1.137, -8.52]} rotation={[-Math.PI / 2, 0, -Math.PI / 2]} scale={0.118} />
       <mesh castShadow receiveShadow geometry={nodes.brick_7003.geometry} material={materials.Grey} position={[6.212, 1.137, -8.52]} rotation={[-Math.PI / 2, 0, -Math.PI / 2]} scale={0.118} />
-      <mesh castShadow receiveShadow geometry={nodes.pin_sphere.geometry} material={materials.Black} position={[-1.83, 0.564, -11.354]} rotation={[2.361, -0.099, 0.099]} scale={-0.118} />
-      <mesh castShadow receiveShadow geometry={nodes.pin_sphere001.geometry} material={materials.Black} position={[1.852, 0.564, -11.354]} rotation={[2.361, -0.099, 0.099]} scale={-0.118} />
+      {/* <mesh castShadow receiveShadow geometry={nodes.pin_sphere.geometry} material={materials.Black} position={[-1.83, 0.564, -11.354]} rotation={[2.361, -0.099, 0.099]} scale={-0.118} /> */}
+      {/* <mesh castShadow receiveShadow geometry={nodes.pin_sphere001.geometry} material={materials.Black} position={[1.852, 0.564, -11.354]} rotation={[2.361, -0.099, 0.099]} scale={-0.118} /> */}
       <mesh castShadow receiveShadow geometry={nodes.axel.geometry} material={materials.Black} position={[0.035, -0.007, 0.001]} rotation={[Math.PI, 0, 0]} scale={0.118} />
       <mesh castShadow receiveShadow geometry={nodes.axel_2.geometry} material={materials.Grey} position={[6.179, -0.006, 0.001]} rotation={[Math.PI, 0, 0]} scale={0.118} />
       <mesh castShadow receiveShadow geometry={nodes.axel_3.geometry} material={materials.Grey} position={[-6.124, -0.006, 0.001]} rotation={[Math.PI, 0, 0]} scale={0.118} />
@@ -252,7 +295,7 @@ export const Robot = forwardRef<Group, RobotProps>((props, ref) => {
       <mesh castShadow receiveShadow geometry={nodes['32269_Black_Technic_Gear_20_Tooth_Double_Bevel001'].geometry} material={materials.Grey} position={[4.372, -0.039, -0.03]} rotation={[0, 0, -Math.PI]} scale={0.118} />
       <mesh castShadow receiveShadow geometry={nodes['3650_Black_Technic_Gear_24_Tooth_Crown_Type_III_(x_pattern)001'].geometry} material={materials.Grey} position={[1.663, -0.02, -0.02]} rotation={[Math.PI, Math.PI / 2, 0]} scale={0.118} />
       <mesh castShadow receiveShadow geometry={nodes.axel001.geometry} material={materials.Grey} position={[1.432, -0.005, -0.029]} rotation={[0, 0, -Math.PI]} scale={0.118} />
-      <mesh castShadow receiveShadow geometry={nodes.motor001.geometry} material={materials.Red} rotation={[-1.571, 0, 0]} scale={0.118} />
+      <mesh castShadow receiveShadow geometry={nodes.motor001.geometry} material={materials.Orange} rotation={[-1.571, 0, 0]} scale={0.118} />
       <mesh castShadow receiveShadow geometry={nodes.wheel004.geometry} material={materials.Neumatic} position={[3.301, -0.009, -0.023]} scale={0.118} />
       <mesh castShadow receiveShadow geometry={nodes.wheel005.geometry} material={materials.Grey} position={[3.325, -0.005, 0.032]} scale={0.118} />
     </group>
@@ -263,7 +306,7 @@ export const Robot = forwardRef<Group, RobotProps>((props, ref) => {
       <mesh castShadow receiveShadow geometry={nodes['32269_Black_Technic_Gear_20_Tooth_Double_Bevel'].geometry} material={materials.Grey} position={[-4.39, -0.039, 0.002]} rotation={[Math.PI, 0, 0]} scale={0.118} />
       <mesh castShadow receiveShadow geometry={nodes['3650_Black_Technic_Gear_24_Tooth_Crown_Type_III_(x_pattern)'].geometry} material={materials.Grey} position={[-1.681, -0.02, -0.008]} rotation={[Math.PI, -Math.PI / 2, 0]} scale={0.118} />
       <mesh castShadow receiveShadow geometry={nodes.axel002.geometry} material={materials.Grey} position={[-1.45, -0.005, 0.001]} rotation={[Math.PI, 0, 0]} scale={0.118} />
-      <mesh castShadow receiveShadow geometry={nodes.motor002.geometry} material={materials.Red} rotation={[-1.571, 0, 0]} scale={0.118} />
+      <mesh castShadow receiveShadow geometry={nodes.motor002.geometry} material={materials.Orange} rotation={[-1.571, 0, 0]} scale={0.118} />
       <mesh castShadow receiveShadow geometry={nodes.wheel.geometry} material={materials.Grey} position={[-3.32, -0.01, 0.005]} rotation={[Math.PI, 0, Math.PI]} scale={0.118} />
       <mesh castShadow receiveShadow geometry={nodes.wheel001.geometry} material={materials.Neumatic} position={[-3.32, -0.01, 0.005]} rotation={[Math.PI, 0, Math.PI]} scale={0.118} />
     </group>
@@ -303,7 +346,7 @@ export const Robot = forwardRef<Group, RobotProps>((props, ref) => {
       {rightWheelGroup}
       {headGroup}
       {/* El resto de la estructura permanece igual */}
-      <mesh castShadow receiveShadow geometry={nodes.pin_2_one_side003.geometry} material={materials.Grey} position={[16.103, 102.398, 17.842]} rotation={[2.349, -0.093, 0.099]} />
+      {/* <mesh castShadow receiveShadow geometry={nodes.pin_2_one_side003.geometry} material={materials.Grey} position={[16.103, 102.398, 17.842]} rotation={[2.349, -0.093, 0.099]} /> */}
       <mesh castShadow receiveShadow geometry={nodes.BrickPi3.geometry} material={materials.Grey} position={[0, 111.451, -57.635]} scale={[34.5, 31.75, 47.6]} />
       <mesh castShadow receiveShadow geometry={nodes.servo_motor.geometry} material={materials.White} position={[0, 45.411, -11.628]} rotation={[Math.PI / 2, 0, 0]} />
       <mesh castShadow receiveShadow geometry={nodes.motor.geometry} material={materials.Grey} position={[31.903, 44.646, -52.354]} rotation={[Math.PI / 2, 0, 0]} />
@@ -328,8 +371,8 @@ export const Robot = forwardRef<Group, RobotProps>((props, ref) => {
       <mesh castShadow receiveShadow geometry={nodes.lift_arm_7.geometry} material={materials.Dark_grey} position={[-32.665, 59.459, 9.097]} rotation={[0, 0, Math.PI]} />
       <mesh castShadow receiveShadow geometry={nodes.lift_arm_7001.geometry} material={materials.Dark_grey} position={[32.665, 59.459, 9.097]} />
       <mesh castShadow receiveShadow geometry={nodes.lift_arm_7002.geometry} material={materials.Dark_grey} position={[6.65, 91.827, 25.184]} rotation={[0, Math.PI / 2, 0]} />
-      <mesh castShadow receiveShadow geometry={nodes.pin_2_double.geometry} material={materials.Black} position={[-32.081, 83.807, 37.97]} rotation={[-Math.PI / 2, Math.PI / 2, 0]} />
-      <mesh castShadow receiveShadow geometry={nodes.pin_2_double001.geometry} material={materials.Black} position={[32.081, 83.807, 37.97]} rotation={[-Math.PI / 2, Math.PI / 2, 0]} />
+      {/* <mesh castShadow receiveShadow geometry={nodes.pin_2_double.geometry} material={materials.Black} position={[-32.081, 83.807, 37.97]} rotation={[-Math.PI / 2, Math.PI / 2, 0]} /> */}
+      {/* <mesh castShadow receiveShadow geometry={nodes.pin_2_double001.geometry} material={materials.Black} position={[32.081, 83.807, 37.97]} rotation={[-Math.PI / 2, Math.PI / 2, 0]} /> */}
       <mesh castShadow receiveShadow geometry={nodes.beam_3008.geometry} material={materials.Dark_grey} position={[16.28, 83.877, -5.635]} rotation={[0, Math.PI / 2, 0]} />
       <mesh castShadow receiveShadow geometry={nodes.beam_5002.geometry} material={materials.Dark_grey} position={[-32.081, 83.807, 10.289]} />
       <mesh castShadow receiveShadow geometry={nodes.beam_9001.geometry} material={materials.Dark_grey} position={[-32.081, 75.756, 10.383]} />
@@ -345,17 +388,17 @@ export const Robot = forwardRef<Group, RobotProps>((props, ref) => {
       <mesh castShadow receiveShadow geometry={nodes.axels003.geometry} material={materials.Black} position={[-39.986, 132.462, -3.472]} rotation={[0, Math.PI / 2, 0]} />
       <mesh castShadow receiveShadow geometry={nodes.beam_3_cross005.geometry} material={materials.Dark_grey} position={[-31.465, 132.462, 17.851]} rotation={[Math.PI / 2, 0, Math.PI]} />
       <mesh castShadow receiveShadow geometry={nodes.beam_3_cross006.geometry} material={materials.Dark_grey} position={[-48.204, 132.462, 2.5]} rotation={[Math.PI / 2, 0, 0]} />
-      <mesh castShadow receiveShadow geometry={nodes.pin_2_double002.geometry} material={materials.Black} position={[-39.986, 132.462, -21.243]} rotation={[Math.PI, 0, Math.PI]} />
+      {/* <mesh castShadow receiveShadow geometry={nodes.pin_2_double002.geometry} material={materials.Black} position={[-39.986, 132.462, -21.243]} rotation={[Math.PI, 0, Math.PI]} /> */}
       <mesh castShadow receiveShadow geometry={nodes.axel_2004.geometry} material={materials.Grey} position={[-32.253, 99.872, 2.136]} rotation={[0, 0, -Math.PI / 2]} />
       <mesh castShadow receiveShadow geometry={nodes.axel_2005.geometry} material={materials.Grey} position={[32.253, 99.872, 2.136]} rotation={[0, 0, -Math.PI / 2]} />
       <mesh castShadow receiveShadow geometry={nodes.beam_5004.geometry} material={materials.Dark_grey} position={[-39.853, 124.519, 2.5]} rotation={[0, Math.PI / 2, 0]} />
       <mesh castShadow receiveShadow geometry={nodes.beam_9005.geometry} material={materials.Dark_grey} position={[0, 115.932, 2.262]} rotation={[0, Math.PI / 2, 0]} />
-      <mesh castShadow receiveShadow geometry={nodes.pin_2_one_side001.geometry} material={materials.Black} position={[32.23, 86.344, 2.452]} rotation={[2.349, -0.093, 0.099]} />
-      <mesh castShadow receiveShadow geometry={nodes.pin_2_one_side002.geometry} material={materials.Black} position={[16.103, 113.091, 17.842]} rotation={[-2.348, 0.1, -3.05]} />
-      <mesh castShadow receiveShadow geometry={nodes.pin_2_one_side004.geometry} material={materials.Black} position={[32.23, 113.091, 2.2]} rotation={[-2.348, 0.1, -3.05]} />
-      <mesh castShadow receiveShadow geometry={nodes.pin_2_one_side005.geometry} material={materials.Black} position={[-31.871, 113.368, 2.2]} rotation={[-2.348, 0.1, -3.05]} />
-      <mesh castShadow receiveShadow geometry={nodes.pin_2_one_side006.geometry} material={materials.Black} position={[-32.121, 86.388, 2.083]} rotation={[2.349, -0.093, 0.099]} />
-      <mesh castShadow receiveShadow geometry={nodes.pin_sets001.geometry} material={materials.Grey} position={[-23.885, 124.074, 18.065]} rotation={[-0.794, -0.1, 0.091]} />
+      {/* <mesh castShadow receiveShadow geometry={nodes.pin_2_one_side001.geometry} material={materials.Black} position={[32.23, 86.344, 2.452]} rotation={[2.349, -0.093, 0.099]} /> */}
+      {/* <mesh castShadow receiveShadow geometry={nodes.pin_2_one_side002.geometry} material={materials.Black} position={[16.103, 113.091, 17.842]} rotation={[-2.348, 0.1, -3.05]} /> */}
+      {/* <mesh castShadow receiveShadow geometry={nodes.pin_2_one_side004.geometry} material={materials.Black} position={[32.23, 113.091, 2.2]} rotation={[-2.348, 0.1, -3.05]} /> */}
+      {/* <mesh castShadow receiveShadow geometry={nodes.pin_2_one_side005.geometry} material={materials.Black} position={[-31.871, 113.368, 2.2]} rotation={[-2.348, 0.1, -3.05]} /> */}
+      {/* <mesh castShadow receiveShadow geometry={nodes.pin_2_one_side006.geometry} material={materials.Black} position={[-32.121, 86.388, 2.083]} rotation={[2.349, -0.093, 0.099]} /> */}
+      {/* <mesh castShadow receiveShadow geometry={nodes.pin_sets001.geometry} material={materials.Grey} position={[-23.885, 124.074, 18.065]} rotation={[-0.794, -0.1, 0.091]} /> */}
       <mesh castShadow receiveShadow geometry={nodes.gyro.geometry} material={materials.White} position={[0, 140.139, 9.53]} rotation={[Math.PI / 2, 0, Math.PI]} />
       <mesh castShadow receiveShadow geometry={nodes.gyro001.geometry} material={materials.Red} position={[0, 140.139, 9.53]} rotation={[Math.PI / 2, 0, Math.PI]} />
       <mesh castShadow receiveShadow geometry={nodes.gyro002.geometry} material={materials.Grey} position={[0, 140.139, 9.53]} rotation={[Math.PI / 2, 0, Math.PI]} />
@@ -382,12 +425,12 @@ export const Robot = forwardRef<Group, RobotProps>((props, ref) => {
       <mesh castShadow receiveShadow geometry={nodes.lift_arm_5001.geometry} material={materials.Dark_grey} position={[-11.342, 75.756, -96.663]} />
       <mesh castShadow receiveShadow geometry={nodes.lift_arm_big.geometry} material={materials.Dark_grey} position={[-47.815, 27.958, -61.441]} rotation={[Math.PI, 0, Math.PI / 2]} />
       <mesh castShadow receiveShadow geometry={nodes.lift_arm_big001.geometry} material={materials.Dark_grey} position={[47.815, 27.958, -61.441]} rotation={[Math.PI, 0, Math.PI / 2]} />
-      <mesh castShadow receiveShadow geometry={nodes.pin_3_double.geometry} material={materials.Grey} position={[8.706, 179.798, -109.742]} />
-      <mesh castShadow receiveShadow geometry={nodes.pin_3_double001.geometry} material={materials.Grey} position={[-8.706, 172.02, -109.742]} />
-      <mesh castShadow receiveShadow geometry={nodes.pin_3_double002.geometry} material={materials.Grey} position={[26.232, 171.915, -109.742]} />
+      {/* <mesh castShadow receiveShadow geometry={nodes.pin_3_double.geometry} material={materials.Grey} position={[8.706, 179.798, -109.742]} /> */}
+      {/* <mesh castShadow receiveShadow geometry={nodes.pin_3_double001.geometry} material={materials.Grey} position={[-8.706, 172.02, -109.742]} /> */}
+      {/* <mesh castShadow receiveShadow geometry={nodes.pin_3_double002.geometry} material={materials.Grey} position={[26.232, 171.915, -109.742]} /> */}
       <mesh castShadow receiveShadow geometry={nodes.beam_7001.geometry} material={materials.Dark_grey} position={[0, 28.184, -101.838]} rotation={[-Math.PI / 2, Math.PI / 2, 0]} />
       <mesh castShadow receiveShadow geometry={nodes.Object291.geometry} material={materials.Grey} position={[34.032, 167.458, -105.96]} rotation={[-Math.PI / 2, 0, 0]} scale={0.4} />
-      <mesh castShadow receiveShadow geometry={nodes.pin_2_one_side.geometry} material={materials.Black} position={[-18.636, 172.02, -109.742]} rotation={[3.003, 0.794, -1.377]} />
+      {/* <mesh castShadow receiveShadow geometry={nodes.pin_2_one_side.geometry} material={materials.Black} position={[-18.636, 172.02, -109.742]} rotation={[3.003, 0.794, -1.377]} /> */}
       <mesh castShadow receiveShadow geometry={nodes.light.geometry} material={materials.Grey} position={[55.744, 63.751, -106.154]} rotation={[0, 0, Math.PI]} />
       <mesh castShadow receiveShadow geometry={nodes.light001.geometry} material={materials.White} position={[55.744, 63.751, -106.154]} rotation={[0, 0, Math.PI]} />
       <mesh castShadow receiveShadow geometry={nodes.light002.geometry} material={materials.Orange} position={[55.744, 63.751, -106.154]} rotation={[0, 0, Math.PI]} />
@@ -401,15 +444,15 @@ export const Robot = forwardRef<Group, RobotProps>((props, ref) => {
       <mesh castShadow receiveShadow geometry={nodes.lift_arm_4.geometry} material={materials.Dark_grey} position={[-30.04, 155.937, -30.647]} rotation={[0, -Math.PI / 2, 0]} />
       <mesh castShadow receiveShadow geometry={nodes.Object001.geometry} material={materials.Grey} position={[-11.816, 151.483, -21.243]} rotation={[Math.PI, -Math.PI / 2, 0]} scale={0.4} />
       <mesh castShadow receiveShadow geometry={nodes.Object002.geometry} material={materials.Grey} position={[-8.11, 160.171, -9.489]} scale={0.4} />
-      <mesh castShadow receiveShadow geometry={nodes.pin_3_double003.geometry} material={materials.Grey} position={[-16.175, 147.885, -29.269]} rotation={[0, 0, -Math.PI / 2]} />
+      {/* <mesh castShadow receiveShadow geometry={nodes.pin_3_double003.geometry} material={materials.Grey} position={[-16.175, 147.885, -29.269]} rotation={[0, 0, -Math.PI / 2]} /> */}
       <mesh castShadow receiveShadow geometry={nodes.Object003.geometry} material={materials.Grey} position={[43.016, 131.923, -33.392]} rotation={[-Math.PI / 2, Math.PI / 2, 0]} scale={0.4} />
-      <mesh castShadow receiveShadow geometry={nodes.pin_3_double004.geometry} material={materials.Grey} position={[39.325, 139.872, -29.16]} rotation={[-Math.PI / 2, Math.PI / 2, 0]} />
+      {/* <mesh castShadow receiveShadow geometry={nodes.pin_3_double004.geometry} material={materials.Grey} position={[39.325, 139.872, -29.16]} rotation={[-Math.PI / 2, Math.PI / 2, 0]} /> */}
       <mesh castShadow receiveShadow geometry={nodes.beam_3_double002.geometry} material={materials.Black} position={[39.224, 147.845, -21.11]} rotation={[Math.PI / 2, 0, 0]} />
       <mesh castShadow receiveShadow geometry={nodes.beam_3_double003.geometry} material={materials.Black} position={[39.224, 147.845, -37.088]} rotation={[Math.PI / 2, 0, 0]} />
       <mesh castShadow receiveShadow geometry={nodes.axel_2001.geometry} material={materials.Grey} position={[47.283, 147.856, -29.114]} rotation={[0, Math.PI / 2, 0]} />
       <mesh castShadow receiveShadow geometry={nodes.axels002.geometry} material={materials.Black} position={[31.129, 17.869, -10.158]} rotation={[0, Math.PI / 2, 0]} />
-      <mesh castShadow receiveShadow geometry={nodes.pin_connectors001.geometry} material={materials.Grey} position={[31.129, 154.632, -52.587]} rotation={[Math.PI / 2, -Math.PI / 2, 0]} />
-      <mesh castShadow receiveShadow geometry={nodes.pin_connectors002.geometry} material={materials.Grey} position={[31.129, 154.632, -69.582]} rotation={[-Math.PI / 2, Math.PI / 2, 0]} />
+      {/* <mesh castShadow receiveShadow geometry={nodes.pin_connectors001.geometry} material={materials.Grey} position={[31.129, 154.632, -52.587]} rotation={[Math.PI / 2, -Math.PI / 2, 0]} /> */}
+      {/* <mesh castShadow receiveShadow geometry={nodes.pin_connectors002.geometry} material={materials.Grey} position={[31.129, 154.632, -69.582]} rotation={[-Math.PI / 2, Math.PI / 2, 0]} /> */}
       <mesh castShadow receiveShadow geometry={nodes.ultrasonic.geometry} material={materials.White} position={[-24.122, 171.81, 8.424]} rotation={[Math.PI / 2, Math.PI / 2, 0]} />
       <mesh castShadow receiveShadow geometry={nodes.ultrasonic001.geometry} material={materials.Red} position={[-24.122, 171.81, 8.424]} rotation={[Math.PI / 2, Math.PI / 2, 0]} />
       <mesh castShadow receiveShadow geometry={nodes.ultrasonic002.geometry} material={materials.Black} position={[-24.122, 171.81, 8.424]} rotation={[Math.PI / 2, Math.PI / 2, 0]} />

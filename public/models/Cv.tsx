@@ -3,6 +3,7 @@ import React, { useRef, forwardRef, useState, useMemo } from 'react'
 import { useGLTF } from '@react-three/drei'
 import { GLTF } from 'three-stdlib'
 import { Group } from 'three';
+import { useSharedMat } from '../../src/components/sharedMaterial';
 
 type GLTFResult = GLTF & {
   nodes: {
@@ -47,7 +48,8 @@ const MeshComponent = ({
 
 export const CV = forwardRef<Group, Props>(({ link = 'https://juanlorenteguarnieri.github.io/portfolio/CV.pdf', ...props }, ref) => {
   const [isHovered, setIsHovered] = useState(false);
-  const { nodes, materials } = useGLTF('models/cv.glb') as GLTFResult
+  const { nodes } = useGLTF('models/cv.glb') as GLTFResult
+  const sharedMaterial = useSharedMat()
 
   const meshProps = useMemo(() => ({
     position: isHovered ? [-0.06, 0, 0.039] as [number, number, number] : [-0.054, 0, 0.036] as [number, number, number],
@@ -60,16 +62,16 @@ export const CV = forwardRef<Group, Props>(({ link = 'https://juanlorenteguarnie
     <MeshComponent
       key="Curve006"
       geometry={nodes.Curve006.geometry}
-      material={materials.Mat}
+      material={sharedMaterial}
       {...meshProps}
     />,
     <MeshComponent
       key="Curve007"
       geometry={nodes.Curve007.geometry}
-      material={materials.Mat}
+      material={sharedMaterial}
       {...meshProps}
     />
-  ], [nodes, materials, meshProps]);
+  ], [nodes, meshProps]);
 
   return (
     <group

@@ -18,7 +18,7 @@ const Navigation = React.memo(({ action, action2, cond, scrollValue, secPos }) =
   );
 
   useEffect(() => {
-    if (progress >= 100 && !isLoaded) {
+    if (progress >= 90 && !isLoaded) {
       setIsLoaded(true);
       action2();
     }
@@ -180,7 +180,7 @@ const Navigations = ({ action, scrollValue, sections }) => {
   }
 
   return (
-    <nav id="menuBar" className="fadeIn fixed top-0 left-0 z-10 h-55 md:h-45 lg:h-35 xl:h-25 fadeIn">
+    <nav id="menuBar" className="fadeIn fixed top-0 left-0 z-10 h-55 md:h-45 lg:h-35 xl:h-25">
       <ul className="list-none justify-between items-center">
         {menuItems.map((item, idx) => (
           <li key={item.key} onClick={(e) => changeScroll(item.value + (idx === 0 ? 0 : idx === 5 ? 600 : 700), e)}>

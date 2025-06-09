@@ -1,3 +1,33 @@
+/* Contenedor desplazable sin mostrar scroll */
+.container {
+  overflow-y: auto;
+  /* o scroll para siempre mostrar scroll funcional */
+  -ms-overflow-style: none;
+  /* Oculta scroll en IE/Edge antiguos */
+  scrollbar-width: none;
+  /* Oculta scroll en Firefox */
+}
+
+.container::-webkit-scrollbar {
+  display: none;
+  /* Oculta scroll en Chrome, Safari, Opera (basados en WebKit/Blink) */
+}
+
+/* Ocultar scroll en toda la página */
+html,
+body {
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE/Edge legacy */
+}
+
+body::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari, Opera */
+}
+
+
 body {
   background-color: #000000;
   color: #dce0e6;
@@ -25,18 +55,18 @@ body::-webkit-scrollbar {
 .logo {
   will-change: filter;
   /* Aplicar la animación */
-  animation: filterAnimation 1s ease-in-out infinite;
+  animation: filterAnimation 0s ease-in-out infinite;
 }
 
 .logo2 {
   will-change: filter;
-  animation: filterAnimation 1s ease-in-out infinite;
+  animation: filterAnimation 0s ease-in-out infinite;
 }
 
 /* Media query para pantallas pequeñas */
-@media (max-width: 600px) {
+@media () {
   .logo2 {
-    animation: filterAnimationSmall 1s ease-in-out infinite;
+    animation: filterAnimationSmall 0s ease-in-out infinite;
   }
 }
 
@@ -49,7 +79,6 @@ body::-webkit-scrollbar {
 
   50% {
     filter: drop-shadow(0 0 20% #50a8ff);
-    /* Tamaño de sombra más pequeño para pantallas pequeñas */
   }
 }
 
@@ -83,7 +112,7 @@ body::-webkit-scrollbar {
   height: 15px;
   border-radius: 20px;
   background: #1775bd;
-  animation: loading 2s forwards cubic-bezier(0, 0, 0, 0);
+  animation: loading 0s forwards cubic-bezier(0, 0, 0, 0);
 }
 
 nav {
@@ -182,15 +211,24 @@ nav.active ul li a:hover span {
 }
 
 .fadeIn {
-  animation: fadeIn 5s ease-in-out;
+  animation: fadeIn 3s ease-in-out;
 }
 
-@keyframes fadeIn1 {
+
+@keyframes fadeLogo {
   0% {
+    opacity: 1;
+  }
+
+  40% {
+    opacity: 1;
+  }
+
+  50% {
     opacity: 0;
   }
 
-  10% {
+  60% {
     opacity: 0;
   }
 
@@ -199,23 +237,8 @@ nav.active ul li a:hover span {
   }
 }
 
-.fadeIn1 {
-  animation: fadeIn1 2s ease-in-out;
-}
-
-@keyframes fadeOutIn {
-
-  0% {
-    opacity: 0;
-  }
-
-  100% {
-    opacity: 1;
-  }
-}
-
-.fadeOutIn {
-  animation: fadeOutIn 8s ease-in-out;
+.fadeLogo {
+  animation: fadeLogo 15s ease-in;
 }
 
 @keyframes rotate {

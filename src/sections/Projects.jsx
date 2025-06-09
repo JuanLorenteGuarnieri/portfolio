@@ -31,19 +31,43 @@ function Projects({ isVisibleLight, pos }) {
   const margin = 2.4; // Margin between projects
 
   // PROJECTS POSITIONS
-  const positions = useMemo(() => [
-    [0, 0, margin * 0],
-    [0, 0, margin * 1],
-    [0, 0, margin * 2],
-    [0, 0, margin * 3],
-    [0, 0, margin * 4],
-    [0, 0, margin * 5],
-    [0, 0, margin * 6],
-    [0, 0, margin * 7],
-    [0, 0, margin * 8],
-    [0, 0, margin * 9],
-    [0, 0, margin * 10],
-  ], [margin]);
+  // const positions = useMemo(() => [
+  //   [0, 0, margin * 0],
+  //   [0, 0, margin * 1],
+  //   [0, 0, margin * 2],
+  //   [0, 0, margin * 3],
+  //   [0, 0, margin * 4],
+  //   [0, 0, margin * 5],
+  //   [0, 0, margin * 6],
+  //   [0, 0, margin * 7],
+  //   [0, 0, margin * 8],
+  //   [0, 0, margin * 9],
+  //   [0, 0, margin * 10],
+  // ], [margin]);
+
+  const positions = useMemo(() => {
+    // Crear el array original ordenado
+    const original = [
+      [0, 0, margin * 0],
+      [0, 0, margin * 1],
+      [0, 0, margin * 2],
+      [0, 0, margin * 3],
+      [0, 0, margin * 4],
+      [0, 0, margin * 5],
+      [0, 0, margin * 6],
+      [0, 0, margin * 7],
+      [0, 0, margin * 8],
+      [0, 0, margin * 9],
+      [0, 0, margin * 10],
+    ];
+    // Desordenarlo usando Fisher-Yates
+    for (let i = original.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [original[i], original[j]] = [original[j], original[i]];
+    }
+
+    return original;
+  }, [margin]);
 
   const projects = useMemo(() => [
     <Raytracer key="Raytracer" pos={positions[0]} parentPos={pos} isVisibleLight={isVisibleLight} />,
@@ -59,20 +83,40 @@ function Projects({ isVisibleLight, pos }) {
     <SLAM key="SLAM" pos={positions[10]} parentPos={pos} isVisibleLight={isVisibleLight} />,
   ], [positions, pos, isVisibleLight]);
 
+  const title = useMemo(() => (
+    <TextAdvance
+      position={[0, 0, 0]}
+      text={"PROJECTS"}
+      font={fontTitle}
+      size={0.3}
+      height={0.1}
+      colorPri={"white"}
+      colorSec={new THREE.Color(0x333333)}
+    />
+  ), []);
+
+  const rectLight = useMemo(() => (
+    <rectAreaLight
+      intensity={13}
+      position={[0, 2, 13.5]}
+      rotation={[-Math.PI / 2, 0, 0]}
+      width={3.}
+      height={26}
+      color={new THREE.Color(0x223060)}
+    />
+  ), [isVisibleLight, pos]);
+
+  const meshVisible = useMemo(
+    () => isVisibleLight(new THREE.Vector3(0, 5, pos[2]), positions.length * (margin + 0.5)),
+    [isVisibleLight, pos, positions.length, margin]
+  );
+
   return (
-    <mesh className="PROJECTS" position={pos} ref={projectRef} visible={isVisibleLight(new THREE.Vector3(0, 5, pos[2]), positions.length * (margin + 0.5))}>
-      <TextAdvance position={[0, 0, 0]}
-        text={"PROJECTS"}
-        font={fontTitle} size={0.3} height={0.1}
-        colorPri={new THREE.Color(0xdddddd)} colorSec={new THREE.Color(0x333333)}
-      />
-
-      <rectAreaLight intensity={13} position={[0, 2, 13.5]} rotation={[-Math.PI / 2, 0, 0]}
-        visible={isVisibleLight(new THREE.Vector3(0, 5, pos[2] + 2), 30)}
-        width={3.} height={26} color={new THREE.Color(0x223060)} />
-
+    <mesh className="PROJECTS" position={pos} ref={projectRef} visible={meshVisible}>
+      {title}
+      {/* {rectLight} */}
       {projects}
-    </mesh >
+    </mesh>
   );
 }
 

@@ -6,7 +6,7 @@ import fontText from '../assets/fonts/Source_Code_Pro/static/Source_Code_Pro_Reg
 import { Juan } from '../../public/models/Juan';
 import { useMemo } from 'react';
 
-const colorPriTitle = new THREE.Color(0xdddddd);
+const colorPriTitle = "white";
 const colorSecTitle = new THREE.Color(0x333333);
 const colorLight = new THREE.Color(0x223060);
 
@@ -73,8 +73,8 @@ function About({ isVisibleLight, pos }) {
     <mesh className="ABOUT" position={pos} visible={isVisibleLight(new THREE.Vector3(0, 5, pos[2]), 9)}>
       {Title}
       {JuanModel}
-      {PointLight1}
-      {PointLight2}
+      {/* {PointLight1}
+      {PointLight2} */}
       {AboutText}
     </mesh>
   );

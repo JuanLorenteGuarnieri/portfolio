@@ -2,11 +2,11 @@ import React, { useRef, useState, useEffect, Suspense, useMemo } from 'react';
 import * as THREE from 'three';
 import { Canvas } from '@react-three/fiber';
 import emailjs from '@emailjs/browser';
-import { Plane, Grid, useDetectGPU, PerformanceMonitor, Bvh, Stats } from '@react-three/drei';
+import { Plane, Grid, useDetectGPU, PerformanceMonitor, Bvh, Stats, Preload } from '@react-three/drei';
 
 import Loader from '../components/Loader';
 import CameraController from '../components/CameraController';
-import Navigation from '../components/Navigation_original';
+import Navigation from '../components/Navigation';
 import Title from './Title';
 import About from './About';
 import Education from './Education';
@@ -34,7 +34,7 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
   const projectsPos = [0, 0, 41.5];
   const skillsPos = [0, 0, 70];
   const contactPos = [0, 0, 73];
-  const interestPos = [0, 0, 82.5];
+  const interestPos = [0, 0, 80.5];
 
 
   const secPos = [
@@ -199,7 +199,7 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
 
   // ANIMATIONS
   const [animationKey, setAnimationKey] = useState(0);
-  const [animationClass, setAnimationClass] = useState('fadeIn1'); // Inicializa con la animación inicial
+  const [animationClass, setAnimationClass] = useState('fadeLogo'); // Inicializa con la animación inicial
 
   const [isContentLoaded, setIsContentLoaded] = useState(false);
   const [isAnimationDone, setIsAnimationDone] = useState(false);
@@ -210,13 +210,6 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
   const changeAnimationDone = () => {
     setIsAnimationDone(true);
   };
-
-  useEffect(() => { //RESET ANIMATION (when all loaded and intro finished)
-    if (isContentLoaded && isAnimationDone) {
-      setAnimationClass('fadeOutIn');
-      setAnimationKey(prevKey => prevKey + 1); // Incrementa la clave para reiniciar la animación
-    }
-  }, [isContentLoaded, isAnimationDone]);
 
   const onMouseClick = (event) => {
     if (
@@ -346,9 +339,6 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
       else {
         setIsPhoneVertical(false);
       }
-      setAnimationClass('fadeOutIn');
-      setAnimationKey(prevKey => prevKey + 1); // Incrementa la clave para reiniciar la animación
-
     };
 
     if (window.screen.orientation) {
@@ -430,13 +420,14 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
 
   // Memoiza el ambientLight
   const memoizedAmbientLight = useMemo(() => (
-    <ambientLight intensity={0.5} />
+    <ambientLight intensity={0.4} />
   ), []);
 
   // Memoiza el pointLight
   const memoizedPointLight = useMemo(() => (
     <pointLight
       ref={lightRef}
+      name="cursor"
       distance={2}
       castShadow={true}
       intensity={25}
@@ -478,6 +469,18 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
     <Stats className="stats" />
   ), []);
 
+
+  const rectLight = useMemo(() => (
+    <rectAreaLight
+      intensity={8}
+      position={[0, 1.5, aboutPos[2] + (interestPos[2] - aboutPos[2] + 8) / 2]}
+      rotation={[-Math.PI / 2, 0, 0]}
+      width={7.}
+      height={interestPos[2] - aboutPos[2] + 8}
+      color={new THREE.Color(0x223060)}
+    />
+  ), [isVisibleLight, aboutPos, interestPos]);
+
   return (
     <>
       <section className="w-full h-screen">
@@ -502,25 +505,35 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
           style={{ position: 'fixed', top: 0, left: 0, zIndex: 1 }}
           onPointerMove={handlePointerMove}
           onTouchMove={handlePointerMove}
-          camera={({ isPerspectiveCamera: true, near: 0.1, far: 9, setFocalLength: 555, zoom: (window.innerWidth / window.innerHeight) / 1.6 })}
+
+          camera={{
+            // Notación alternativa a quitar llaves en camera, se pasa un objeto literal
+            makeDefault: true,
+            near: 0.1,
+            far: 9,
+            fov: (window.innerWidth / window.innerHeight) * (180 / Math.PI / 1.6), // equivalente a setFocalLength de R3F
+          }}
         >
-          {isContentLoaded && isAnimationDone ? (
+          {(
             !(window.screen.orientation.type == "portrait-primary" ||
               window.screen.orientation.type == "portrait-secondary" ||
               window.innerHeight > window.innerWidth) ? (
               <Suspense fallback={null}>
+                <Preload all />
                 {memoizedPerformanceMonitor}
                 {memoizedCameraController}
                 {memoizedAmbientLight}
-                {memoizedStats}
+                {/* {memoizedStats} */}
                 {memoizedPointLight}
+                {rectLight}
                 {memoizedSections}
                 {memoizedFloor}
               </Suspense>
             ) : (
               <MobileCaption />
             )
-          ) : (
+          )}
+          {isContentLoaded && isAnimationDone ? (<></>) : (
             <Loader action={changeAnimationDone} />
           )}
         </Canvas>

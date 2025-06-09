@@ -6,6 +6,8 @@ import { Doc } from '../../public/models/Doc';
 import { Github } from '../../public/models/Github';
 import { C } from '../../public/models/C';
 import React, { useMemo } from 'react';
+import { Docs } from '../../public/models/Docs';
+import { Slides } from '../../public/models/Slides';
 
 function Raytracer({ isVisibleLight, pos, parentPos }) {
 
@@ -58,8 +60,9 @@ function Raytracer({ isVisibleLight, pos, parentPos }) {
   const links = useMemo(() => (
     <mesh className="LINKS" position={[0, 0, 2.3]}>
       <Bvh firstHitOnly>
-        <Doc link='https://github.com/JuanLorenteGuarnieri/RayTracer/blob/main/RayTracer.pdf' scale={12} position={[0.7, -0.08, 0]} rotation={[0, 0, 0]} />
-        <Github link='https://github.com/JuanLorenteGuarnieri/RayTracer' scale={12} position={[0, -0.08, 0]} rotation={[0, 0, 0]} />
+        <Docs link='https://JuanLorenteGuarnieri.github.io/portfolio/RayTracer-Report.pdf' scale={15} position={[0.7, -0.09, 0]} rotation={[0, 0, 0]} />
+        <Github link='https://github.com/JuanLorenteGuarnieri/RayTracer' scale={12} position={[0, -0.07, 0]} rotation={[0, 0, 0]} />
+        <Slides link='https://drive.google.com/drive/folders/1SgZ4fhS7zTB9Ixg7SCq1hK_kvaDZo8yt?usp=sharing' scale={15} position={[-0.7, -0.09, 0]} rotation={[0, 0, 0]} />
       </Bvh>
     </mesh>
   ), []);
@@ -105,11 +108,19 @@ function Raytracer({ isVisibleLight, pos, parentPos }) {
 
   return (
     <mesh className="RAY TRACER" position={pos} visible={isVisibleLight(new THREE.Vector3(0, 5, pos[2] + parentPos[2]), 8)}>
-      {/* <mesh className="MODEL" position={[-3, 0.36, 2]} rotation={[-Math.PI / 6, Math.PI / 4, 0]}>
-        {pointLightModel}
+      <mesh className="MODEL" position={[-3, 0.3, 2]} rotation={[-Math.PI / 7, Math.PI / 4, 0]} scale={0.95}>
+        {/* {pointLightModel} */}
         <Bvh firstHitOnly>
           {planes}
-          <CubeCamera key={cubeCameraKey} frames={1} far={0.6} resolution={32}>
+          <Sphere args={[0.15, 64, 64]} position={[0.2, 0.15, 0]} castShadow receiveShadow>
+            <meshPhysicalMaterial
+              color={new THREE.Color(0xffffff)}
+              roughness={0}
+              metalness={1}
+              side={THREE.DoubleSide}
+            />
+          </Sphere>
+          {/* <CubeCamera key={cubeCameraKey} frames={1} far={0.5} resolution={32}>
             {(texture) => (
               <Sphere args={[0.15, 64, 64]} position={[0.2, 0.15, 0]} castShadow receiveShadow>
                 <meshPhysicalMaterial
@@ -121,14 +132,14 @@ function Raytracer({ isVisibleLight, pos, parentPos }) {
                 />
               </Sphere>
             )}
-          </CubeCamera>
+          </CubeCamera> */}
           {sphereStatic}
         </Bvh>
-      </mesh> */}
+      </mesh>
 
       {staticTexts}
       {cModel}
-      {pointLightC}
+      {/* {pointLightC} */}
       {links}
     </mesh>
   );

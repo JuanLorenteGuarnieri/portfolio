@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { LogoGema } from '../../public/models/LogoGema';
 import { Logo } from '../../public/models/Logo';
-import { Bvh, Float } from '@react-three/drei';
+import { Bvh, Float, Plane } from '@react-three/drei';
 import * as THREE from 'three';
 import TextAdvance from '../components/TextAdvance';
 import { Linkedin } from '../../public/models/Linkedin';
@@ -9,6 +9,7 @@ import { Github } from '../../public/models/Github';
 import { CV } from '../../public/models/Cv';
 import fontTitle from '../assets/fonts/Encode_Sans_Semi_Expanded/Encode_Sans_Semi_Expanded_Bold.json';
 import fontText from '../assets/fonts/Source_Code_Pro/static/Source_Code_Pro_Regular.json';
+import { BakedLogo } from '../components/BakedLogo';
 
 const LOGO_POSITION = [0, 0, 0.5];
 const LOGO_MESH_POSITION = [0, 0.2, 1];
@@ -20,14 +21,14 @@ const TITLE_POSITION = [0, 0, 2.4];
 const SUBTITLE_POSITION = [0, 0, 2.8];
 
 const LINKS_POSITION = [0, 0, 3.15];
-const LINKEDIN_POSITION = [0.7, -0.08, 0];
-const GITHUB_POSITION = [0, -0.08, 0];
-const CV_POSITION = [-0.7, -0.08, 0];
+const LINKEDIN_POSITION = [0.7, -0.07, 0];
+const GITHUB_POSITION = [0, -0.07, 0];
+const CV_POSITION = [-0.7, -0.07, 0];
 const LINKS_SCALE = 12;
 
-const COLOR_PRIMARY = new THREE.Color(0xdddddd);
+const COLOR_PRIMARY = "white";
 const COLOR_SECONDARY = new THREE.Color(0x333333);
-const COLOR_SUBTITLE = new THREE.Color(0x223060);
+const COLOR_SUBTITLE = "white";
 const COLOR_POINTLIGHT = new THREE.Color(0x223060);
 
 function Title({ isVisibleLight, pos }) {

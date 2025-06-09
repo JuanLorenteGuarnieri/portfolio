@@ -15,7 +15,7 @@ function Experience({ isVisibleLight, pos }) {
       font={fontTitle}
       size={0.3}
       height={0.1}
-      colorPri={new THREE.Color(0xdddddd)}
+      colorPri={"white"}
       colorSec={new THREE.Color(0x333333)}
     />
   ), []);
@@ -56,7 +56,7 @@ function Experience({ isVisibleLight, pos }) {
       font={fontText}
       size={0.16}
       height={0.05}
-      colorPri={new THREE.Color(0xaaaaaa)}
+      colorPri={"white"}
       colorSec={new THREE.Color(0x223060)}
     />
   ), []);
@@ -76,7 +76,7 @@ function Experience({ isVisibleLight, pos }) {
       visible={isVisibleLight(new THREE.Vector3(0, 5, pos[2]), 8)}
     >
       {titleText}
-      {rectLight}
+      {/* {rectLight} */}
       {gilabGroup}
     </mesh>
   ), [pos, isVisibleLight, titleText, rectLight, gilabGroup]);

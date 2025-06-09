@@ -3,6 +3,7 @@ import React, { useRef, forwardRef, useState, useMemo } from 'react'
 import { useGLTF } from '@react-three/drei'
 import { GLTF } from 'three-stdlib'
 import { Group } from 'three';
+import { useSharedMat } from '../../src/components/sharedMaterial';
 
 type GLTFResult = GLTF & {
   nodes: {
@@ -20,6 +21,7 @@ type LogoProps = JSX.IntrinsicElements['group'];
 export const Send = forwardRef<Group, LogoProps>((props, ref) => {
   const [isHovered, setIsHovered] = useState(false);
   const { nodes, materials } = useGLTF('models/send.glb') as GLTFResult
+  const sharedMaterial = useSharedMat()
 
   const position: [number, number, number] = isHovered ? [-0.017, 0, 0.017] : [-0.016, 0, 0.016];
   const scale = isHovered ? 0.096 : 0.089;
@@ -35,14 +37,14 @@ export const Send = forwardRef<Group, LogoProps>((props, ref) => {
       castShadow
       receiveShadow
       geometry={nodes.Curve.geometry}
-      material={materials.Mat}
+      material={sharedMaterial}
       position={position}
       scale={scale}
       onPointerEnter={handlePointerEnter}
       onPointerLeave={handlePointerLeave}
     />
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  ), [nodes.Curve.geometry, materials.Mat, position, scale]);
+  ), [nodes.Curve.geometry, position, scale]);
 
   const Curve001Mesh = useMemo(() => (
     <mesh

@@ -6,14 +6,18 @@ import { Bvh } from '@react-three/drei';
 import { Github } from '../../public/models/Github';
 import { Python } from '../../public/models/Python';
 import { Robot } from '../../public/models/Robot';
+import { Doc } from '../../public/models/Doc';
+import { Image } from '../../public/models/Image';
+import { Slides } from '../../public/models/Slides';
+
 
 function Robotics({ isVisibleLight, pos, parentPos }) {
   // Memoriza los componentes que no dependen de props variables
   const robotModel = useMemo(() => (
     <Bvh firstHitOnly>
-      <Robot position={[-3.1, -0.05, 1.6]} rotation={[0, Math.PI / 4, 0]} scale={0.005} />
+      <Robot position={[-3.1, -0.05, 1.6]} rotation={[0, Math.PI / 4, 0]} scale={0.005} parentPos={[pos[0] + parentPos[0], pos[1] + parentPos[1], pos[2] + parentPos[2],]} />
     </Bvh>
-  ), []);
+  ), [parentPos, pos]);
 
   const pythonModel = useMemo(() => (
     <Python scale={18} position={[3, -0.02, 1.6]} rotation={[0, 0, 0]} />
@@ -21,7 +25,9 @@ function Robotics({ isVisibleLight, pos, parentPos }) {
 
   const githubLink = useMemo(() => (
     <Bvh firstHitOnly>
-      <Github link='https://github.com/hsunekichi/Robotica' scale={12} position={[0, -0.08, 0]} rotation={[0, 0, 0]} />
+      <Slides link='https://drive.google.com/file/d/1mok9GjYCliyckWt_ftIpx4tUi6o7pQgs/view?usp=sharing' scale={15} position={[-0.7, -0.09, 0]} rotation={[0, 0, 0]} />
+      <Github link='https://github.com/hsunekichi/Robotica' scale={12} position={[0, -0.07, 0]} rotation={[0, 0, 0]} />
+      <Image link='https://drive.google.com/drive/folders/1SYlXSeWGGZLfEhEhYhmMHG4Jji68iFWm?usp=sharing' scale={7} position={[0.7, -0.06, 0]} rotation={[0, 0, 0]} />
     </Bvh>
   ), []);
 
@@ -92,8 +98,8 @@ function Robotics({ isVisibleLight, pos, parentPos }) {
   return (
     <mesh className="Robotics" position={pos} visible={visible}>
       <mesh className="MODEL" >
-        {pointLightRobot}
-        {/* {robotModel} */}
+        {/* {pointLightRobot} */}
+        {robotModel}
       </mesh>
 
       {roboticsText}
@@ -102,10 +108,10 @@ function Robotics({ isVisibleLight, pos, parentPos }) {
       {descriptionText}
 
       {pythonModel}
-      {pointLightPython}
+      {/* {pointLightPython} */}
 
       {brickPiText}
-      {pointLightBrickPi}
+      {/* {pointLightBrickPi} */}
 
       {linksMesh}
     </mesh>
