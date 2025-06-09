@@ -25,10 +25,6 @@ export const Slammap = forwardRef<Group, Props>(({ ...props }, ref) => {
         const lines = text.split('\n').filter(Boolean)
         const parsed = lines.map(line => {
           let [x, y, z, scale] = line.trim().split(/\s+/).map(Number)
-          // x = x
-          // y = y
-          // z = z
-          // count++
           return { x, y, z, scale }
         })
         const reduced = parsed.filter((_, index) => index % 3 === 0)
