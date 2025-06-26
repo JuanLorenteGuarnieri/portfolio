@@ -70,12 +70,13 @@ function SLAM({ isVisibleLight, pos, parentPos }) {
 
 
   const slamModel = useMemo(() => (
-    <>
-      <Bvh firstHitOnly>
-        <Slammap position={[-3.2, 0.39, 1.5]} scale={0.48} rotation={[-0.6, Math.PI - 0.35, Math.PI + 0.35]} />
-      </Bvh>
-      <Slamcamera position={[-3.2, 0.39, 1.5]} scale={0.48} rotation={[-0.6, Math.PI - 0.35, Math.PI + 0.35]} />
-    </>
+    (!/Mobi|Android/i.test(navigator.userAgent) ? (
+      <>
+        <Bvh firstHitOnly>
+          <Slammap position={[-3.2, 0.39, 1.5]} scale={0.48} rotation={[-0.6, Math.PI - 0.35, Math.PI + 0.35]} />
+        </Bvh>
+        <Slamcamera position={[-3.2, 0.39, 1.5]} scale={0.48} rotation={[-0.6, Math.PI - 0.35, Math.PI + 0.35]} />
+      </>) : null)
   ), []);
 
   const meshVisible = useMemo(() => isVisibleLight(new THREE.Vector3(0, 5, pos[2] + parentPos[2]), 8), [isVisibleLight, pos, parentPos]);

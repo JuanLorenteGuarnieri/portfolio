@@ -61,17 +61,18 @@ function Panorama({ isVisibleLight, pos, parentPos }) {
   ), []);
 
   const planeComponent = useMemo(() => (
-    <Bvh firstHitOnly >
-      <Plane args={[0.664, 0.412, 1, 1]} position={[-3.0, 0.08, 1.6]} rotation={[-Math.PI / 2, 0, 0]} scale={2.3}
-        receiveShadow={true} castShadow={true}>
-        <meshPhysicalMaterial
-          color={new THREE.Color(0xffffff)}
-          side={THREE.DoubleSide}
-          alphaTest={0.5}
-          map={panoramaTexture}
-        />
-      </Plane>
-    </Bvh>
+    (!/Mobi|Android/i.test(navigator.userAgent) ? (
+      <Bvh firstHitOnly >
+        <Plane args={[0.664, 0.412, 1, 1]} position={[-3.0, 0.08, 1.6]} rotation={[-Math.PI / 2, 0, 0]} scale={2.3}
+          receiveShadow={true} castShadow={true}>
+          <meshPhysicalMaterial
+            color={new THREE.Color(0xffffff)}
+            side={THREE.DoubleSide}
+            alphaTest={0.5}
+            map={panoramaTexture}
+          />
+        </Plane>
+      </Bvh>) : null)
   ), [panoramaTexture]);
 
   const pythonLight = useMemo(() => (

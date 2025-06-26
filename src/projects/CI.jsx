@@ -13,9 +13,10 @@ import { Matlab } from '../../public/models/Matlab';
 function CI({ isVisibleLight, pos, parentPos }) {
   // Memoized models
   const nlosModel = useMemo(() => (
-    <Bvh firstHitOnly>
-      <Nlos position={[-2.9, 0.0, 1.7]} scale={0.015} rotation={[-Math.PI / 8, Math.PI, 0]} />
-    </Bvh>
+    (!/Mobi|Android/i.test(navigator.userAgent) ? (
+      <Bvh firstHitOnly>
+        <Nlos position={[-2.9, 0.0, 1.7]} scale={0.015} rotation={[-Math.PI / 8, Math.PI, 0]} />
+      </Bvh>) : null)
   ), []);
 
   const pythonModel = useMemo(() => (

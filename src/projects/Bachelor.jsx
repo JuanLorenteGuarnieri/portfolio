@@ -65,20 +65,21 @@ function Bachelor({ isVisibleLight, pos, parentPos }) {
   ), []);
 
   const sphereModel = useMemo(() => (
-    <Bvh firstHitOnly>
-      <Sphere position={[-2.8, 0.4, 1.5]} scale={0.4} rotation={[Math.PI / 2, -Math.PI / 1.5, Math.PI]} castShadow={true}>
-        <meshPhysicalMaterial
-          color={new THREE.Color(0xffffff)}
-          side={THREE.DoubleSide}
-          emissive={new THREE.Color(0xffffff)}
-          map={scanpathTexture}
-          emissiveMap={scanpathTexture}
-          emissiveIntensity={0.3}
-        />
-      </Sphere>
-      <SurfacePoint position={[-2.8, 0.4, 1.5]} distance={0.4} centerLatLon={[60.0, 60.0]}
-        sphereRadius={0.05} sphereColor={'red'} rotation={[-Math.PI / 2, Math.PI / 1.5, Math.PI]} />
-    </Bvh>
+    (!/Mobi|Android/i.test(navigator.userAgent) ? (
+      <Bvh firstHitOnly>
+        <Sphere position={[-2.8, 0.4, 1.5]} scale={0.4} rotation={[Math.PI / 2, -Math.PI / 1.5, Math.PI]} castShadow={true}>
+          <meshPhysicalMaterial
+            color={new THREE.Color(0xffffff)}
+            side={THREE.DoubleSide}
+            emissive={new THREE.Color(0xffffff)}
+            map={scanpathTexture}
+            emissiveMap={scanpathTexture}
+            emissiveIntensity={0.3}
+          />
+        </Sphere>
+        <SurfacePoint position={[-2.8, 0.4, 1.5]} distance={0.4} centerLatLon={[60.0, 60.0]}
+          sphereRadius={0.05} sphereColor={'red'} rotation={[-Math.PI / 2, Math.PI / 1.5, Math.PI]} />
+      </Bvh>) : null)
   ), [scanpathTexture]);
 
   const linksMesh = useMemo(() => (

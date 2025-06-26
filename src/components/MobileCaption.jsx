@@ -1,15 +1,34 @@
-import { Html } from '@react-three/drei';
-
-function MobileCaption({ }) {
+function MobileCaption() {
   return (
-    <Html center> {/* ROTATE SCREEN */}
-      <div className="">
-        <div className="text-center">
-          <svg version="1.0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900.000000 900.000000"
-            fill="white" className='h-55 animate-rotate logo2' >
-            <g transform="translate(-100,900) scale(0.12,-0.12)"
-              stroke="none">
-              <path d="M3514 7251 c-28 -16 -64 -46 -80 -66 -16 -20 -34 -42 -39 -48 -15
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 3,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        pointerEvents: 'none',
+        background: 'black', // Cambiado a negro
+      }}
+    >
+      <div style={{ textAlign: 'center' }}>
+        <svg
+          version="1.0"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 1 1 500"
+          fill="white"
+          style={{
+            width: '70vw',
+            height: '70vw',
+            margin: '0 auto',
+            display: 'block',
+          }}
+          className="animate-rotate logo2"
+        >
+          <g transform="translate(-220,450) scale(0.05,-0.05)"
+            stroke="none">
+            <path d="M3514 7251 c-28 -16 -64 -46 -80 -66 -16 -20 -34 -42 -39 -48 -15
                               -17 -75 -116 -75 -123 0 -3 -6 -20 -14 -37 -8 -18 -31 -81 -51 -142 -20 -60
                               -40 -119 -45 -130 -5 -11 -21 -49 -36 -85 -28 -69 -77 -172 -97 -205 -69 -113
                               -221 -276 -309 -331 -51 -32 -190 -104 -233 -120 -101 -37 -237 -80 -285 -89
@@ -67,7 +86,7 @@ function MobileCaption({ }) {
                               91 -19 100 -4 9 -11 41 -14 71 -4 29 -10 58 -16 65 -5 6 -12 30 -16 53 -4 24
                               -11 45 -16 49 -5 3 -9 12 -9 20 0 14 -29 87 -49 124 -4 8 -25 47 -46 85 -104
                               195 -221 313 -363 368 -62 25 -109 21 -168 -12z"/>
-              <path d="M4452 4628 c-14 -28 -35 -61 -42 -68 -3 -3 -30 -36 -60 -75 -30 -38
+            <path d="M4452 4628 c-14 -28 -35 -61 -42 -68 -3 -3 -30 -36 -60 -75 -30 -38
                               -61 -76 -68 -84 -7 -7 -41 -50 -74 -95 -34 -44 -68 -87 -75 -94 -18 -18 -16
                               -57 2 -72 8 -7 15 -18 15 -25 0 -7 7 -18 15 -25 8 -7 15 -21 15 -32 0 -10 7
                               -21 15 -24 8 -4 15 -14 15 -24 0 -11 5 -22 11 -25 5 -4 14 -17 20 -28 9 -22
@@ -78,12 +97,11 @@ function MobileCaption({ }) {
                               13 25 18 37 6 11 15 24 20 28 20 12 11 60 -17 90 -15 17 -50 59 -77 95 -27 36
                               -56 72 -65 81 -9 9 -39 47 -65 83 -27 36 -52 66 -57 66 -4 0 -8 4 -8 9 0 5
                               -10 25 -22 45 -28 43 -68 49 -86 14z"/>
-            </g>
-          </svg >
-          <p>Rotate the screen</p>
-        </div>
+          </g>
+        </svg>
+        <p style={{ fontSize: '200%', marginInline: '30vw' }}>Rotate the screen</p>
       </div>
-    </Html>
+    </div>
   );
 }
 

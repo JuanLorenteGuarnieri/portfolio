@@ -5,6 +5,7 @@ import emailjs from '@emailjs/browser';
 import { Plane, Grid, useDetectGPU, PerformanceMonitor, Bvh, Stats, Preload } from '@react-three/drei';
 
 import Loader from '../components/Loader';
+import video from '/public/Intro.mp4';
 import CameraController from '../components/CameraController';
 import Navigation from '../components/Navigation';
 import Title from './Title';
@@ -16,6 +17,7 @@ import ContactMe from './ContactMe';
 import MobileCaption from '../components/MobileCaption';
 import Interests from './Interests';
 import Experience from './Experience';
+import VideoPlayer from '../components/VideoPlayer';
 
 const Home = ({ scrollValue, maxY, changeScroll }) => {
   // CONFIGURATION
@@ -198,9 +200,6 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
   }, []);
 
   // ANIMATIONS
-  const [animationKey, setAnimationKey] = useState(0);
-  const [animationClass, setAnimationClass] = useState('fadeLogo'); // Inicializa con la animación inicial
-
   const [isContentLoaded, setIsContentLoaded] = useState(false);
   const [isAnimationDone, setIsAnimationDone] = useState(false);
 
@@ -208,6 +207,7 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
     setIsContentLoaded(true);
   };
   const changeAnimationDone = () => {
+    // console.log("Animation done");
     setIsAnimationDone(true);
   };
 
@@ -257,7 +257,8 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
     };
     // Only depend on variables that affect the click logic
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userName, userEmail, message, isAnimationDone]);
+  }, [userName, userEmail, message, isAnimationDone, window]);
+
 
   const calculateIntersect = (x, y) => {
     if (!cameraRef.current) return;
@@ -300,6 +301,7 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
         y = y_old;
       }
     }
+    updateMouseSpeed(event.clientX, event.clientY);
   };
 
   useEffect(() => {
@@ -310,7 +312,7 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
     const mouseY = y || window.innerHeight / 2;
     calculateIntersect(mouseX, mouseY);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scrollValue]);
+  }, [scrollValue, window.innerWidth, window.innerHeight]);
 
   const isMobileDevice = () => {
     return /Mobi|Android/i.test(navigator.userAgent);
@@ -320,37 +322,73 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
 
   const enableShadows = !isMobileDevice();
 
-  useEffect(() => { // detect if phone is in vertical mode
-    if (isMobileDevice() && window.innerHeight / 1.3 > window.innerWidth) {
-      setIsPhoneVertical(true);
-    }
-    else {
-      setIsPhoneVertical(false);
-    }
-  }, [window.innerHeight, window.innerWidth, ondeviceorientation, isPhoneVertical]);
-
-  const [key, setKey] = useState(0);
-
-  useEffect(() => { //detect rotate screen orientation
-    const handleOrientationChange = () => {
-      if (window.screen.orientation.type == "portrait-primary" || window.screen.orientation.type == "portrait-secondary") {
-        setIsPhoneVertical(true);
+  useEffect(() => {
+    const disableZoom = (e) => {
+      // Previene zoom con Ctrl/Cmd + rueda del ratón o pinch-zoom en móviles
+      if (
+        e.ctrlKey || e.metaKey ||
+        (e.touches && e.touches.length > 1) // Pinch zoom en mobile
+      ) {
+        e.preventDefault();
       }
-      else {
+    };
+    const preventGesture = (e) => {
+      e.preventDefault();
+    };
+    window.addEventListener('wheel', disableZoom, { passive: false });
+    window.addEventListener('gesturestart', preventGesture, { passive: false });
+    window.addEventListener('gesturechange', preventGesture, { passive: false });
+    window.addEventListener('gestureend', preventGesture, { passive: false });
+
+    // Previene zoom con doble toque y pinch en móviles
+    let lastTouchEnd = 0;
+    const onTouchEnd = (e) => {
+      const now = Date.now();
+      if (now - lastTouchEnd <= 300) {
+        e.preventDefault();
+      }
+      lastTouchEnd = now;
+    };
+    const onTouchMove = (e) => {
+      if (e.touches && e.touches.length > 1) {
+        e.preventDefault();
+      }
+    };
+    document.addEventListener('touchend', onTouchEnd, false);
+    document.addEventListener('touchmove', onTouchMove, { passive: false });
+
+    return () => {
+      window.removeEventListener('wheel', disableZoom, { passive: false });
+      window.removeEventListener('gesturestart', preventGesture, { passive: false });
+      window.removeEventListener('gesturechange', preventGesture, { passive: false });
+      window.removeEventListener('gestureend', preventGesture, { passive: false });
+      document.removeEventListener('touchend', onTouchEnd, false);
+      document.removeEventListener('touchmove', onTouchMove, { passive: false });
+    };
+  }, []);
+
+  useEffect(() => {
+    const checkOrientation = () => {
+      if (isMobileDevice() && window.innerHeight / 1.3 > window.innerWidth) {
+        setIsPhoneVertical(true);
+      } else {
         setIsPhoneVertical(false);
       }
     };
 
-    if (window.screen.orientation) {
-      window.addEventListener('orientationchange', handleOrientationChange);
-    }
+    // Ejecuta al montar
+    checkOrientation();
 
+    // Suscribe a eventos
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('orientationchange', checkOrientation);
+
+    // Limpia al desmontar
     return () => {
-      if (window.screen.orientation) {
-        window.removeEventListener('orientationchange', handleOrientationChange);
-      }
+      window.removeEventListener('resize', checkOrientation);
+      window.removeEventListener('orientationchange', checkOrientation);
     };
-  }, [isPhoneVertical]);
+  }, [isMobileDevice]);
 
   useEffect(() => { //focus/blur inputs
     if (typeForm === 0) {
@@ -371,6 +409,23 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
       }
     }
   }, [typeForm]);
+
+  useEffect(() => {
+    if (!isAnimationDone) {
+      const preventScroll = (e) => {
+        window.scrollTo(0, 0);
+        e.preventDefault();
+      };
+      window.addEventListener('scroll', preventScroll, { passive: false });
+      document.body.style.overflow = 'hidden';
+      return () => {
+        window.removeEventListener('scroll', preventScroll, { passive: false });
+        document.body.style.overflow = '';
+      };
+    } else {
+      document.body.style.overflow = '';
+    }
+  }, [isAnimationDone]);
 
   // Memoiza los componentes de las secciones
   const memoizedSections = useMemo(() => (
@@ -462,7 +517,7 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
   // Memoiza el CameraController
   const memoizedCameraController = useMemo(() => (
     <CameraController scrollValue={scrollValue} cameraRef={cameraRef} maxY={maxY} />
-  ), [scrollValue, maxY]);
+  ), [scrollValue, maxY, cameraRef]);
 
   // Memoiza el Stats
   const memoizedStats = useMemo(() => (
@@ -483,11 +538,18 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
 
   return (
     <>
-      <section className="w-full h-screen">
+      <section >
+        {isAnimationDone ? null : (
+          // <Loader action={changeAnimationDone} />
+          <VideoPlayer src={video} onVideoComplete={setIsAnimationDone} />
+        )}
+        {(
+          isPhoneVertical && isAnimationDone ? (<MobileCaption />) : null
+        )}
+
         <Canvas
           dpr={dpr}
           shadows={enableShadows}
-          className={animationClass}
           gl={{
             antialias: true,
             stencil: false,
@@ -501,8 +563,11 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
             failIfMajorPerformanceCaveat: false,
             physicallyCorrectLights: false
           }}
-          key={animationKey}
-          style={{ position: 'fixed', top: 0, left: 0, zIndex: 1 }}
+          style={{
+            position: 'fixed', top: 0, left: 0, zIndex: 1,
+            opacity: isAnimationDone ? 1 : 0,
+            transition: isAnimationDone ? 'opacity 15s ease' : 'none'
+          }}
           onPointerMove={handlePointerMove}
           onTouchMove={handlePointerMove}
 
@@ -510,37 +575,26 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
             // Notación alternativa a quitar llaves en camera, se pasa un objeto literal
             makeDefault: true,
             near: 0.1,
-            far: 9,
-            fov: (window.innerWidth / window.innerHeight) * (180 / Math.PI / 1.6), // equivalente a setFocalLength de R3F
+            far: (window.innerWidth > window.innerHeight ? 9 : 13),
+            fov: (window.innerWidth > window.innerHeight ? window.innerWidth / window.innerHeight : window.innerHeight / window.innerWidth) * (180 / Math.PI / 1.6), // equivalente a setFocalLength de R3F
           }}
         >
-          {(
-            !(window.screen.orientation.type == "portrait-primary" ||
-              window.screen.orientation.type == "portrait-secondary" ||
-              window.innerHeight > window.innerWidth) ? (
-              <Suspense fallback={null}>
-                <Preload all />
-                {memoizedPerformanceMonitor}
-                {memoizedCameraController}
-                {memoizedAmbientLight}
-                {/* {memoizedStats} */}
-                {memoizedPointLight}
-                {rectLight}
-                {memoizedSections}
-                {memoizedFloor}
-              </Suspense>
-            ) : (
-              <MobileCaption />
-            )
-          )}
-          {isContentLoaded && isAnimationDone ? (<></>) : (
-            <Loader action={changeAnimationDone} />
-          )}
+          {/* <Suspense fallback={null}> */}
+          {/* <Preload all /> */}
+          {memoizedPerformanceMonitor}
+          {memoizedCameraController}
+          {memoizedAmbientLight}
+          {/* {memoizedStats} */}
+          {memoizedPointLight}
+          {rectLight}
+          {memoizedSections}
+          {memoizedFloor}
+          {/* </Suspense> */}
         </Canvas>
         <input ref={hiddenInputRef1}
           type="text"
           className="opacity-0"
-          style={{ position: "absolute", top: scrollValue, left: "0px" }}
+          style={{ position: "absolute", top: "0px", left: "0px" }}
 
           onChange={(e) => {
             if (!isMobileDevice()) {
@@ -555,7 +609,7 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
         <input ref={hiddenInputRef2}
           type="text"
           className="opacity-0"
-          style={{ position: "absolute", top: scrollValue, left: "0px" }}
+          style={{ position: "absolute", top: "0px", left: "0px" }}
 
           onChange={(e) => {
             if (!isMobileDevice()) {
@@ -570,7 +624,7 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
         <input ref={hiddenInputRef3}
           type="text"
           className="opacity-0"
-          style={{ position: "absolute", top: scrollValue, left: "0px" }}
+          style={{ position: "absolute", top: "0px", left: "0px" }}
 
           onChange={(e) => {
             if (!isMobileDevice()) {
@@ -583,7 +637,7 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
           aria-hidden="true" // Ocultar a lectores de pantalla
         />
         <Navigation secPos={secPos} action={changeScroll} scrollValue={scrollValue} action2={changeContentLoaded}
-          cond={isAnimationDone && !((!isMobileDevice() && window.innerHeight > window.innerWidth) || (isMobileDevice() && (window.screen.orientation.type == "portrait-primary" || window.screen.orientation.type == "portrait-secondary")))} />
+          cond={!isPhoneVertical && isAnimationDone} />
       </section >
     </>
   );

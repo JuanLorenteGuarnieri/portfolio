@@ -14,9 +14,10 @@ import { Slides } from '../../public/models/Slides';
 function Robotics({ isVisibleLight, pos, parentPos }) {
   // Memoriza los componentes que no dependen de props variables
   const robotModel = useMemo(() => (
-    <Bvh firstHitOnly>
-      <Robot position={[-3.1, -0.05, 1.6]} rotation={[0, Math.PI / 4, 0]} scale={0.005} parentPos={[pos[0] + parentPos[0], pos[1] + parentPos[1], pos[2] + parentPos[2],]} />
-    </Bvh>
+    (!/Mobi|Android/i.test(navigator.userAgent) ? (
+      <Bvh firstHitOnly>
+        <Robot position={[-3.1, -0.05, 1.6]} rotation={[0, Math.PI / 4, 0]} scale={0.005} parentPos={[pos[0] + parentPos[0], pos[1] + parentPos[1], pos[2] + parentPos[2],]} />
+      </Bvh>) : null)
   ), [parentPos, pos]);
 
   const pythonModel = useMemo(() => (

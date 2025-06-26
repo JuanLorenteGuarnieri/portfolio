@@ -167,7 +167,7 @@ function Interests({ isVisibleLight, pos }) {
     const today = new Date();
 
     // Racha conocida para una fecha conocida
-    const knownStreak = 667;
+    const knownStreak = 666;
     const knownDate = new Date('2025-06-06');
 
     // Fecha en que empezó la racha

@@ -74,14 +74,15 @@ function ACI({ isVisibleLight, pos, parentPos }) {
   ), []);
 
   const modelMesh = useMemo(() => (
-    <mesh className="MODEL">
-      {/* <pointLight
+    (!/Mobi|Android/i.test(navigator.userAgent) ? (
+      <mesh className="MODEL">
+        {/* <pointLight
         intensity={30}
         position={[-3.3, 1, 1.4]}
         color={new THREE.Color(0x223060)}
       /> */}
-      {vlbiModel}
-    </mesh>
+        {vlbiModel}
+      </mesh>) : null)
   ), [vlbiModel]);
 
   const pythonLight = useMemo(() => (

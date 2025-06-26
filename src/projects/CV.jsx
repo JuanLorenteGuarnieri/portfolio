@@ -80,10 +80,11 @@ function CV({ isVisibleLight, pos, parentPos }) {
 
   // Memoized MODEL mesh
   const modelMesh = useMemo(() => (
-    <mesh className="MODEL">
-      {/* {pilarLight} */}
-      {pilarModel}
-    </mesh>
+    (!/Mobi|Android/i.test(navigator.userAgent) ? (
+      <mesh className="MODEL">
+        {/* {pilarLight} */}
+        {pilarModel}
+      </mesh>) : null)
   ), [pilarLight, pilarModel]);
 
   return (

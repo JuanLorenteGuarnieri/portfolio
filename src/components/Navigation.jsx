@@ -18,7 +18,7 @@ const Navigation = React.memo(({ action, action2, cond, scrollValue, secPos }) =
   );
 
   useEffect(() => {
-    if (progress >= 90 && !isLoaded) {
+    if (progress >= 50 && !isLoaded) {
       setIsLoaded(true);
       action2();
     }

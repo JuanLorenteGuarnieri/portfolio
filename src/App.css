@@ -214,33 +214,6 @@ nav.active ul li a:hover span {
   animation: fadeIn 3s ease-in-out;
 }
 
-
-@keyframes fadeLogo {
-  0% {
-    opacity: 1;
-  }
-
-  40% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0;
-  }
-
-  60% {
-    opacity: 0;
-  }
-
-  100% {
-    opacity: 1;
-  }
-}
-
-.fadeLogo {
-  animation: fadeLogo 15s ease-in;
-}
-
 @keyframes rotate {
 
   0%,

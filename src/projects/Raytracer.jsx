@@ -106,21 +106,20 @@ function Raytracer({ isVisibleLight, pos, parentPos }) {
     return () => clearInterval(interval);
   }, []);
 
-  return (
-    <mesh className="RAY TRACER" position={pos} visible={isVisibleLight(new THREE.Vector3(0, 5, pos[2] + parentPos[2]), 8)}>
-      <mesh className="MODEL" position={[-3, 0.3, 2]} rotation={[-Math.PI / 7, Math.PI / 4, 0]} scale={0.95}>
-        {/* {pointLightModel} */}
-        <Bvh firstHitOnly>
-          {planes}
-          <Sphere args={[0.15, 64, 64]} position={[0.2, 0.15, 0]} castShadow receiveShadow>
-            <meshPhysicalMaterial
-              color={new THREE.Color(0xffffff)}
-              roughness={0}
-              metalness={1}
-              side={THREE.DoubleSide}
-            />
-          </Sphere>
-          {/* <CubeCamera key={cubeCameraKey} frames={1} far={0.5} resolution={32}>
+
+  const model = useMemo(() => (
+    (!/Mobi|Android/i.test(navigator.userAgent) ? (
+      <Bvh firstHitOnly>
+        {planes}
+        <Sphere args={[0.15, 64, 64]} position={[0.2, 0.15, 0]} castShadow receiveShadow>
+          <meshPhysicalMaterial
+            color={new THREE.Color(0xffffff)}
+            roughness={0}
+            metalness={1}
+            side={THREE.DoubleSide}
+          />
+        </Sphere>
+        {/* <CubeCamera key={cubeCameraKey} frames={1} far={0.5} resolution={32}>
             {(texture) => (
               <Sphere args={[0.15, 64, 64]} position={[0.2, 0.15, 0]} castShadow receiveShadow>
                 <meshPhysicalMaterial
@@ -133,8 +132,15 @@ function Raytracer({ isVisibleLight, pos, parentPos }) {
               </Sphere>
             )}
           </CubeCamera> */}
-          {sphereStatic}
-        </Bvh>
+        {sphereStatic}
+      </Bvh>) : null)
+  ), []);
+
+  return (
+    <mesh className="RAY TRACER" position={pos} visible={isVisibleLight(new THREE.Vector3(0, 5, pos[2] + parentPos[2]), 8)}>
+      <mesh className="MODEL" position={[-3, 0.3, 2]} rotation={[-Math.PI / 7, Math.PI / 4, 0]} scale={0.95}>
+        {/* {pointLightModel} */}
+        {model}
       </mesh>
 
       {staticTexts}

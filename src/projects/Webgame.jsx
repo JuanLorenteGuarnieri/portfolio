@@ -56,20 +56,21 @@ function Webgame({ isVisibleLight, pos, parentPos }) {
   ), []);
 
   const model = useMemo(() => (
-    <mesh className="MODEL" >
-      {/* <pointLight intensity={30} position={[-3.3, 1, 1.4]}
+    (!/Mobi|Android/i.test(navigator.userAgent) ? (
+      <mesh className="MODEL" >
+        {/* <pointLight intensity={30} position={[-3.3, 1, 1.4]}
         color={new THREE.Color(0x223060)} /> */}
-      <Bvh firstHitOnly >
-        <Float
-          speed={4}
-          rotationIntensity={0.3}
-          floatIntensity={0.01}
-          floatingRange={[-0.2, 0.1]}
-        >
-          <RusticSpaceShip position={[-3.5, 0.2, 1.8]} />
-        </Float>
-      </Bvh>
-    </mesh>
+        <Bvh firstHitOnly >
+          <Float
+            speed={4}
+            rotationIntensity={0.3}
+            floatIntensity={0.01}
+            floatingRange={[-0.2, 0.1]}
+          >
+            <RusticSpaceShip position={[-3.5, 0.2, 1.8]} />
+          </Float>
+        </Bvh>
+      </mesh>) : null)
   ), []);
 
   const pointLights = useMemo(() => (

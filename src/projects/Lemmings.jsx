@@ -111,10 +111,11 @@ function Lemmings({ isVisibleLight, pos, parentPos }) {
 
   // Memoriza el mesh del Lemming y su luz
   const LemmingMesh = useMemo(() => (
-    <mesh className="MODEL">
-      {/* {LemmingLight} */}
-      {LemmingModel}
-    </mesh>
+    (!/Mobi|Android/i.test(navigator.userAgent) ? (
+      <mesh className="MODEL">
+        {/* {LemmingLight} */}
+        {LemmingModel}
+      </mesh>) : null)
   ), [LemmingLight, LemmingModel]);
 
   return (

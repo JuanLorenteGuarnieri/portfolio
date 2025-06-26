@@ -6,7 +6,12 @@ const CameraController = ({ scrollValue, cameraRef }) => {
 
   // Adjust camera FOV and zoom based on window size
   const adjustCamera = useCallback(() => {
-    camera.zoom = Math.max(1, window.innerWidth / window.innerHeight) / 1.6;
+    if (window.innerWidth > window.innerHeight) {
+      camera.zoom = Math.max(1, window.innerWidth / window.innerHeight) / 1.6;
+    } else {
+      camera.zoom = Math.max(1, window.innerHeight / window.innerWidth) / 1.6;
+    }
+    // camera.zoom = Math.max(1, window.innerWidth / window.innerHeight) / 1.6;
     camera.lookAt(0, 0, camera.position.z - 2 + Math.min(0.5, window.innerHeight / window.innerWidth));
     camera.updateProjectionMatrix();
     gl.setSize(window.innerWidth, window.innerHeight);
@@ -14,16 +19,16 @@ const CameraController = ({ scrollValue, cameraRef }) => {
 
   // Set initial camera settings and handle resize
   useEffect(() => {
-    cameraRef.current = camera;
     camera.near = 0.1;
     // camera.far = 8;
     camera.position.set(0, 5, 24);
     camera.lookAt(0, 0, 23);
     adjustCamera();
+    cameraRef.current = camera;
 
     window.addEventListener('resize', adjustCamera);
     return () => window.removeEventListener('resize', adjustCamera);
-  }, [camera, cameraRef, adjustCamera]);
+  }, [camera, cameraRef, adjustCamera, window]);
 
   // Map scrollValue to camera z position
   useEffect(() => {

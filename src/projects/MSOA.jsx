@@ -12,17 +12,18 @@ import { Docs } from '../../public/models/Docs';
 
 function MSOA({ isVisibleLight, pos, parentPos }) {
   const helmetMesh = useMemo(() => (
-    <mesh className="MODEL" >
-      {/* <pointLight
+    (!/Mobi|Android/i.test(navigator.userAgent) ? (
+      <mesh className="MODEL" >
+        {/* <pointLight
         intensity={30}
         position={[-3.3, 1, 1.4]}
         distance={isVisibleLight(new THREE.Vector3(0, 5, pos[2] + parentPos[2] + 1.4), 7) ? 4 : 0.01}
         color={new THREE.Color(0x223060)}
       /> */}
-      <Bvh firstHitOnly>
-        <Helmet position={[-3.2, 0.0, 1.5]} rotation={[0, Math.PI / 3, -Math.PI / 4.4]} />
-      </Bvh>
-    </mesh>
+        <Bvh firstHitOnly>
+          <Helmet position={[-3.2, 0.0, 1.5]} rotation={[0, Math.PI / 3, -Math.PI / 4.4]} />
+        </Bvh>
+      </mesh>) : null)
   ), [isVisibleLight, pos, parentPos]);
 
   const textLines = useMemo(() => ([
