@@ -1,32 +1,24 @@
-import React, { useRef, useState, useEffect, Suspense, useMemo } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import * as THREE from 'three';
-import { Canvas } from '@react-three/fiber';
-import emailjs from '@emailjs/browser';
-import { Plane, Grid, useDetectGPU, PerformanceMonitor, Bvh, Stats, Preload } from '@react-three/drei';
 
-import Loader from '../components/Loader';
 import video from '/public/Intro.mp4';
-import CameraController from '../components/CameraController';
 import Navigation from '../components/Navigation';
-import Title from './Title';
-import About from './About';
-import Education from './Education';
-import Projects from './Projects';
-import Skills from './Skills';
-import ContactMe from './ContactMe';
 import MobileCaption from '../components/MobileCaption';
-import Interests from './Interests';
-import Experience from './Experience';
 import VideoPlayer from '../components/VideoPlayer';
+import HomeScene from './HomeScene';
+import CustomCursor from '../components/CustomCursor';
+import { useMouseSpeed } from '../hooks/useMouseSpeed';
+import { useViewportOrientation } from '../hooks/useViewportOrientation';
+import { useContactForm } from '../hooks/useContactForm';
+
+const CURSOR_COLOR = 'white';
+const isMobileDevice = () => /Mobi|Android/i.test(navigator.userAgent);
 
 const Home = ({ scrollValue, maxY, changeScroll }) => {
   // CONFIGURATION
-  const GPUTier = useDetectGPU()
-  const cameraRef = React.useRef();
+  const cameraRef = useRef();
   const [dpr, setDpr] = useState(0.75);
   const [targetPos, setTargetPos] = useState(0);
-
-  const lightRef = useRef();
 
   // SECTIONS POSITIONS
   const titlePos = [0, 0, 22];
@@ -34,9 +26,9 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
   const educationPos = [0, 0, 32.8];
   const experiencePos = [0, 0, 37.9];
   const projectsPos = [0, 0, 41.5];
-  const skillsPos = [0, 0, 70];
-  const contactPos = [0, 0, 73];
-  const interestPos = [0, 0, 80.5];
+  const skillsPos = [0, 0, 72];
+  const contactPos = [0, 0, 75];
+  const interestPos = [0, 0, 82.5];
 
 
   const secPos = [
@@ -52,46 +44,27 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
 
   // CONTACT
   const sendFormRef = useRef();
-  //         FORMS
+  // FORMS
   const [typeForm, setTypeForm] = useState(0);
 
   const hiddenInputRef1 = useRef(), hiddenInputRef2 = useRef(), hiddenInputRef3 = useRef();
   const form1Ref = useRef(), form2Ref = useRef(), form3Ref = useRef();
-  const [userName, setUserName] = useState('');
-  const [userEmail, setUserEmail] = useState('');
-  const [message, setMessage] = useState('');
 
-  const [feedback, setFeedback] = useState('');
-  const [colorFeedback, setcolorFeedback] = useState(0x5cae5e);
-
-  const changeUserName = (n) => {
-    setUserName(n);
-  };
-
-  const changeUserEmail = (n) => {
-    setUserEmail(n);
-  };
-
-  const changeMessage = (n) => {
-    setMessage(n);
-  };
-
-  // Función para comprobar si el email es válido
-  const emailIncorrecto = (email) => {
-    // Expresión regular para validar el formato del email
-    const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-    return !regex.test(email);
-  };
-
-  // Función para comprobar si el nombre de usuario es válido (letras, números y espacios permitidos)
-  const nombreUsuarioInvalido = (nombre) => {
-    const regex = /^[a-zA-Z0-9 ]+$/;
-    return !regex.test(nombre);
-  };
+  const {
+    userName,
+    userEmail,
+    message,
+    feedback,
+    colorFeedback,
+    changeUserName,
+    changeUserEmail,
+    changeMessage,
+    sendEmail,
+  } = useContactForm();
 
   const getDistance2Camera = (v1) => {
     if (!cameraRef.current) return 0;
-    var position = cameraRef.current.position;
+    const position = cameraRef.current.position;
     return Math.sqrt(
       Math.pow(v1.x - position.x, 2) +
       Math.pow(v1.y - position.y, 2) +
@@ -107,46 +80,6 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
 
   const isVisibleLight = (v1, dist) => {
     return isBeforeCamera(v1) && getDistance2Camera(v1) < dist;
-  };
-
-  var sendEmail = () => {
-    // Crear un objeto de datos para el correo electrónico
-    var templateParams = {
-      user_name: userName,
-      user_email: userEmail,
-      message: message,
-    };
-
-    if (userName === '' || userEmail === '' || message === '') {
-      setFeedback('Complete all the fields');
-      setcolorFeedback(0xff4440);
-      return;
-    }
-    if (emailIncorrecto(userEmail)) {
-      setFeedback('The email is not valid');
-      setcolorFeedback(0xff4440);
-      return;
-    }
-    if (nombreUsuarioInvalido(userName)) {
-      setFeedback('The username is not valid');
-      setcolorFeedback(0xff4440);
-      return;
-    }
-
-    emailjs.send('service_4bprkd7', 'template_ri6j7pk', templateParams, 'PIjQsVkt3UW5dD4Vy')
-      .then((result) => {
-        setFeedback('Email sent');
-        setcolorFeedback(0x5cae5e);
-        changeUserName('');
-        changeUserEmail('');
-        changeMessage('');
-        setTimeout(() => {
-          setFeedback('');
-        }, 5000);
-      }, (error) => {
-        setFeedback(error.text);
-        setcolorFeedback(0xff4440);
-      });
   };
 
   // Configura el raycaster
@@ -257,7 +190,7 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
     };
     // Only depend on variables that affect the click logic
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userName, userEmail, message, isAnimationDone, window]);
+  }, [userName, userEmail, message, isAnimationDone]);
 
 
   const calculateIntersect = (x, y) => {
@@ -283,8 +216,7 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
   const handlePointerMove = (event) => { //RECHARGE LIGHT CURSOR WHEN MOVING
     if (cameraRef.current) {
       // Obtiene las coordenadas del cursor
-      let x, x_old, y, y_old;
-      const { clientX, clientY } = event;
+      let x, y;
       if (event.touches) {
         // Manejo del evento táctil
         const touch = event.touches[0];
@@ -295,30 +227,20 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
         y = event.clientY;
       }
 
-      if (x != x_old || y != y_old) {
-        calculateIntersect(x, y);
-        x = x_old;
-        y = y_old;
-      }
+      calculateIntersect(x, y);
+      updateMouseSpeed(x, y);
     }
-    updateMouseSpeed(event.clientX, event.clientY);
   };
 
   useEffect(() => {
-    // Usa la última posición conocida del ratón para calcular el punto de intersección cuando cambia scrollValue
     const { x, y } = lastMousePos.current;
-    // Si no hay movimiento previo, usa el centro de la pantalla como fallback
     const mouseX = x || window.innerWidth / 2;
     const mouseY = y || window.innerHeight / 2;
     calculateIntersect(mouseX, mouseY);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scrollValue, window.innerWidth, window.innerHeight]);
+  }, [scrollValue]);
 
-  const isMobileDevice = () => {
-    return /Mobi|Android/i.test(navigator.userAgent);
-  };
-
-  const [isPhoneVertical, setIsPhoneVertical] = useState(false);
+  const { isPhoneVertical, isMobileDevice } = useViewportOrientation();
+  const showCursor = !isMobileDevice();
 
   const enableShadows = !isMobileDevice();
 
@@ -367,29 +289,6 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
     };
   }, []);
 
-  useEffect(() => {
-    const checkOrientation = () => {
-      if (isMobileDevice() && window.innerHeight / 1.3 > window.innerWidth) {
-        setIsPhoneVertical(true);
-      } else {
-        setIsPhoneVertical(false);
-      }
-    };
-
-    // Ejecuta al montar
-    checkOrientation();
-
-    // Suscribe a eventos
-    window.addEventListener('resize', checkOrientation);
-    window.addEventListener('orientationchange', checkOrientation);
-
-    // Limpia al desmontar
-    return () => {
-      window.removeEventListener('resize', checkOrientation);
-      window.removeEventListener('orientationchange', checkOrientation);
-    };
-  }, [isMobileDevice]);
-
   useEffect(() => { //focus/blur inputs
     if (typeForm === 0) {
       hiddenInputRef1.current && hiddenInputRef1.current.blur();
@@ -398,13 +297,13 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
     } else {
       switch (typeForm) {
         case 1:
-          hiddenInputRef1.current && hiddenInputRef1.current.focus();
+          hiddenInputRef1.current && hiddenInputRef1.current?.focus({ preventScroll: true });
           break;
         case 2:
-          hiddenInputRef2.current && hiddenInputRef2.current.focus();
+          hiddenInputRef2.current && hiddenInputRef2.current?.focus({ preventScroll: true });
           break;
         case 3:
-          hiddenInputRef3.current && hiddenInputRef3.current.focus();
+          hiddenInputRef3.current && hiddenInputRef3.current?.focus({ preventScroll: true });
           break;
       }
     }
@@ -427,114 +326,44 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
     }
   }, [isAnimationDone]);
 
-  // Memoiza los componentes de las secciones
-  const memoizedSections = useMemo(() => (
-    <>
-      <Title isVisibleLight={isVisibleLight} pos={titlePos} />
-      <About isVisibleLight={isVisibleLight} pos={aboutPos} />
-      <Education isVisibleLight={isVisibleLight} pos={educationPos} />
-      <Experience isVisibleLight={isVisibleLight} pos={experiencePos} />
-      <Projects isVisibleLight={isVisibleLight} pos={projectsPos} />
-      <Skills isVisibleLight={isVisibleLight} pos={skillsPos} />
-      <ContactMe
-        isVisibleLight={isVisibleLight}
-        pos={contactPos}
-        scrollValue={scrollValue}
-        userName={userName}
-        userEmail={userEmail}
-        message={message}
-        feedback={feedback}
-        colorFeedback={colorFeedback}
-        changeUserName={changeUserName}
-        changeUserEmail={changeUserEmail}
-        changeMessage={changeMessage}
-        typeForm={typeForm}
-        changeTypeForm={changeTypeForm}
-        form1Ref={form1Ref}
-        form2Ref={form2Ref}
-        form3Ref={form3Ref}
-        sendFormRef={sendFormRef}
-        changeContentLoaded={changeContentLoaded}
-        changeAnimationDone={changeAnimationDone}
-      />
-      <Interests isVisibleLight={isVisibleLight} pos={interestPos} />
-    </>
-    // Solo vuelve a crear si cambian estas dependencias
-  ), [
-    isVisibleLight, titlePos, aboutPos, educationPos, experiencePos, projectsPos, skillsPos, contactPos, interestPos,
-    scrollValue, userName, userEmail, message, feedback, colorFeedback, changeUserName, changeUserEmail, changeMessage,
-    typeForm, changeTypeForm, form1Ref, form2Ref, form3Ref, sendFormRef, changeContentLoaded, changeAnimationDone
-  ]);
-
-  // Memoiza el floor
-  const memoizedFloor = useMemo(() => (
-    <Plane args={[500, 500]} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 35]} receiveShadow>
-      <meshPhysicalMaterial color={new THREE.Color(0x444444)} />
-    </Plane>
-  ), []);
-
-  // Memoiza el ambientLight
-  const memoizedAmbientLight = useMemo(() => (
-    <ambientLight intensity={0.4} />
-  ), []);
-
-  // Memoiza el pointLight
-  const memoizedPointLight = useMemo(() => (
-    <pointLight
-      ref={lightRef}
-      name="cursor"
-      distance={2}
-      castShadow={true}
-      intensity={25}
-      position={[targetPos[0], 0.4, targetPos[2]]}
-      shadow-bias={-0.01}
-      shadow-camera-near={0.01}
-      onUpdate={light => {
-        const minSize = 1;
-        const maxSize = 400;
-        const mapSize = Math.round(maxSize - (maxSize - minSize) * mouseSpeed);
-        light.shadow.mapSize.width = mapSize;
-        light.shadow.mapSize.height = mapSize;
-        light.shadow.needsUpdate = true;
-      }}
-      color={new THREE.Color(0x223060)}
-    />
-  ), [targetPos, mouseSpeed]);
-
-  // Memoiza el PerformanceMonitor
-  const memoizedPerformanceMonitor = useMemo(() => (
-    <PerformanceMonitor
-      factor={0.6}
-      ms={200}
-      iterations={3}
-      threshold={0.6}
-      bounds={() => [30, 45]}
-      onDecline={() => { setDpr(prev => Math.max(0.3, prev - 0.1)); }}
-      onIncline={() => { setDpr(prev => Math.min(0.8, prev + 0.1)); }}
-    />
-  ), []);
-
-  // Memoiza el CameraController
-  const memoizedCameraController = useMemo(() => (
-    <CameraController scrollValue={scrollValue} cameraRef={cameraRef} maxY={maxY} />
-  ), [scrollValue, maxY, cameraRef]);
-
-  // Memoiza el Stats
-  const memoizedStats = useMemo(() => (
-    <Stats className="stats" />
-  ), []);
-
-
-  const rectLight = useMemo(() => (
-    <rectAreaLight
-      intensity={8}
-      position={[0, 1.5, aboutPos[2] + (interestPos[2] - aboutPos[2] + 8) / 2]}
-      rotation={[-Math.PI / 2, 0, 0]}
-      width={7.}
-      height={interestPos[2] - aboutPos[2] + 8}
-      color={new THREE.Color(0x223060)}
-    />
-  ), [isVisibleLight, aboutPos, interestPos]);
+  const sceneProps = {
+    cameraRef,
+    dpr,
+    setDpr,
+    enableShadows,
+    isAnimationDone,
+    handlePointerMove,
+    scrollValue,
+    maxY,
+    targetPos,
+    mouseSpeed,
+    titlePos,
+    aboutPos,
+    educationPos,
+    experiencePos,
+    projectsPos,
+    skillsPos,
+    contactPos,
+    interestPos,
+    isVisibleLight,
+    typeForm,
+    changeTypeForm,
+    form1Ref,
+    form2Ref,
+    form3Ref,
+    sendFormRef,
+    changeContentLoaded,
+    changeAnimationDone,
+    userName,
+    userEmail,
+    message,
+    feedback,
+    colorFeedback,
+    changeUserName,
+    changeUserEmail,
+    changeMessage,
+    sendEmail,
+  };
 
   return (
     <>
@@ -546,62 +375,20 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
         {(
           isPhoneVertical && isAnimationDone ? (<MobileCaption />) : null
         )}
+        {showCursor && isAnimationDone && <CustomCursor color={CURSOR_COLOR} size={5} />}
 
-        <Canvas
-          dpr={dpr}
-          shadows={enableShadows}
-          gl={{
-            antialias: true,
-            stencil: false,
-            alpha: true,
-            depth: true,
-            logarithmicDepthBuffer: false,
-            preserveDrawingBuffer: false,
-            premultipliedAlpha: false,
-            precision: 'lowp',
-            powerPreference: 'high-performance',
-            failIfMajorPerformanceCaveat: false,
-            physicallyCorrectLights: false
-          }}
-          style={{
-            position: 'fixed', top: 0, left: 0, zIndex: 1,
-            opacity: isAnimationDone ? 1 : 0,
-            transition: isAnimationDone ? 'opacity 15s ease' : 'none'
-          }}
-          onPointerMove={handlePointerMove}
-          onTouchMove={handlePointerMove}
-
-          camera={{
-            // Notación alternativa a quitar llaves en camera, se pasa un objeto literal
-            makeDefault: true,
-            near: 0.1,
-            far: (window.innerWidth > window.innerHeight ? 9 : 13),
-            fov: (window.innerWidth > window.innerHeight ? window.innerWidth / window.innerHeight : window.innerHeight / window.innerWidth) * (180 / Math.PI / 1.6), // equivalente a setFocalLength de R3F
-          }}
-        >
-          {/* <Suspense fallback={null}> */}
-          {/* <Preload all /> */}
-          {memoizedPerformanceMonitor}
-          {memoizedCameraController}
-          {memoizedAmbientLight}
-          {/* {memoizedStats} */}
-          {memoizedPointLight}
-          {rectLight}
-          {memoizedSections}
-          {memoizedFloor}
-          {/* </Suspense> */}
-        </Canvas>
+        <HomeScene {...sceneProps} />
         <input ref={hiddenInputRef1}
           type="text"
           className="opacity-0"
-          style={{ position: "absolute", top: "0px", left: "0px" }}
+          style={{ position: "fixed", top: "0px", left: "0px" }}
 
           onChange={(e) => {
             if (!isMobileDevice()) {
               e.preventDefault();
               e.stopPropagation();
             } else {
-              setUserName(e.target.value);
+              changeUserName(e.target.value);
             }
           }}
           aria-hidden="true" // Ocultar a lectores de pantalla
@@ -609,14 +396,14 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
         <input ref={hiddenInputRef2}
           type="text"
           className="opacity-0"
-          style={{ position: "absolute", top: "0px", left: "0px" }}
+          style={{ position: "fixed", top: "0px", left: "0px" }}
 
           onChange={(e) => {
             if (!isMobileDevice()) {
               e.preventDefault();
               e.stopPropagation();
             } else {
-              setUserEmail(e.target.value);
+              changeUserEmail(e.target.value);
             }
           }}
           aria-hidden="true" // Ocultar a lectores de pantalla
@@ -624,14 +411,14 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
         <input ref={hiddenInputRef3}
           type="text"
           className="opacity-0"
-          style={{ position: "absolute", top: "0px", left: "0px" }}
+          style={{ position: "fixed", top: "0px", left: "0px" }}
 
           onChange={(e) => {
             if (!isMobileDevice()) {
               e.preventDefault();
               e.stopPropagation();
             } else {
-              setMessage(e.target.value);
+              changeMessage(e.target.value);
             }
           }}
           aria-hidden="true" // Ocultar a lectores de pantalla

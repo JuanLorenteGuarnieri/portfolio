@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import TextAdvance from '../components/TextAdvance';
 import fontTitle from '../assets/fonts/Encode_Sans_Semi_Expanded/Encode_Sans_Semi_Expanded_Bold.json';
 import fontText from '../assets/fonts/Source_Code_Pro/static/Source_Code_Pro_Regular.json';
-import { Gilab } from '../../public/models/Gilab';
+import { Gilab } from '../models/Gilab';
 
 function Experience({ isVisibleLight, pos }) {
   const gilabPos = [0, 0, 0.9];
@@ -52,7 +52,7 @@ function Experience({ isVisibleLight, pos }) {
     <TextAdvance
       position={[-0.8, 0, 0.7]}
       align="left"
-      text={"\nFeb - May  2025"}
+      text={"\nJan - Jun  2025"}
       font={fontText}
       size={0.16}
       height={0.05}

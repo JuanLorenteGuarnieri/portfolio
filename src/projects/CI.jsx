@@ -2,13 +2,13 @@ import * as THREE from 'three';
 import TextAdvance from '../components/TextAdvance';
 import fontText from '../assets/fonts/Source_Code_Pro/static/Source_Code_Pro_Regular.json';
 import { Bvh } from '@react-three/drei';
-import { Github } from '../../public/models/Github';
-import { Python } from '../../public/models/Python';
-import { Nlos } from '../../public/models/Nlos';
+import { Github } from '../models/Github';
+import { Python } from '../models/Python';
+import { Nlos } from '../models/Nlos';
 import { useMemo } from 'react';
-import { Doc } from '../../public/models/Doc';
-import { Docs } from '../../public/models/Docs';
-import { Matlab } from '../../public/models/Matlab';
+import { Doc } from '../models/Doc';
+import { Docs } from '../models/Docs';
+import { Matlab } from '../models/Matlab';
 
 function CI({ isVisibleLight, pos, parentPos }) {
   // Memoized models
@@ -98,3 +98,4 @@ function CI({ isVisibleLight, pos, parentPos }) {
 }
 
 export default CI;
+

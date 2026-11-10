@@ -3,12 +3,12 @@ import { useMemo } from 'react';
 import TextAdvance from '../components/TextAdvance';
 import fontText from '../assets/fonts/Source_Code_Pro/static/Source_Code_Pro_Regular.json';
 import { Bvh } from '@react-three/drei';
-import { Github } from '../../public/models/Github';
-import { Windows } from '../../public/models/Windows';
-import { C } from '../../public/models/C';
-import { Lemming } from '../../public/models/Lemming';
-import { Docs } from '../../public/models/Docs';
-import { Sdl } from '../../public/models/Sdl';
+import { Github } from '../models/Github';
+import { Windows } from '../models/Windows';
+import { C } from '../models/C';
+import { Lemming } from '../models/Lemming';
+import { Docs } from '../models/Docs';
+import { Sdl } from '../models/Sdl';
 
 function Lemmings({ isVisibleLight, pos, parentPos }) {
   // Memoriza los textos repetidos

@@ -1,16 +1,7 @@
-import React, { useRef, useEffect, useMemo, useState } from 'react';
-import { Bvh, Text3D } from '@react-three/drei';
+import React, { useRef, useEffect, useState } from 'react';
+import { Text3D } from '@react-three/drei';
 import * as THREE from 'three';
-import {
-  computeBoundsTree,
-  disposeBoundsTree,
-  acceleratedRaycast,
-} from 'three-mesh-bvh'
 import { useSharedMat } from './sharedMaterial';
-
-THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree
-THREE.BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree
-THREE.Mesh.prototype.raycast = acceleratedRaycast
 
 const TextAdvance = ({
   text,
@@ -24,27 +15,24 @@ const TextAdvance = ({
   const textRef = useRef();
   const [textPosition, setTextPosition] = useState(position);
 
-  const sharedMaterial = useSharedMat()
+  const sharedMaterial = useSharedMat();
 
   useEffect(() => {
-    const mesh = textRef.current
+    const mesh = textRef.current;
     if (mesh) {
-      mesh.geometry.computeBoundsTree()
+      mesh.geometry.computeBoundsTree?.();
     }
-  }, [])
+  }, []);
 
-  const textProps = useMemo(
-    () => ({
-      font,
-      size,
-      height: height * 0.7,
-      bevelEnabled: true,
-      bevelSize: 0.0001,
-      bevelSegments: 1,
-      bevelThickness: height * 0.25,
-    }),
-    [font, size, height]
-  );
+  const textProps = {
+    font,
+    size,
+    height: height * 0.7,
+    bevelEnabled: true,
+    bevelSize: 0.0001,
+    bevelSegments: 1,
+    bevelThickness: height * 0.25,
+  };
 
   useEffect(() => {
     if (!textRef.current) return;
@@ -52,7 +40,7 @@ const TextAdvance = ({
     const box = new THREE.Box3().setFromObject(textRef.current);
     const sizeVec = box.getSize(new THREE.Vector3());
 
-    let newPosition = [...position];
+    const newPosition = [...position];
     if (align === 'center') {
       newPosition[0] -= sizeVec.x / 2;
       newPosition[1] -= sizeVec.y / 2;
@@ -64,40 +52,30 @@ const TextAdvance = ({
     // eslint-disable-next-line
   }, [align, position, text, font, size, height]);
 
-
-  // Memoiza el material para evitar recrearlo en cada render
-  const textMaterial = useMemo(() => (
-    <meshStandardMaterial
-      attach="material"
-      color={colorPri}
-      emissive={colorPri}
-      emissiveIntensity={0}
-      roughness={0.0}
-      metalness={0.1}
-    />
-  ), [colorPri]);
-
-  // Memoiza el componente Text3D para evitar recrearlo en cada render
-  const text3DComponent = useMemo(() => (
-    <Text3D
-      ref={textRef}
-      castShadow
-      receiveShadow
-      position={textPosition}
-      rotation={[-Math.PI / 2, 0, 0]}
-      {...textProps}
-      material={sharedMaterial}
-      color={colorPri}
-    >
-      {text}
-      {/* {textMaterial} */}
-      {colorPri != 'white' ? textMaterial : null}
-    </Text3D>
-  ), [text, textPosition, textProps]);//, textMaterial]);
-
   return (
     <mesh>
-      {text3DComponent}
+      <Text3D
+        ref={textRef}
+        castShadow={true}
+        receiveShadow={true}
+        position={textPosition}
+        rotation={[-Math.PI / 2, 0, 0]}
+        {...textProps}
+        material={sharedMaterial}
+        color={colorPri}
+      >
+        {text}
+        {colorPri !== 'white' && (
+          <meshStandardMaterial
+            attach="material"
+            color={colorPri}
+            emissive={colorPri}
+            emissiveIntensity={0}
+            roughness={0.0}
+            metalness={0.1}
+          />
+        )}
+      </Text3D>
     </mesh>
   );
 };

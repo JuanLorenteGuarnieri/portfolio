@@ -3,13 +3,13 @@ import { useMemo } from 'react';
 import TextAdvance from '../components/TextAdvance';
 import fontText from '../assets/fonts/Source_Code_Pro/static/Source_Code_Pro_Regular.json';
 import { Bvh } from '@react-three/drei';
-import { Github } from '../../public/models/Github';
-import { Python } from '../../public/models/Python';
-import { Vlbi } from '../../public/models/Vlbi';
-import { Doc } from '../../public/models/Doc';
-import { Docs } from '../../public/models/Docs';
-import { Slides } from '../../public/models/Slides';
-import { Matlab } from '../../public/models/Matlab';
+import { Github } from '../models/Github';
+import { Python } from '../models/Python';
+import { Vlbi } from '../models/Vlbi';
+import { Doc } from '../models/Doc';
+import { Docs } from '../models/Docs';
+import { Slides } from '../models/Slides';
+import { Matlab } from '../models/Matlab';
 
 function ACI({ isVisibleLight, pos, parentPos }) {
   // Memoriza los textos y modelos que no dependen de props

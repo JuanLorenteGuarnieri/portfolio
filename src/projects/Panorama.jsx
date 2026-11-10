@@ -3,14 +3,14 @@ import { TextureLoader } from 'three';
 import TextAdvance from '../components/TextAdvance';
 import fontText from '../assets/fonts/Source_Code_Pro/static/Source_Code_Pro_Regular.json';
 import { Bvh, Plane } from '@react-three/drei';
-import { Github } from '../../public/models/Github';
-import { Opencv } from '../../public/models/Opencv';
-import { Python } from '../../public/models/Python';
+import { Github } from '../models/Github';
+import { Opencv } from '../models/Opencv';
+import { Python } from '../models/Python';
 import { useLoader } from '@react-three/fiber';
 import { useMemo } from 'react';
-import { Doc } from '../../public/models/Doc';
-import { Docs } from '../../public/models/Docs';
-import { Slides } from '../../public/models/Slides';
+import { Doc } from '../models/Doc';
+import { Docs } from '../models/Docs';
+import { Slides } from '../models/Slides';
 
 function Panorama({ isVisibleLight, pos, parentPos }) {
   const panoramaTexture = useLoader(TextureLoader, 'https://JuanLorenteGuarnieri.github.io/portfolio/panorama.png');
@@ -114,3 +114,4 @@ function Panorama({ isVisibleLight, pos, parentPos }) {
 }
 
 export default Panorama;
+

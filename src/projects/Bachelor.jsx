@@ -3,15 +3,15 @@ import { TextureLoader } from 'three';
 import TextAdvance from '../components/TextAdvance';
 import fontText from '../assets/fonts/Source_Code_Pro/static/Source_Code_Pro_Regular.json';
 import { Bvh, Sphere } from '@react-three/drei';
-import { Github } from '../../public/models/Github';
-import { Pytorch } from '../../public/models/Pytorch';
-import { Python } from '../../public/models/Python';
-import { SurfacePoint } from '../../public/models/SurfacePoint';
+import { Github } from '../models/Github';
+import { Pytorch } from '../models/Pytorch';
+import { Python } from '../models/Python';
+import { SurfacePoint } from '../models/SurfacePoint';
 import { useLoader } from '@react-three/fiber';
 import { useMemo } from 'react';
-import { Doc } from '../../public/models/Doc';
-import { Docs } from '../../public/models/Docs';
-import { Slides } from '../../public/models/Slides';
+import { Doc } from '../models/Doc';
+import { Docs } from '../models/Docs';
+import { Slides } from '../models/Slides';
 
 function Bachelor({ isVisibleLight, pos, parentPos }) {
   const scanpathTexture = useLoader(TextureLoader, 'https://JuanLorenteGuarnieri.github.io/portfolio/scanpath.png');
@@ -110,3 +110,4 @@ function Bachelor({ isVisibleLight, pos, parentPos }) {
 }
 
 export default Bachelor;
+

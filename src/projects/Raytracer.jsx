@@ -2,12 +2,12 @@ import * as THREE from 'three';
 import TextAdvance from '../components/TextAdvance';
 import fontText from '../assets/fonts/Source_Code_Pro/static/Source_Code_Pro_Regular.json';
 import { Bvh, CubeCamera, Plane, Sphere } from '@react-three/drei';
-import { Doc } from '../../public/models/Doc';
-import { Github } from '../../public/models/Github';
-import { C } from '../../public/models/C';
+import { Doc } from '../models/Doc';
+import { Github } from '../models/Github';
+import { C } from '../models/C';
 import React, { useMemo } from 'react';
-import { Docs } from '../../public/models/Docs';
-import { Slides } from '../../public/models/Slides';
+import { Docs } from '../models/Docs';
+import { Slides } from '../models/Slides';
 
 function Raytracer({ isVisibleLight, pos, parentPos }) {
 
@@ -152,3 +152,4 @@ function Raytracer({ isVisibleLight, pos, parentPos }) {
 }
 
 export default Raytracer;
+

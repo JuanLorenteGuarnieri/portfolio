@@ -9,6 +9,15 @@
   --green-rgb: 125 161 35;
 }
 
+@keyframes shrink {
+  from {
+    transform: scale(1.1);
+  }
+  to {
+    transform: scale(0.9);
+  }
+}
+
 /* Contenedor desplazable sin mostrar scroll */
 .container {
   overflow-y: auto;

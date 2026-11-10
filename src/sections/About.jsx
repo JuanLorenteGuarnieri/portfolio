@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import TextAdvance from '../components/TextAdvance';
 import fontTitle from '../assets/fonts/Encode_Sans_Semi_Expanded/Encode_Sans_Semi_Expanded_Bold.json';
 import fontText from '../assets/fonts/Source_Code_Pro/static/Source_Code_Pro_Regular.json';
-import { Juan } from '../../public/models/Juan';
+import { Juan } from '../models/Juan';
 import { useMemo } from 'react';
 
 const colorPriTitle = "white";

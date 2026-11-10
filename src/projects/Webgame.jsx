@@ -2,11 +2,11 @@ import * as THREE from 'three';
 import TextAdvance from '../components/TextAdvance';
 import fontText from '../assets/fonts/Source_Code_Pro/static/Source_Code_Pro_Regular.json';
 import { Bvh, Float } from '@react-three/drei';
-import { Play } from '../../public/models/Play';
-import { Github } from '../../public/models/Github';
-import { Reacts } from '../../public/models/React';
-import { Threejs } from '../../public/models/Threejs';
-import { RusticSpaceShip } from '../../public/models/RusticSpaceShip';
+import { Play } from '../models/Play';
+import { Github } from '../models/Github';
+import { Reacts } from '../models/React';
+import { Threejs } from '../models/Threejs';
+import { RusticSpaceShip } from '../models/RusticSpaceShip';
 import { useMemo } from 'react';
 
 function Webgame({ isVisibleLight, pos, parentPos }) {

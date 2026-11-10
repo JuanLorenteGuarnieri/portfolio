@@ -1,7 +1,19 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { useThree } from '@react-three/fiber';
 import { Text3D } from '@react-three/drei';
-import * as THREE from 'three';
+
+const TEXT_LINE_LENGTH = 28;
+const DEFAULT_CURSOR_OFFSET = 0.116;
+const DEFAULT_SIZE_NORMALIZER = 0.05;
+
+function Text3DLine({ position, rotation, text, textProps, colorPri }) {
+  return (
+    <Text3D castShadow receiveShadow position={position} rotation={rotation} {...textProps}>
+      {text}
+      <meshPhongMaterial attach="material" color={colorPri} />
+    </Text3D>
+  );
+}
 
 const Text3DInteractive = ({
   id,
@@ -16,53 +28,51 @@ const Text3DInteractive = ({
   maxLengthCharacters = 41,
   textParagraph = false,
   text,
-  setText
+  setText,
 }) => {
-  const textRef = useRef();
-  const [textProps, setTextProps] = useState({ font, size, height });
   const { gl } = useThree();
   const [cursorPosition, setCursorPosition] = useState(0);
-  const [sizeRatio, setSizeRatio] = useState(1);
-
-  const cursorRef = useRef();
   const [showCursor, setShowCursor] = useState(true);
-
-  const handleKeyDown = (e) => {
-    if (!(typeForm == id)) return;
-
-    if (e.key === 'Enter') {
-      gl.domElement.removeAttribute('tabindex');
-      setCursorPosition(text.length);
-      change(id + 1);
-    } else if (e.key === 'Backspace') {
-      if (cursorPosition > 0) {
-        const newText = text.substring(0, cursorPosition - 1) + text.substring(cursorPosition);
-        setText(newText);
-        setCursorPosition(cursorPosition - 1);
-      }
-    } else if (e.key === 'ArrowLeft') {
-      setCursorPosition(Math.max(0, cursorPosition - 1));
-    } else if (e.key === 'ArrowRight') {
-      setCursorPosition(Math.min(text.length, cursorPosition + 1));
-    } else if (e.key.length === 1 && maxLengthCharacters > text.length) {
-      const newText = text.substring(0, cursorPosition) + e.key + text.substring(cursorPosition);
-      setText(newText);
-      setCursorPosition(cursorPosition + 1);
-    }
-  };
+  const latest = useRef({ text, typeForm, cursorPosition });
 
   useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown);
+    latest.current = { text, typeForm, cursorPosition };
+  }, [text, typeForm, cursorPosition]);
 
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      const { text: currentText, typeForm: currentTypeForm, cursorPosition: currentCursor } = latest.current;
+      if (currentTypeForm !== id) return;
+
+      if (e.key === 'Enter') {
+        gl.domElement.removeAttribute('tabindex');
+        setCursorPosition(currentText.length);
+        change(id + 1);
+      } else if (e.key === 'Backspace') {
+        if (currentCursor > 0) {
+          const newText = currentText.substring(0, currentCursor - 1) + currentText.substring(currentCursor);
+          setText(newText);
+          setCursorPosition(currentCursor - 1);
+        }
+      } else if (e.key === 'ArrowLeft') {
+        setCursorPosition((pos) => Math.max(0, pos - 1));
+      } else if (e.key === 'ArrowRight') {
+        setCursorPosition((pos) => Math.min(currentText.length, pos + 1));
+      } else if (e.key.length === 1 && maxLengthCharacters > currentText.length) {
+        const newText = currentText.substring(0, currentCursor) + e.key + currentText.substring(currentCursor);
+        setText(newText);
+        setCursorPosition(currentCursor + 1);
+      }
     };
-  }, [text, gl.domElement, typeForm, cursorPosition]);
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [id, change, gl.domElement, maxLengthCharacters, setText]);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if (typeForm == id) {
-        setShowCursor(prev => !prev);
+      if (typeForm === id) {
+        setShowCursor((prev) => !prev);
       } else {
         setCursorPosition(text.length);
         setShowCursor(false);
@@ -70,124 +80,84 @@ const Text3DInteractive = ({
     }, 500);
 
     return () => clearInterval(interval);
-  }, [id, typeForm]);
+  }, [id, typeForm, text.length]);
 
-  useEffect(() => {
-    const textLength = text.length;
-    if (textLength > maxCharacters && !textParagraph) {
-      const newSize = Math.max(size * (maxCharacters / textLength), 0.1);
-      setSizeRatio(newSize / size);
-      setTextProps({ font, size: newSize, height });
-    } else {
-      if (textLength <= maxCharacters) {
-        setSizeRatio(1);
-      }
-      setTextProps({ font, size, height });
+  const textProps = useMemo(() => {
+    if (!textParagraph && text.length > maxCharacters) {
+      const newSize = Math.max(size * (maxCharacters / text.length), 0.1);
+      return { font, size: newSize, height };
     }
-  }, [text, font, height, size, maxCharacters]);
+    return { font, size, height };
+  }, [text, textParagraph, font, height, maxCharacters, size]);
 
-  // Memoized Text3D lines for paragraph mode
-  const memoizedParagraphLines = useMemo(() => {
-    if (!textParagraph) return null;
-    const lines = [];
-    for (let i = 0; i < 5; i++) {
-      lines.push(
-        <Text3D
-          key={i}
-          ref={null}
-          castShadow
-          receiveShadow
-          position={[position[0], position[1], position[2] + 0.3 * i]}
-          rotation={[-Math.PI / 2, 0, 0]}
-          {...textProps}
-        >
-          {text.slice(i * 28, (i + 1) * 28)}
-          <meshPhongMaterial attach="material" color={colorPri} />
-        </Text3D>
-      );
+  const sizeRatio = useMemo(() => {
+    if (!textParagraph && text.length > maxCharacters) {
+      return Math.max(size * (maxCharacters / text.length), 0.1) / size;
     }
-    return lines;
-    // eslint-disable-next-line
-  }, [text, textProps, colorPri, position, textParagraph]);
+    return 1;
+  }, [text, textParagraph, maxCharacters, size]);
 
-  // Memoized cursor for paragraph mode
-  const memoizedParagraphCursor = useMemo(() => {
-    if (!textParagraph || !showCursor) return null;
-    const line = Math.min(Math.floor(cursorPosition / 28), 4);
-    const col = (line === 4 ? 28 : cursorPosition % 28);
-    return (
-      <Text3D
-        ref={cursorRef}
-        castShadow
-        receiveShadow
-        position={[
-          position[0] - 0.05 + 0.1161 * col,
-          position[1],
-          position[2] + 0.3 * line
-        ]}
-        rotation={[-Math.PI / 2, 0, 0]}
-        {...textProps}
-      >
-        {'|'}
-        <meshPhongMaterial attach="material" color={colorPri} />
-      </Text3D>
-    );
-    // eslint-disable-next-line
-  }, [showCursor, cursorPosition, textProps, colorPri, position, textParagraph]);
+  const paragraphLines = textParagraph
+    ? Array.from({ length: 5 }, (_, i) => {
+        const sliceText = text.slice(i * TEXT_LINE_LENGTH, (i + 1) * TEXT_LINE_LENGTH);
+        return (
+          <Text3DLine
+            key={i}
+            position={[position[0], position[1], position[2] + 0.3 * i]}
+            rotation={[-Math.PI / 2, 0, 0]}
+            text={sliceText}
+            textProps={textProps}
+            colorPri={colorPri}
+          />
+        );
+      })
+    : null;
 
-  // Memoized Text3D for single line
-  const memoizedSingleLine = useMemo(() => {
-    if (textParagraph) return null;
+  const paragraphCursor = textParagraph && showCursor ? (() => {
+    const line = Math.min(Math.floor(cursorPosition / TEXT_LINE_LENGTH), 4);
+    const col = line === 4 ? TEXT_LINE_LENGTH : cursorPosition % TEXT_LINE_LENGTH;
     return (
-      <Text3D
-        ref={textRef}
-        castShadow
-        receiveShadow
-        position={position}
+      <Text3DLine
+        position={[position[0] - DEFAULT_SIZE_NORMALIZER + 0.1161 * col, position[1], position[2] + 0.3 * line]}
         rotation={[-Math.PI / 2, 0, 0]}
-        {...textProps}
-      >
-        {text}
-        <meshPhongMaterial attach="material" color={colorPri} />
-      </Text3D>
+        text="|"
+        textProps={textProps}
+        colorPri={colorPri}
+      />
     );
-    // eslint-disable-next-line
-  }, [text, textProps, colorPri, position, textParagraph]);
+  })() : null;
 
-  // Memoized cursor for single line
-  const memoizedSingleCursor = useMemo(() => {
-    if (textParagraph || !showCursor) return null;
-    return (
-      <Text3D
-        ref={cursorRef}
-        castShadow
-        receiveShadow
-        position={[
-          position[0] - 0.05 + 0.116 * cursorPosition * sizeRatio,
-          position[1],
-          position[2]
-        ]}
-        rotation={[-Math.PI / 2, 0, 0]}
-        {...textProps}
-      >
-        {'|'}
-        <meshPhongMaterial attach="material" color={colorPri} />
-      </Text3D>
-    );
-    // eslint-disable-next-line
-  }, [showCursor, cursorPosition, textProps, colorPri, position, sizeRatio, textParagraph]);
+  const singleLine = !textParagraph ? (
+    <Text3DLine
+      position={position}
+      rotation={[-Math.PI / 2, 0, 0]}
+      text={text}
+      textProps={textProps}
+      colorPri={colorPri}
+    />
+  ) : null;
+
+  const singleCursor = !textParagraph && showCursor ? (
+    <Text3DLine
+      position={[position[0] - DEFAULT_SIZE_NORMALIZER + DEFAULT_CURSOR_OFFSET * cursorPosition * sizeRatio, position[1], position[2]]}
+      rotation={[-Math.PI / 2, 0, 0]}
+      text="|"
+      textProps={textProps}
+      colorPri={colorPri}
+    />
+  ) : null;
 
   return (
     <group>
       {textParagraph ? (
         <>
-          {memoizedParagraphLines}
-          {memoizedParagraphCursor}
+          {paragraphLines}
+          {paragraphCursor}
         </>
       ) : (
         <>
-          {memoizedSingleLine}
-          {memoizedSingleCursor}
+          {singleLine}
+          {singleCursor}
         </>
       )}
     </group>

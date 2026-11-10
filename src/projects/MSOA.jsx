@@ -2,13 +2,13 @@ import * as THREE from 'three';
 import TextAdvance from '../components/TextAdvance';
 import fontText from '../assets/fonts/Source_Code_Pro/static/Source_Code_Pro_Regular.json';
 import { Bvh } from '@react-three/drei';
-import { C } from '../../public/models/C';
-import { Helmet } from '../../public/models/Helmet';
+import { C } from '../models/C';
+import { Helmet } from '../models/Helmet';
 import { useMemo } from 'react';
-import { Doc } from '../../public/models/Doc';
-import { Github } from '../../public/models/Github';
-import { Image } from '../../public/models/Image';
-import { Docs } from '../../public/models/Docs';
+import { Doc } from '../models/Doc';
+import { Github } from '../models/Github';
+import { Image } from '../models/Image';
+import { Docs } from '../models/Docs';
 
 function MSOA({ isVisibleLight, pos, parentPos }) {
   const helmetMesh = useMemo(() => (
@@ -103,3 +103,4 @@ function MSOA({ isVisibleLight, pos, parentPos }) {
 }
 
 export default MSOA;
+

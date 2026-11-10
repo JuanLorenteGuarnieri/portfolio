@@ -3,13 +3,13 @@ import { useMemo } from 'react';
 import TextAdvance from '../components/TextAdvance';
 import fontText from '../assets/fonts/Source_Code_Pro/static/Source_Code_Pro_Regular.json';
 import { Bvh } from '@react-three/drei';
-import { Github } from '../../public/models/Github';
-import { C } from '../../public/models/C';
-import { Doc } from '../../public/models/Doc';
-import { Docs } from '../../public/models/Docs';
-import { Slides } from '../../public/models/Slides';
-import { Slammap } from '../../public/models/Slammap';
-import { Slamcamera } from '../../public/models/Slamcamera';
+import { Github } from '../models/Github';
+import { C } from '../models/C';
+import { Doc } from '../models/Doc';
+import { Docs } from '../models/Docs';
+import { Slides } from '../models/Slides';
+import { Slammap } from '../models/Slammap';
+import { Slamcamera } from '../models/Slamcamera';
 
 function SLAM({ isVisibleLight, pos, parentPos }) {
   const textColorSec = useMemo(() => new THREE.Color(0x223060), []);

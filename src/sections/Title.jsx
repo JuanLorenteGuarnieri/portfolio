@@ -1,12 +1,12 @@
 import { useMemo } from 'react';
-import { LogoGema } from '../../public/models/LogoGema';
-import { Logo } from '../../public/models/Logo';
+import { LogoGema } from '../models/LogoGema';
+import { Logo } from '../models/Logo';
 import { Bvh, Float, Plane } from '@react-three/drei';
 import * as THREE from 'three';
 import TextAdvance from '../components/TextAdvance';
-import { Linkedin } from '../../public/models/Linkedin';
-import { Github } from '../../public/models/Github';
-import { CV } from '../../public/models/Cv';
+import { Linkedin } from '../models/Linkedin';
+import { Github } from '../models/Github';
+import { CV } from '../models/Cv';
 import fontTitle from '../assets/fonts/Encode_Sans_Semi_Expanded/Encode_Sans_Semi_Expanded_Bold.json';
 import fontText from '../assets/fonts/Source_Code_Pro/static/Source_Code_Pro_Regular.json';
 import { BakedLogo } from '../components/BakedLogo';
@@ -129,3 +129,4 @@ function Title({ isVisibleLight, pos }) {
 }
 
 export default Title;
+

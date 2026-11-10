@@ -3,12 +3,12 @@ import { useMemo } from 'react';
 import TextAdvance from '../components/TextAdvance';
 import fontText from '../assets/fonts/Source_Code_Pro/static/Source_Code_Pro_Regular.json';
 import { Bvh } from '@react-three/drei';
-import { Github } from '../../public/models/Github';
-import { Python } from '../../public/models/Python';
-import { Robot } from '../../public/models/Robot';
-import { Doc } from '../../public/models/Doc';
-import { Image } from '../../public/models/Image';
-import { Slides } from '../../public/models/Slides';
+import { Github } from '../models/Github';
+import { Python } from '../models/Python';
+import { Robot } from '../models/Robot';
+import { Doc } from '../models/Doc';
+import { Image } from '../models/Image';
+import { Slides } from '../models/Slides';
 
 
 function Robotics({ isVisibleLight, pos, parentPos }) {

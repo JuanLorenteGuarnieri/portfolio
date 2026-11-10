@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import TextAdvance from '../components/TextAdvance';
 import fontTitle from '../assets/fonts/Encode_Sans_Semi_Expanded/Encode_Sans_Semi_Expanded_Bold.json';
 import fontText from '../assets/fonts/Source_Code_Pro/static/Source_Code_Pro_Regular.json';
-import { Unizar } from '../../public/models/Unizar';
+import { Unizar } from '../models/Unizar';
 
 function Education({ isVisibleLight, pos }) {
   const bachelorPos = [0, 0, 0.9];
@@ -73,7 +73,7 @@ function Education({ isVisibleLight, pos }) {
       <TextAdvance
         position={[-0.8, 0, 1.05]}
         align="left"
-        text={"2024 - 2025"}
+        text={"2024 - 2026"}
         font={fontText}
         size={0.16}
         height={0.05}
