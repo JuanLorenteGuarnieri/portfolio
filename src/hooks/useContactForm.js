@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react';
-import emailjs from '@emailjs/browser';
 
 const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID || 'service_4bprkd7';
 const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || 'template_ri6j7pk';
@@ -52,7 +51,9 @@ export function useContactForm() {
       message,
     };
 
-    emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY)
+    // Carga diferida: EmailJS solo se descarga cuando se envía el primer mensaje
+    import('@emailjs/browser')
+      .then(({ default: emailjs }) => emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY))
       .then(() => {
         setFeedback('Email sent');
         setColorFeedback(0x5cae5e);

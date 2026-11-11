@@ -19,7 +19,7 @@ export const Pilar = forwardRef<Group, Props>(({ ...props }, ref) => {
   const dummy = useRef(new Object3D())
 
   useEffect(() => {
-    fetch('https://JuanLorenteGuarnieri.github.io/portfolio/points3D.txt')
+    fetch(`${import.meta.env.BASE_URL}points3D.txt`)
       .then(res => res.text())
       .then(text => {
         const lines = text.split('\n').filter(Boolean)

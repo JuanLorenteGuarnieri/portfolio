@@ -13,7 +13,7 @@ import { Docs } from '../models/Docs';
 import { Slides } from '../models/Slides';
 
 function Panorama({ isVisibleLight, pos, parentPos }) {
-  const panoramaTexture = useLoader(TextureLoader, 'https://JuanLorenteGuarnieri.github.io/portfolio/panorama.png');
+  const panoramaTexture = useLoader(TextureLoader, `${import.meta.env.BASE_URL}panorama.png`);
 
   // Memoriza los componentes que no dependen de props dinámicas
   const titleTexts = useMemo(() => (

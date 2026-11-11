@@ -20,7 +20,7 @@ export const Slamcamera = forwardRef<Group, Props>(({ ...props }, ref) => {
 
   // Carga y normaliza
   useEffect(() => {
-    fetch('https://JuanLorenteGuarnieri.github.io/portfolio/euroc_camera.txt')
+    fetch(`${import.meta.env.BASE_URL}euroc_camera.txt`)
       .then(res => res.text())
       .then(text => {
         const lines = text.split('\n').filter(Boolean)
@@ -56,7 +56,14 @@ export const Slamcamera = forwardRef<Group, Props>(({ ...props }, ref) => {
 
     const elapsed = clockRef.current.getElapsedTime() * 9 // en segundos
     // Buscar el índice que coincide o avanza
-    let idx = poses.findIndex(p => p.timestamp >= elapsed)
+    // Primera pose con timestamp >= elapsed (búsqueda binaria: las poses vienen ordenadas por tiempo)
+    let lo = 0, hi = poses.length
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1
+      if (poses[mid].timestamp >= elapsed) hi = mid
+      else lo = mid + 1
+    }
+    let idx = lo === poses.length ? -1 : lo
     if (idx === -1) {
       // Si sobrepasamos la última pose, reiniciamos el reloj
       clockRef.current.stop()

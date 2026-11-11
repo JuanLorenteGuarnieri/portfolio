@@ -1,7 +1,6 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useMemo, useCallback } from 'react';
 import * as THREE from 'three';
 
-import video from '/public/Intro.mp4';
 import Navigation from '../components/Navigation';
 import MobileCaption from '../components/MobileCaption';
 import VideoPlayer from '../components/VideoPlayer';
@@ -10,42 +9,70 @@ import CustomCursor from '../components/CustomCursor';
 import { useMouseSpeed } from '../hooks/useMouseSpeed';
 import { useViewportOrientation } from '../hooks/useViewportOrientation';
 import { useContactForm } from '../hooks/useContactForm';
+import { subscribeScroll, getScrollY, scrollToCameraZ } from '../scrollStore';
+import { useVisibility } from '../hooks/useVisibility';
+import { planWarmupStops } from '../lib/warmup';
+
+// El vídeo vive en /public: se referencia por URL (no se importa) para que Vite no lo duplique en el bundle.
+const video = `${import.meta.env.BASE_URL}Intro.mp4`;
 
 const CURSOR_COLOR = 'white';
-const isMobileDevice = () => /Mobi|Android/i.test(navigator.userAgent);
 
-const Home = ({ scrollValue, maxY, changeScroll }) => {
+// Para comparar: abre la web con ?nowarmup para desactivar el precalentamiento de la escena.
+const WARMUP_ENABLED = !new URLSearchParams(window.location.search).has('nowarmup');
+
+// Si el precalentamiento no termina (red muy lenta, error...), se muestra la escena igualmente
+// pasado este tiempo desde que acaba la intro.
+const WARMUP_TIMEOUT_MS = 20000;
+
+// ---------------------------------------------------------------------------
+// CONSTANTES DE MÓDULO (referencias estables => React.memo y useMemo funcionan)
+// ---------------------------------------------------------------------------
+// SECTIONS POSITIONS
+const titlePos = [0, 0, 22];
+const aboutPos = [0, 0, 28];
+const educationPos = [0, 0, 32.8];
+const experiencePos = [0, 0, 37.9];
+const projectsPos = [0, 0, 41.5];
+const skillsPos = [0, 0, 72];
+const contactPos = [0, 0, 75];
+const interestPos = [0, 0, 82.5];
+
+const SEC_POS = [
+  { key: 'sectionTitle', value: titlePos[2], label: 'Title' },
+  { key: 'sectionAbout', value: aboutPos[2], label: 'About' },
+  { key: 'sectionEducation', value: educationPos[2], label: 'Education' },
+  { key: 'sectionExperience', value: experiencePos[2], label: 'Experience' },
+  { key: 'sectionProyects', value: projectsPos[2], label: 'Projects' },
+  { key: 'sectionSkills', value: skillsPos[2], label: 'Skills' },
+  { key: 'sectionContact', value: contactPos[2], label: 'Contact' },
+  { key: 'sectionInterest', value: interestPos[2], label: 'Interests' }
+];
+
+// Scroll (px) al que empieza cada sección (inversa de scrollToCameraZ)
+const SEC_SCROLL = SEC_POS.map(({ value }) => (value - 24.5) / 0.00461);
+const sectionIndexAt = (y) => {
+  let idx = -1;
+  for (let i = 0; i < SEC_SCROLL.length; i++) if (y >= SEC_SCROLL[i]) idx = i;
+  return idx;
+};
+
+// Objetos reutilizados (antes se creaban de nuevo en cada render)
+const raycaster = new THREE.Raycaster();
+const mouseNDC = new THREE.Vector2();
+const hitPoint = new THREE.Vector3();
+
+const Home = ({ maxY, changeScroll }) => {
   // CONFIGURATION
   const cameraRef = useRef();
+  const lightRef = useRef();
   const [dpr, setDpr] = useState(0.75);
-  const [targetPos, setTargetPos] = useState(0);
-
-  // SECTIONS POSITIONS
-  const titlePos = [0, 0, 22];
-  const aboutPos = [0, 0, 28];
-  const educationPos = [0, 0, 32.8];
-  const experiencePos = [0, 0, 37.9];
-  const projectsPos = [0, 0, 41.5];
-  const skillsPos = [0, 0, 72];
-  const contactPos = [0, 0, 75];
-  const interestPos = [0, 0, 82.5];
-
-
-  const secPos = [
-    { key: 'sectionTitle', value: titlePos[2], label: 'Title' },
-    { key: 'sectionAbout', value: aboutPos[2], label: 'About' },
-    { key: 'sectionEducation', value: educationPos[2], label: 'Education' },
-    { key: 'sectionExperience', value: experiencePos[2], label: 'Experience' },
-    { key: 'sectionProyects', value: projectsPos[2], label: 'Projects' },
-    { key: 'sectionSkills', value: skillsPos[2], label: 'Skills' },
-    { key: 'sectionContact', value: contactPos[2], label: 'Contact' },
-    { key: 'sectionInterest', value: interestPos[2], label: 'Interests' }
-  ];
 
   // CONTACT
   const sendFormRef = useRef();
   // FORMS
   const [typeForm, setTypeForm] = useState(0);
+  const changeTypeForm = useCallback((n) => { setTypeForm(n); }, []);
 
   const hiddenInputRef1 = useRef(), hiddenInputRef2 = useRef(), hiddenInputRef3 = useRef();
   const form1Ref = useRef(), form2Ref = useRef(), form3Ref = useRef();
@@ -62,87 +89,159 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
     sendEmail,
   } = useContactForm();
 
-  const getDistance2Camera = (v1) => {
-    if (!cameraRef.current) return 0;
-    const position = cameraRef.current.position;
-    return Math.sqrt(
-      Math.pow(v1.x - position.x, 2) +
-      Math.pow(v1.y - position.y, 2) +
-      Math.pow(v1.z - position.z, 2)
-    );
-  };
+  // Visibilidad por proximidad a la cámara (ver hooks/useVisibility.js)
+  const { isVisibleLight, syncVisibility, bumpVisibility, waitUntilRendered, registry: visRegistry } = useVisibility(cameraRef);
+  const warmingRef = useRef(false);
 
-  const isBeforeCamera = (v1) => {
-    if (!cameraRef.current) return 0;
-    var position = cameraRef.current.position;
-    return position.z + 3 > v1.z;
-  };
+  const handleCameraReady = useCallback(() => { bumpVisibility(); }, [bumpVisibility]);
 
-  const isVisibleLight = (v1, dist) => {
-    return isBeforeCamera(v1) && getDistance2Camera(v1) < dist;
-  };
+  // ---------------------------------------------------------------------------
+  // LUZ DEL CURSOR (imperativa: sin estado de React => sin re-renders por movimiento)
+  // ---------------------------------------------------------------------------
+  const calculateIntersect = useCallback((x, y) => {
+    const cam = cameraRef.current;
+    if (!cam) return;
 
-  // Configura el raycaster
-  const raycaster = new THREE.Raycaster();
-  const mouse = new THREE.Vector2();
+    mouseNDC.x = (x / window.innerWidth) * 2 - 1;
+    mouseNDC.y = -(y / window.innerHeight) * 2 + 1;
 
-  const [mouseSpeed, setMouseSpeed] = useState(0);
-  const lastMousePos = useRef({ x: 0, y: 0, t: Date.now() });
+    raycaster.setFromCamera(mouseNDC, cam);
 
-  const updateMouseSpeed = (x, y) => {
-    const now = Date.now();
-    const { x: lastX, y: lastY, t: lastT } = lastMousePos.current;
-    const dt = now - lastT;
-    if (dt > 0) {
-      const dx = x - lastX;
-      const dy = y - lastY;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      const speed = dist / dt; // px/ms
-      // Normaliza la velocidad a un rango de 0 a 1
-      const normalizedSpeed = Math.min(speed / 800, 1);
-      setMouseSpeed(normalizedSpeed);
-    }
-    lastMousePos.current = { x, y, t: now };
-  };
+    // Calcula el punto de intersección con el plano y=0 (suelo)
+    const { origin, direction } = raycaster.ray;
+    if (direction.y === 0) return; // Evita división por cero
 
-  useEffect(() => {
-    const handleMouseMove = (event) => {
-      updateMouseSpeed(event.clientX, event.clientY);
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-    };
+    const t = -origin.y / direction.y;
+    if (t < 0) return; // Solo intersecciones delante de la cámara
+
+    hitPoint.copy(direction).multiplyScalar(t).add(origin);
+    if (lightRef.current) lightRef.current.position.set(hitPoint.x, 0.4, hitPoint.z);
   }, []);
 
-  const changeTypeForm = (n) => {
-    setTypeForm(n);
-  };
+  // La resolución del mapa de sombras baja cuando el ratón se mueve rápido
+  const applyShadowSize = useCallback((speed) => {
+    const light = lightRef.current;
+    if (!light || !Number.isFinite(speed)) return;
+    const minSize = 1;
+    const maxSize = 400;
+    const mapSize = Math.round(maxSize - (maxSize - minSize) * speed);
+    light.shadow.mapSize.width = mapSize;
+    light.shadow.mapSize.height = mapSize;
+    light.shadow.needsUpdate = true;
+  }, []);
 
-  const handleKeyDown = (event) => { // Prevent default action for 'Space' (scroll)
-    if (event.keyCode === 32) {
-      event.preventDefault();
+  const { updateMouseSpeed, lastMousePos } = useMouseSpeed(applyShadowSize);
+
+  const handlePointerMove = useCallback((event) => { //RECHARGE LIGHT CURSOR WHEN MOVING
+    if (cameraRef.current) {
+      // Obtiene las coordenadas del cursor
+      let x, y;
+      if (event.touches) {
+        // Manejo del evento táctil
+        const touch = event.touches[0];
+        x = touch.clientX;
+        y = touch.clientY;
+      } else {
+        x = event.clientX;
+        y = event.clientY;
+      }
+
+      calculateIntersect(x, y);
+      updateMouseSpeed(x, y);
     }
-  };
+  }, [calculateIntersect, updateMouseSpeed]);
+
+  // ---------------------------------------------------------------------------
+  // SCROLL: mueve la cámara, la luz del cursor y detecta cambios de visibilidad
+  // ---------------------------------------------------------------------------
+  const [navIdx, setNavIdx] = useState(-1);
+
+  const applyScroll = useCallback((y) => {
+    const cam = cameraRef.current;
+    if (!cam || warmingRef.current) return;
+
+    // 1) Cámara (antes: setState en App + useEffect en CameraController)
+    cam.position.z = scrollToCameraZ(y);
+    cam.updateMatrixWorld();
+
+    // 2) Luz del cursor: usa la última posición conocida del ratón (o el centro de la pantalla)
+    const { x, y: my } = lastMousePos.current;
+    calculateIntersect(x || window.innerWidth / 2, my || window.innerHeight / 2);
+
+    // 3) ¿Ha cambiado la visibilidad de alguna sección/proyecto/luz registrada?
+    syncVisibility();
+
+    // 4) Sección activa en la navegación (solo re-renderiza si cambia de sección)
+    setNavIdx(sectionIndexAt(y));
+  }, [calculateIntersect, syncVisibility, lastMousePos]);
+
+  useEffect(() => subscribeScroll(applyScroll), [applyScroll]);
+
+  // ---------------------------------------------------------------------------
+  // PRECALENTAMIENTO (ver components/SceneWarmUp.jsx)
+  // ---------------------------------------------------------------------------
+  const warmApi = useMemo(() => ({
+    plan() {
+      const cam = cameraRef.current;
+      if (!cam) return [];
+      const entries = Array.from(visRegistry.current.values());
+      return planWarmupStops(entries, cam.position, scrollToCameraZ(0), scrollToCameraZ(maxY));
+    },
+    begin() {
+      warmingRef.current = true;
+    },
+    // Mueve la cámara y espera a que React haya aplicado la visibilidad nueva a la escena.
+    async moveCameraTo(z) {
+      const cam = cameraRef.current;
+      cam.position.z = z;
+      cam.updateMatrixWorld();
+      const changed = syncVisibility();
+      if (changed.length) await waitUntilRendered(changed);
+    },
+    end() {
+      warmingRef.current = false;
+      applyScroll(getScrollY()); // vuelve a la posición real del scroll
+    },
+  }), [maxY, syncVisibility, waitUntilRendered, applyScroll, visRegistry]);
+
+  // ---------------------------------------------------------------------------
+  // INTRO: la escena se muestra cuando ha terminado el vídeo Y el precalentamiento
+  // ---------------------------------------------------------------------------
+  const [videoEnded, setVideoEnded] = useState(false);
+  const [sceneWarm, setSceneWarm] = useState(false);
+  const isAnimationDone = videoEnded && sceneWarm;
+
+  const handleVideoEnded = useCallback(() => { setVideoEnded(true); }, []);
+  const handleWarmDone = useCallback(() => { setSceneWarm(true); }, []);
 
   useEffect(() => {
+    if (!WARMUP_ENABLED) setSceneWarm(true);
+  }, []);
+
+  useEffect(() => {
+    if (videoEnded && !sceneWarm) {
+      const t = setTimeout(() => setSceneWarm(true), WARMUP_TIMEOUT_MS);
+      return () => clearTimeout(t);
+    }
+  }, [videoEnded, sceneWarm]);
+
+  const [, setIsContentLoaded] = useState(false);
+  const changeContentLoaded = useCallback(() => { setIsContentLoaded(true); }, []);
+
+  // ---------------------------------------------------------------------------
+  // EVENTOS
+  // ---------------------------------------------------------------------------
+  useEffect(() => {
+    const handleKeyDown = (event) => { // Prevent default action for 'Space' (scroll)
+      if (event.keyCode === 32) {
+        event.preventDefault();
+      }
+    };
     window.addEventListener('keydown', handleKeyDown);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
-
-  // ANIMATIONS
-  const [isContentLoaded, setIsContentLoaded] = useState(false);
-  const [isAnimationDone, setIsAnimationDone] = useState(false);
-
-  const changeContentLoaded = () => {
-    setIsContentLoaded(true);
-  };
-  const changeAnimationDone = () => {
-    // console.log("Animation done");
-    setIsAnimationDone(true);
-  };
 
   const onMouseClick = (event) => {
     if (
@@ -154,12 +253,12 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
     }
 
     // Calcula la posición del mouse en coordenadas normalizadas (-1 a +1)
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    mouseNDC.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouseNDC.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
     changeTypeForm(0);
 
-    raycaster.setFromCamera(mouse, cameraRef.current);
+    raycaster.setFromCamera(mouseNDC, cameraRef.current);
 
     const refs = [
       { ref: form1Ref, type: 1 },
@@ -191,53 +290,6 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
     // Only depend on variables that affect the click logic
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userName, userEmail, message, isAnimationDone]);
-
-
-  const calculateIntersect = (x, y) => {
-    if (!cameraRef.current) return;
-
-    // Reutiliza mouse y raycaster ya definidos fuera
-    mouse.x = (x / window.innerWidth) * 2 - 1;
-    mouse.y = -(y / window.innerHeight) * 2 + 1;
-
-    raycaster.setFromCamera(mouse, cameraRef.current);
-
-    // Calcula el punto de intersección con el plano y=0 (suelo)
-    const { origin, direction } = raycaster.ray;
-    if (direction.y === 0) return; // Evita división por cero
-
-    const t = -origin.y / direction.y;
-    if (t < 0) return; // Solo intersecciones delante de la cámara
-
-    const intersectPoint = new THREE.Vector3().copy(direction).multiplyScalar(t).add(origin);
-    setTargetPos([intersectPoint.x, 0, intersectPoint.z]);
-  };
-
-  const handlePointerMove = (event) => { //RECHARGE LIGHT CURSOR WHEN MOVING
-    if (cameraRef.current) {
-      // Obtiene las coordenadas del cursor
-      let x, y;
-      if (event.touches) {
-        // Manejo del evento táctil
-        const touch = event.touches[0];
-        x = touch.clientX;
-        y = touch.clientY;
-      } else {
-        x = event.clientX;
-        y = event.clientY;
-      }
-
-      calculateIntersect(x, y);
-      updateMouseSpeed(x, y);
-    }
-  };
-
-  useEffect(() => {
-    const { x, y } = lastMousePos.current;
-    const mouseX = x || window.innerWidth / 2;
-    const mouseY = y || window.innerHeight / 2;
-    calculateIntersect(mouseX, mouseY);
-  }, [scrollValue]);
 
   const { isPhoneVertical, isMobileDevice } = useViewportOrientation();
   const showCursor = !isMobileDevice();
@@ -326,58 +378,54 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
     }
   }, [isAnimationDone]);
 
-  const sceneProps = {
-    cameraRef,
-    dpr,
-    setDpr,
-    enableShadows,
-    isAnimationDone,
-    handlePointerMove,
-    scrollValue,
-    maxY,
-    targetPos,
-    mouseSpeed,
-    titlePos,
-    aboutPos,
-    educationPos,
-    experiencePos,
-    projectsPos,
-    skillsPos,
-    contactPos,
-    interestPos,
-    isVisibleLight,
-    typeForm,
-    changeTypeForm,
-    form1Ref,
-    form2Ref,
-    form3Ref,
-    sendFormRef,
-    changeContentLoaded,
-    changeAnimationDone,
-    userName,
-    userEmail,
-    message,
-    feedback,
-    colorFeedback,
-    changeUserName,
-    changeUserEmail,
-    changeMessage,
-    sendEmail,
-  };
-
   return (
     <>
       <section >
         {isAnimationDone ? null : (
-          // <Loader action={changeAnimationDone} />
-          <VideoPlayer src={video} onVideoComplete={setIsAnimationDone} />
+          // Mientras dura el precalentamiento el vídeo se queda en su último fotograma
+          <VideoPlayer src={video} onVideoComplete={handleVideoEnded} />
         )}
         {(
           isPhoneVertical && isAnimationDone ? (<MobileCaption />) : null
         )}
         {showCursor && isAnimationDone && <CustomCursor color={CURSOR_COLOR} size={5} />}
 
-        <HomeScene {...sceneProps} />
+        <HomeScene
+          cameraRef={cameraRef}
+          lightRef={lightRef}
+          dpr={dpr}
+          setDpr={setDpr}
+          enableShadows={enableShadows}
+          isAnimationDone={isAnimationDone}
+          sceneWarm={sceneWarm}
+          handlePointerMove={handlePointerMove}
+          onCameraReady={handleCameraReady}
+          warmApi={WARMUP_ENABLED ? warmApi : null}
+          onWarmDone={handleWarmDone}
+          titlePos={titlePos}
+          aboutPos={aboutPos}
+          educationPos={educationPos}
+          experiencePos={experiencePos}
+          projectsPos={projectsPos}
+          skillsPos={skillsPos}
+          contactPos={contactPos}
+          interestPos={interestPos}
+          isVisibleLight={isVisibleLight}
+          typeForm={typeForm}
+          changeTypeForm={changeTypeForm}
+          form1Ref={form1Ref}
+          form2Ref={form2Ref}
+          form3Ref={form3Ref}
+          sendFormRef={sendFormRef}
+          userName={userName}
+          userEmail={userEmail}
+          message={message}
+          feedback={feedback}
+          colorFeedback={colorFeedback}
+          changeUserName={changeUserName}
+          changeUserEmail={changeUserEmail}
+          changeMessage={changeMessage}
+        />
         <input ref={hiddenInputRef1}
           type="text"
           className="opacity-0"
@@ -423,7 +471,9 @@ const Home = ({ scrollValue, maxY, changeScroll }) => {
           }}
           aria-hidden="true" // Ocultar a lectores de pantalla
         />
-        <Navigation secPos={secPos} action={changeScroll} scrollValue={scrollValue} action2={changeContentLoaded}
+        <Navigation secPos={SEC_POS} action={changeScroll}
+          scrollValue={navIdx >= 0 ? SEC_SCROLL[navIdx] : Number.NEGATIVE_INFINITY}
+          action2={changeContentLoaded}
           cond={!isPhoneVertical && isAnimationDone} />
       </section >
     </>

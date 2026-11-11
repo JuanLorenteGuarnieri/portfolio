@@ -14,7 +14,7 @@ import { Docs } from '../models/Docs';
 import { Slides } from '../models/Slides';
 
 function Bachelor({ isVisibleLight, pos, parentPos }) {
-  const scanpathTexture = useLoader(TextureLoader, 'https://JuanLorenteGuarnieri.github.io/portfolio/scanpath.png');
+  const scanpathTexture = useLoader(TextureLoader, `${import.meta.env.BASE_URL}scanpath.png`);
 
   const titleTexts = useMemo(() => (
     <>

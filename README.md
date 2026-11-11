@@ -48,7 +48,6 @@ The scene contains dedicated 3D sections for:
 * Interactive 3D contact form
 * EmailJS contact integration
 * Dynamic external statistics
-* GitHub Actions for automated data updates
 * GitHub Pages deployment
 
 ## 3D Architecture
@@ -87,6 +86,8 @@ The portfolio uses a continuous 3D scene where vertical scrolling controls the c
 
 The camera controller also adapts the projection parameters to the viewport size.
 
+Scroll is **not** kept in React state. `src/scrollStore.js` owns a single passive `scroll` listener that notifies subscribers once per animation frame; `Home` moves the camera imperatively and only re-renders the 3D tree when a section's proximity-based visibility actually flips (`src/hooks/useVisibility.js`).
+
 This approach allows the entire portfolio to behave as a spatial walkthrough instead of a sequence of independent pages.
 
 ## Rendering and Performance
@@ -98,6 +99,32 @@ Because the portfolio renders a large number of 3D assets in real time, the appl
 The runtime performance monitor dynamically adjusts the rendering resolution according to measured frame-rate performance.
 
 The device pixel ratio is reduced when performance degrades and increased again when additional rendering capacity is available.
+
+### Scene warm-up (no hitches when something appears for the first time)
+
+three.js uploads geometry and textures and compiles shaders lazily, the first time an object is drawn, and the shader depends on the number of visible lights. Without a warm-up, that work happens in the middle of the scroll. `src/components/SceneWarmUp.jsx` walks the whole scroll range during the intro (one stop per distinct set of visible objects, planned by `src/lib/warmup.js`) and draws a frame at each stop with frustum culling disabled. The scene is revealed when the intro video has ended **and** the warm-up is done.
+
+* Open the site with `?nowarmup` to disable it and compare.
+* In the console, `__sceneStats()` returns the number of shaders, geometries and textures; after the warm-up, scrolling through the whole page should not increase them.
+
+### Render architecture
+
+* The cursor light, the camera and the rotating phone in the contact section are updated imperatively (refs / `useFrame`), never through React state.
+* Sections are wrapped in `React.memo` and receive stable props, so typing in the contact form or moving the mouse does not reconcile the whole scene.
+* All text meshes share one material (`useSharedMat`) and `Text3D` fonts are subsetted (see `tools/`).
+* Assets are fetched through `import.meta.env.BASE_URL`, so the site works on any host/base path.
+
+### Asset pipeline (`tools/`)
+
+```bash
+# Re-scale / re-compress GLB textures (requires Pillow). Review the result visually before replacing the originals.
+python3 tools/optimize_glb.py public/models /tmp/models_opt
+
+# Subset a typeface.json font to the glyphs actually used
+python3 tools/subset_fonts.py full_font.json src/assets/fonts/MyFont.json
+```
+
+Keep new textures at 1024 px or less where possible: GPU memory grows with the square of the texture size.
 
 ### BVH Raycasting
 
@@ -153,21 +180,7 @@ The contact interface is implemented as a dedicated React component rather than 
 
 ## Dynamic Data
 
-The interests section includes dynamically updated information from external services.
-
-The repository also contains Node.js scripts and GitHub Actions workflows used to update generated static data periodically.
-
-```text
-External service
-      ↓
-Update script
-      ↓
-Generated JSON
-      ↓
-GitHub Actions
-      ↓
-Static portfolio
-```
+The interests section shows the number of chess games played (fetched at runtime from the public chess.com API) and a Duolingo streak computed locally from a known date/value (`src/sections/Interests.jsx`). Update `knownStreak` / `knownDate` there to refresh it.
 
 ## Technologies
 
@@ -190,28 +203,29 @@ Static portfolio
 
 * EmailJS
 * GitHub Pages
-* GitHub Actions
 
 ## Repository Structure
 
 ```text
 portfolio/
-├── .github/
-│   └── workflows/        # Automated data update workflows
 ├── public/
 │   └── models/            # 3D models and generated assets
 ├── src/
 │   ├── assets/            # Fonts and visual assets
-│   ├── components/        # Reusable 3D/UI components
+│   ├── components/        # Reusable 3D/UI components (incl. SceneWarmUp)
+│   ├── hooks/             # Contact form, mouse speed, visibility, viewport
+│   ├── lib/               # Pure helpers (visibility, warm-up planner)
+│   ├── models/            # gltfjsx-generated model components
 │   ├── projects/          # 3D representations of portfolio projects
 │   ├── sections/          # Main portfolio sections
 │   ├── App.jsx            # Application root
 │   ├── main.jsx           # React entry point
+│   ├── scrollStore.js     # Shared scroll state (outside React)
 │   └── bvh-setup.tsx      # BVH raycasting integration
+├── tools/                 # Asset optimisation scripts
 ├── index.html
 ├── package.json
-├── vite.config.js
-└── update-streak.mjs
+└── vite.config.js
 ```
 
 ## Development
@@ -244,7 +258,7 @@ npm run preview
 
 The application is deployed as a static site through GitHub Pages.
 
-The repository also contains GitHub Actions workflows used for automated background data updates.
+Deploy with `npm run deploy` (builds and publishes `dist/` to the `gh-pages` branch).
 
 ## Design Goals
 

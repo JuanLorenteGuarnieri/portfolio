@@ -16,7 +16,7 @@ function Bachelor({ isVisibleLight, pos, parentPos }) {
 
   useEffect(() => {
     const video = document.createElement('video');
-    video.src = 'https://JuanLorenteGuarnieri.github.io/portfolio/scanpath.mp4';
+    video.src = `${import.meta.env.BASE_URL}scanpath.mp4`;
     video.loop = true;
     video.muted = true;
     video.playsInline = true;

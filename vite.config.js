@@ -5,6 +5,8 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   base: '/portfolio/',
+  // Una única copia de three (fiber, drei y three-mesh-bvh la comparten): evita instancias duplicadas.
+  resolve: { dedupe: ['three'] },
   build: {
     rollupOptions: {
       output: {

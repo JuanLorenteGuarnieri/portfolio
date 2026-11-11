@@ -17,13 +17,6 @@ const TextAdvance = ({
 
   const sharedMaterial = useSharedMat();
 
-  useEffect(() => {
-    const mesh = textRef.current;
-    if (mesh) {
-      mesh.geometry.computeBoundsTree?.();
-    }
-  }, []);
-
   const textProps = {
     font,
     size,

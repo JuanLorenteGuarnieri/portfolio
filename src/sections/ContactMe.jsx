@@ -1,5 +1,8 @@
+import { useRef } from 'react';
+import { useFrame } from '@react-three/fiber';
 import { Bvh } from '@react-three/drei';
 import * as THREE from 'three';
+import { getScrollY } from '../scrollStore';
 import TextAdvance from '../components/TextAdvance';
 import fontTitle from '../assets/fonts/Encode_Sans_Semi_Expanded/Encode_Sans_Semi_Expanded_Bold.json';
 import fontText from '../assets/fonts/Source_Code_Pro/static/Source_Code_Pro_Regular.json';
@@ -42,10 +45,19 @@ function ContactTitle() {
   );
 }
 
+// El iPhone gira con el scroll. Se actualiza en el bucle de render leyendo el scroll compartido:
+// ya no hace falta re-renderizar React en cada evento de scroll.
+function ScrollRotor({ children, ...props }) {
+  const ref = useRef();
+  useFrame(() => {
+    if (ref.current) ref.current.rotation.z = (getScrollY() * Math.PI) / 1200 + 0.3;
+  });
+  return <group ref={ref} {...props}>{children}</group>;
+}
+
 function ContactMe({
   isVisibleLight,
   pos,
-  scrollValue,
   userName,
   userEmail,
   message,
@@ -142,7 +154,9 @@ function ContactMe({
       <mesh className="Iphone" position={[0, 0, 0]}>
         <Bvh firstHitOnly>
           <Send ref={sendFormRef} scale={20} position={[0.5, -0.08, 4.6]} rotation={[0, 0, 0]} />
-          <Iphone position={[2, 0.68, 3]} rotation={[0, 0, (scrollValue * Math.PI) / 1200 + 0.3]} scale={1.5} />
+          <ScrollRotor position={[2, 0.68, 3]} rotation={[0, 0, 0.3]} scale={1.5}>
+            <Iphone />
+          </ScrollRotor>
         </Bvh>
       </mesh>
     </mesh>

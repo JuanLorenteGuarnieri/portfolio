@@ -19,7 +19,7 @@ export const Slammap = forwardRef<Group, Props>(({ ...props }, ref) => {
   // let count = -1
 
   useEffect(() => {
-    fetch('https://JuanLorenteGuarnieri.github.io/portfolio/euroc.txt')
+    fetch(`${import.meta.env.BASE_URL}euroc.txt`)
       .then(res => res.text())
       .then(text => {
         const lines = text.split('\n').filter(Boolean)
