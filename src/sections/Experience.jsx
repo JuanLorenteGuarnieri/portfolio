@@ -42,7 +42,7 @@ function Experience({ isVisibleLight, pos }) {
       text={"Internship at Graphics \n& Imaging Lab\nUniversity of Zaragoza"}
       font={fontText}
       size={0.16}
-      height={0.05}
+      height={0.03}
       colorPri={"white"}
       colorSec={new THREE.Color(0x223060)}
     />
@@ -55,7 +55,7 @@ function Experience({ isVisibleLight, pos }) {
       text={"\nJan - Jun  2025"}
       font={fontText}
       size={0.16}
-      height={0.05}
+      height={0.03}
       colorPri={"white"}
       colorSec={new THREE.Color(0x223060)}
     />

@@ -82,7 +82,7 @@ export const Drone = forwardRef<Group, RobotProps>(({ parentPos, ...props }, ref
 
   return (
     <group ref={ref} {...props} dispose={null}>
-      <group position={[0, -0.158, 0]} scale={0.1}>
+      <group position={[0, -0.188, 0]} rotation={[0, Math.PI, 0]} scale={0.1}>
         <primitive object={nodes.Root2} />
         <mesh castShadow receiveShadow rotation={[0, 0, 0]} ref={prop1} geometry={nodes.prop_1127.geometry} material={materials.Material_37} position={[-8.698, 5.5, 7.943]} />
         <mesh castShadow receiveShadow rotation={[0, 0.1, 0]} ref={prop2} geometry={nodes.prop_2130.geometry} material={materials.Material_40} position={[-8.77, 5.5, -6.562]} />

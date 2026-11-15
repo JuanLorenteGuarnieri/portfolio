@@ -1,4 +1,4 @@
-import { Bvh, Float } from '@react-three/drei';
+import { Bvh } from '@react-three/drei';
 import * as THREE from 'three';
 import { useEffect, useState } from 'react';
 import TextAdvance from '../components/TextAdvance';
@@ -32,9 +32,8 @@ function InterestModels() {
     <Bvh firstHitOnly>
       <Piano position={[4.8, -0.19, 1.6]} rotation={[0, -Math.PI / 3, 0]} />
       <Chess scale={2.4} position={[-4.5, 0, 4.5]} rotation={[0, 0, 0]} />
-      <Float speed={4} rotationIntensity={0.3} floatIntensity={0.4} floatingRange={[0, 1]}>
-        <RubikCube scale={0.15} position={[-4.8, 0, 1.8]} rotation={[0, Math.PI / 6, 0]} />
-      </Float>
+      {/* La flotación (antes un <Float> de drei) ahora está dentro de RubikCube: se calma al entrar en el modo cubo */}
+      <RubikCube scale={0.15} position={[-4.5, 0, 1.8]} rotation={[0, Math.PI / 6, 0]} />
       <Book scale={0.065} position={[4.7, 0, 4.5]} rotation={[0, -1.7, 0]} />
       <Duolingo position={[-4.2, 0, 6.5]} rotation={[0, 0, 0]} />
     </Bvh>

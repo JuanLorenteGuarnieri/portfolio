@@ -28,6 +28,12 @@ body::-webkit-scrollbar {
 }
 
 
+/* Negro también en <html>: así el fondo no depende de que el de <body> se propague al lienzo
+   y no puede asomar blanco por ningún borde (sobredesplazamiento, redondeos de píxel...). */
+html {
+  background-color: #000000;
+}
+
 body {
   background-color: #000000;
   color: #dce0e6;

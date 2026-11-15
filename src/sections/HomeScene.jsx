@@ -4,6 +4,9 @@ import { Canvas } from '@react-three/fiber';
 import { PerformanceMonitor } from '@react-three/drei';
 
 import CameraController from '../components/CameraController';
+import PianoCameraRig from '../components/PianoCameraRig';
+import CubeCameraRig from '../components/CubeCameraRig';
+import FocusLight from '../components/FocusLight';
 import SceneWarmUp from '../components/SceneWarmUp';
 import Title from './Title';
 import About from './About';
@@ -78,6 +81,7 @@ const HomeScene = ({
   sceneWarm,
   handlePointerMove,
   onCameraReady,
+  onViewChange,
   warmApi,
   onWarmDone,
   titlePos,
@@ -151,7 +155,10 @@ const HomeScene = ({
           onIncline={() => { setDpr(prev => Math.min(0.8, prev + 0.1)); }}
         />
       )}
-      <CameraController cameraRef={cameraRef} onReady={onCameraReady} />
+      <CameraController cameraRef={cameraRef} onReady={onCameraReady} onViewChange={onViewChange} />
+      <PianoCameraRig />
+      <CubeCameraRig />
+      <FocusLight />
       {warmApi && <SceneWarmUp api={warmApi} onDone={onWarmDone} />}
 
       <AmbientLight />

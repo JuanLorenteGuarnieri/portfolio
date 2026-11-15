@@ -81,12 +81,12 @@ async function runWarmUp({ gl, scene, camera, api, isCancelled }) {
     api.end();
   }
 
-  // const info = gl.info;
-  // // eslint-disable-next-line no-console
-  // console.info(
-  //   `[warm-up] ${stops.length} paradas, ${renders} frames, ${info.programs ? info.programs.length : '?'} shaders, ` +
-  //   `${info.memory.geometries} geometrías, ${info.memory.textures} texturas en ${Math.round(performance.now() - t0)} ms`
-  // );
+  const info = gl.info;
+  // eslint-disable-next-line no-console
+  console.info(
+    `[warm-up] ${stops.length} paradas, ${renders} frames, ${info.programs ? info.programs.length : '?'} shaders, ` +
+    `${info.memory.geometries} geometrías, ${info.memory.textures} texturas en ${Math.round(performance.now() - t0)} ms`
+  );
 }
 
 /**
@@ -103,6 +103,9 @@ export default function SceneWarmUp({ api, onDone }) {
       shaders: gl.info.programs ? gl.info.programs.length : null,
       geometrias: gl.info.memory.geometries,
       texturas: gl.info.memory.textures,
+      // del último frame dibujado: sirven para medir el coste de cada zona del scroll
+      llamadasDeDibujo: gl.info.render.calls,
+      triangulos: gl.info.render.triangles,
     });
     let cancelled = false;
     runWarmUp({ gl, scene, camera, api, isCancelled: () => cancelled })

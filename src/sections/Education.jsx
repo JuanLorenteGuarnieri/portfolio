@@ -41,7 +41,7 @@ function Education({ isVisibleLight, pos }) {
         text={"Computer Science \nUniversity of Zaragoza"}
         font={fontText}
         size={0.16}
-        height={0.05}
+        height={0.03}
         colorPri={"white"}
         colorSec={new THREE.Color(0x223060)}
       />
@@ -51,7 +51,7 @@ function Education({ isVisibleLight, pos }) {
         text={"2020 - 2024"}
         font={fontText}
         size={0.16}
-        height={0.05}
+        height={0.03}
         colorPri={new THREE.Color(0xaaaaaa)}
         colorSec={new THREE.Color(0x223060)}
       />
@@ -66,7 +66,7 @@ function Education({ isVisibleLight, pos }) {
         text={"Master in Robotics, Graphics\n& Computer Vision \nUniversity of Zaragoza"}
         font={fontText}
         size={0.16}
-        height={0.05}
+        height={0.03}
         colorPri={"white"}
         colorSec={new THREE.Color(0x223060)}
       />
@@ -76,7 +76,7 @@ function Education({ isVisibleLight, pos }) {
         text={"2024 - 2026"}
         font={fontText}
         size={0.16}
-        height={0.05}
+        height={0.03}
         colorPri={new THREE.Color(0xaaaaaa)}
         colorSec={new THREE.Color(0x223060)}
       />

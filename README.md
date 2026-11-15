@@ -107,6 +107,10 @@ three.js uploads geometry and textures and compiles shaders lazily, the first ti
 * Open the site with `?nowarmup` to disable it and compare.
 * In the console, `__sceneStats()` returns the number of shaders, geometries and textures; after the warm-up, scrolling through the whole page should not increase them.
 
+### Adaptive culling distance
+
+Sections, projects and their lights are hidden by distance to the camera. How far the screen reaches depends on the window aspect ratio (R3F fixes `fov` at mount, `zoom` follows every resize), so `src/lib/frustumReach.js` computes, from the real camera, how much farther than a 16:9 reference window it sees and adds that to every hide distance (never subtracts).
+
 ### Render architecture
 
 * The cursor light, the camera and the rotating phone in the contact section are updated imperatively (refs / `useFrame`), never through React state.

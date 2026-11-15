@@ -1,26 +1,23 @@
-import { isVisibleFrom } from './visibility';
-
 /**
  * Calcula en qué posiciones Z de la cámara hay que "parar" para ver, al menos una vez, cada
  * combinación distinta de objetos visibles mientras se recorre todo el scroll.
  *
- * @param entries  comprobaciones registradas: [{ v1: {x,y,z}, dist }]
- * @param camPos   posición actual de la cámara (solo se usan x e y; z recorre el rango)
- * @param zStart   z de la cámara con scroll = 0
- * @param zEnd     z de la cámara con scroll máximo
- * @param step     resolución del barrido (unidades de escena)
- * @returns        [{ z, sig }] un punto (el centro del tramo) por cada combinación distinta
+ * @param entries     comprobaciones registradas: [{ v1: {x,y,z}, dist }]
+ * @param isVisibleAt (entry, z) => boolean: la MISMA regla que usa Home (incluye los márgenes
+ *                    que dependen de la proporción de la ventana)
+ * @param zStart      z de la cámara con scroll = 0
+ * @param zEnd        z de la cámara con scroll máximo
+ * @param step        resolución del barrido (unidades de escena)
+ * @returns           [{ z, sig }] un punto (el centro del tramo) por cada combinación distinta
  */
-export function planWarmupStops(entries, camPos, zStart, zEnd, step = 0.05) {
+export function planWarmupStops(entries, isVisibleAt, zStart, zEnd, step = 0.05) {
   const runs = [];
   let prevSig = null;
-  const cam = { x: camPos.x, y: camPos.y, z: zStart };
 
   for (let z = zStart; z <= zEnd + 1e-9; z += step) {
-    cam.z = z;
     let sig = '';
     for (let i = 0; i < entries.length; i++) {
-      sig += isVisibleFrom(cam, entries[i].v1, entries[i].dist) ? '1' : '0';
+      sig += isVisibleAt(entries[i], z) ? '1' : '0';
     }
     if (sig !== prevSig) {
       runs.push({ sig, from: z, to: z });

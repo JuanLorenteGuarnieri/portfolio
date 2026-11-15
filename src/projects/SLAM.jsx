@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import TextAdvance from '../components/TextAdvance';
 import fontText from '../assets/fonts/Source_Code_Pro/static/Source_Code_Pro_Regular.json';
 import { Bvh } from '@react-three/drei';
@@ -69,15 +69,17 @@ function SLAM({ isVisibleLight, pos, parentPos }) {
 
 
 
+  const slamMapRef = useRef(null);
+
   const slamModel = useMemo(() => (
     (!/Mobi|Android/i.test(navigator.userAgent) ? (
       <>
         <Bvh firstHitOnly>
-          <Slammap position={[-3.2, 0.39, 1.5]} scale={0.48} rotation={[-0.6, Math.PI - 0.35, Math.PI + 0.35]} />
+          <Slammap ref={slamMapRef} position={[-3.2, 0.39, 1.5]} scale={0.48} rotation={[-0.6, Math.PI - 0.35, Math.PI + 0.35]} />
         </Bvh>
-        <Slamcamera position={[-3.2, 0.39, 1.5]} scale={0.48} rotation={[-0.6, Math.PI - 0.35, Math.PI + 0.35]} />
+        <Slamcamera mapRef={slamMapRef} position={[-3.2, 0.39, 1.5]} scale={0.48} rotation={[-0.6, Math.PI - 0.35, Math.PI + 0.35]} />
       </>) : null)
-  ), []);
+  ), [slamMapRef]);
 
   const meshVisible = useMemo(() => isVisibleLight(new THREE.Vector3(0, 5, pos[2] + parentPos[2]), 8), [isVisibleLight, pos, parentPos]);
 

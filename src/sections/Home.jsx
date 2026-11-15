@@ -6,7 +6,12 @@ import MobileCaption from '../components/MobileCaption';
 import VideoPlayer from '../components/VideoPlayer';
 import HomeScene from './HomeScene';
 import CustomCursor from '../components/CustomCursor';
+import PianoOverlay from '../components/PianoOverlay';
+import CubeOverlay from '../components/CubeOverlay';
+import { isFocusBusy, useFocusBusy } from '../lib/focusModes';
+import { isLightFocused, setCursorScreen } from '../lib/lightFocus';
 import { useMouseSpeed } from '../hooks/useMouseSpeed';
+import { setMousePos } from '../lib/mousePosStore';
 import { useViewportOrientation } from '../hooks/useViewportOrientation';
 import { useContactForm } from '../hooks/useContactForm';
 import { subscribeScroll, getScrollY, scrollToCameraZ } from '../scrollStore';
@@ -90,7 +95,7 @@ const Home = ({ maxY, changeScroll }) => {
   } = useContactForm();
 
   // Visibilidad por proximidad a la cámara (ver hooks/useVisibility.js)
-  const { isVisibleLight, syncVisibility, bumpVisibility, waitUntilRendered, registry: visRegistry } = useVisibility(cameraRef);
+  const { isVisibleLight, isVisibleAtZ, syncVisibility, bumpVisibility, setMargins, waitUntilRendered, registry: visRegistry } = useVisibility(cameraRef);
   const warmingRef = useRef(false);
 
   const handleCameraReady = useCallback(() => { bumpVisibility(); }, [bumpVisibility]);
@@ -102,6 +107,7 @@ const Home = ({ maxY, changeScroll }) => {
     const cam = cameraRef.current;
     if (!cam) return;
 
+    setCursorScreen(x, y); // FocusLight lo usa para saber dónde estaría la luz si siguiera al cursor
     mouseNDC.x = (x / window.innerWidth) * 2 - 1;
     mouseNDC.y = -(y / window.innerHeight) * 2 + 1;
 
@@ -115,7 +121,9 @@ const Home = ({ maxY, changeScroll }) => {
     if (t < 0) return; // Solo intersecciones delante de la cámara
 
     hitPoint.copy(direction).multiplyScalar(t).add(origin);
-    if (lightRef.current) lightRef.current.position.set(hitPoint.x, 0.4, hitPoint.z);
+    setMousePos(hitPoint.x, hitPoint.z); // habilidades lo leen para repelerse del ratón
+    // En modo piano / modo cubo la luz está quieta sobre el objeto (ver components/FocusLight.jsx)
+    if (lightRef.current && !isLightFocused()) lightRef.current.position.set(hitPoint.x, 0.4, hitPoint.z);
   }, []);
 
   // La resolución del mapa de sombras baja cuando el ratón se mueve rápido
@@ -158,7 +166,8 @@ const Home = ({ maxY, changeScroll }) => {
 
   const applyScroll = useCallback((y) => {
     const cam = cameraRef.current;
-    if (!cam || warmingRef.current) return;
+    // En modo piano / cubo la cámara la mueve su rig (FocusCameraRig) y el scroll está bloqueado
+    if (!cam || warmingRef.current || isFocusBusy()) return;
 
     // 1) Cámara (antes: setState en App + useEffect en CameraController)
     cam.position.z = scrollToCameraZ(y);
@@ -185,7 +194,7 @@ const Home = ({ maxY, changeScroll }) => {
       const cam = cameraRef.current;
       if (!cam) return [];
       const entries = Array.from(visRegistry.current.values());
-      return planWarmupStops(entries, cam.position, scrollToCameraZ(0), scrollToCameraZ(maxY));
+      return planWarmupStops(entries, isVisibleAtZ, scrollToCameraZ(0), scrollToCameraZ(maxY));
     },
     begin() {
       warmingRef.current = true;
@@ -202,7 +211,7 @@ const Home = ({ maxY, changeScroll }) => {
       warmingRef.current = false;
       applyScroll(getScrollY()); // vuelve a la posición real del scroll
     },
-  }), [maxY, syncVisibility, waitUntilRendered, applyScroll, visRegistry]);
+  }), [maxY, syncVisibility, waitUntilRendered, applyScroll, visRegistry, isVisibleAtZ]);
 
   // ---------------------------------------------------------------------------
   // INTRO: la escena se muestra cuando ha terminado el vídeo Y el precalentamiento
@@ -292,6 +301,7 @@ const Home = ({ maxY, changeScroll }) => {
   }, [userName, userEmail, message, isAnimationDone]);
 
   const { isPhoneVertical, isMobileDevice } = useViewportOrientation();
+  const focusBusy = useFocusBusy();
   const showCursor = !isMobileDevice();
 
   const enableShadows = !isMobileDevice();
@@ -400,6 +410,7 @@ const Home = ({ maxY, changeScroll }) => {
           sceneWarm={sceneWarm}
           handlePointerMove={handlePointerMove}
           onCameraReady={handleCameraReady}
+          onViewChange={setMargins}
           warmApi={WARMUP_ENABLED ? warmApi : null}
           onWarmDone={handleWarmDone}
           titlePos={titlePos}
@@ -474,7 +485,9 @@ const Home = ({ maxY, changeScroll }) => {
         <Navigation secPos={SEC_POS} action={changeScroll}
           scrollValue={navIdx >= 0 ? SEC_SCROLL[navIdx] : Number.NEGATIVE_INFINITY}
           action2={changeContentLoaded}
-          cond={!isPhoneVertical && isAnimationDone} />
+          cond={!isPhoneVertical && isAnimationDone && !focusBusy} />
+        <PianoOverlay />
+        <CubeOverlay />
       </section >
     </>
   );

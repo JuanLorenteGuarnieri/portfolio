@@ -47,7 +47,7 @@ function About({ isVisibleLight, pos }) {
       text={aboutText}
       font={fontText}
       size={0.16}
-      height={0.1}
+      height={0.08}
       colorPri="white"
       colorSec={colorLight}
     />

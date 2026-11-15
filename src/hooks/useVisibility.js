@@ -21,6 +21,9 @@ export function useVisibility(cameraRef) {
   const renderedVersionRef = useRef(0);  // versión con la que se ha renderizado el árbol por última vez
   renderedVersionRef.current = visVersion;
   const registry = useRef(new Map());
+  // Márgenes extra (unidades) que se suman a `dist` (delante) y al margen de 3 (detrás) según la
+  // proporción de la ventana. Los fija CameraController en cada resize (ver lib/frustumReach.js).
+  const marginsRef = useRef({ ahead: 0, behind: 0 });
 
   const bumpVisibility = useCallback(() => {
     visVersionRef.current += 1;
@@ -29,7 +32,16 @@ export function useVisibility(cameraRef) {
 
   const computeVisible = useCallback((v1, dist) => {
     const cam = cameraRef.current;
-    return cam ? isVisibleFrom(cam.position, v1, dist) : false;
+    if (!cam) return false;
+    const m = marginsRef.current;
+    return isVisibleFrom(cam.position, v1, dist + m.ahead, 3 + m.behind);
+  }, [cameraRef]);
+
+  // Misma regla, pero para una Z de cámara arbitraria (la usa el planificador del precalentamiento)
+  const isVisibleAtZ = useCallback((entry, z) => {
+    const cam = cameraRef.current;
+    const m = marginsRef.current;
+    return isVisibleFrom({ x: cam.position.x, y: cam.position.y, z }, entry.v1, entry.dist + m.ahead, 3 + m.behind);
   }, [cameraRef]);
 
   // Su identidad cambia con visVersion a propósito: los useMemo de las secciones que la
@@ -62,6 +74,14 @@ export function useVisibility(cameraRef) {
     return changed;
   }, [computeVisible, bumpVisibility]);
 
+  // Cambia los márgenes (p. ej. al redimensionar la ventana) y aplica el resultado al momento.
+  const setMargins = useCallback((margins) => {
+    const m = marginsRef.current;
+    if (Math.abs(m.ahead - margins.ahead) < 1e-3 && Math.abs(m.behind - margins.behind) < 1e-3) return;
+    marginsRef.current = { ahead: margins.ahead, behind: margins.behind };
+    syncVisibility();
+  }, [syncVisibility]);
+
   // Espera (máx. ≈ 0,7 s) a que React haya re-renderizado las comprobaciones que cambiaron.
   const waitUntilRendered = useCallback(async (changed) => {
     const target = visVersionRef.current;
@@ -72,5 +92,5 @@ export function useVisibility(cameraRef) {
     return false;
   }, []);
 
-  return { isVisibleLight, syncVisibility, bumpVisibility, waitUntilRendered, registry };
+  return { isVisibleLight, isVisibleAtZ, syncVisibility, bumpVisibility, setMargins, waitUntilRendered, registry };
 }

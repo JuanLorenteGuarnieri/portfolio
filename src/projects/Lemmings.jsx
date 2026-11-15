@@ -80,7 +80,9 @@ function Lemmings({ isVisibleLight, pos, parentPos }) {
   // Memoriza el Lemming model
   const LemmingModel = useMemo(() => (
     <Bvh firstHitOnly>
-      <Lemming position={[-3.9, 0.0, 2.2]} scale={0.08} />
+      {/* position = centro de los pies; scale = tamaño de un píxel (0.04, la mitad que antes). El punto es
+          el mismo donde estaba el lemming: antes (-3.9, 2.2) con escala 0.08 -> centro (-3.1, 1.8). */}
+      <Lemming position={[-2.1, 0.0, 1.8]} scale={0.05} />
     </Bvh>
   ), []);
 
